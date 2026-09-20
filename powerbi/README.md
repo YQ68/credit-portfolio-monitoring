@@ -101,25 +101,25 @@ Cài hai CLI một lần:
 npm install -g @microsoft/powerbi-report-authoring-cli@latest @microsoft/powerbi-desktop-bridge-cli@latest
 ```
 
-## Vì sao mở Desktop xong git lại hiện diff
+## Lần chuyển đổi đầu tiên của Desktop
 
-Mở file bằng Power BI Desktop là Desktop sẽ ghi lại file theo dạng chuẩn của nó.
-Hai thay đổi luôn xuất hiện, cả hai đều vô hại:
+Khi Desktop mở một PBIP **vừa sinh ra từ script lần đầu**, nó chuyển đổi rồi ghi
+lại file theo dạng chuẩn của nó: thêm `lineageTag` (một GUID định danh nội bộ) cho
+mọi bảng, cột và measure trong TMDL, và nâng URL `$schema` của PBIR.
 
-1. **Thêm `lineageTag`** (một GUID) cho mọi bảng, cột và measure trong TMDL.
-   Đây là định danh nội bộ của model. Generator cố tình không sinh chúng, Desktop
-   tự gán ở lần lưu đầu. Bản trong repo đã có sẵn tag; chạy lại
-   `build_pbip_model.py` sẽ xoá đi và Desktop gán lại bộ mới ở lần mở kế tiếp.
+Bản trong repo **đã qua bước đó**, nên mở lên không sinh thêm diff nào. Đã kiểm:
+mở Desktop từ trạng thái đã commit, `git status` trả về 0 file thay đổi.
 
-2. **Nâng URL `$schema` của PBIR.** Desktop 2.157 ghi `visualContainer/2.12.0`,
-   `report/3.4.0`, `page/2.3.1`. Generator cố tình giữ `2.9.0`, `3.3.0`, `2.1.0`
-   vì ba bản mới **chưa được Microsoft publish** (tải về HTTP 404), nên
-   `powerbi-report-author` không lấy được schema và **bỏ qua hẳn lớp kiểm JSON
-   Schema**. Giữ bản cũ để còn lớp kiểm đó, chính nó đã bắt được lỗi thiếu
-   `reportVersionAtImport` khi dựng project này.
+Bạn chỉ gặp lại chuyện này sau khi chạy lại `build_pbip_model.py`, vì generator cố
+tình không sinh `lineageTag` (đúng khuyến nghị của Microsoft: để engine tự gán ở
+lần lưu đầu). Khi đó mở Desktop một lần rồi commit phần chuẩn hoá là xong.
 
-Diff loại này commit hay bỏ (`git checkout -- powerbi/`) đều được, không ảnh hưởng
-tới nội dung báo cáo.
+Riêng URL `$schema`, generator cố tình giữ `visualContainer/2.9.0`, `report/3.3.0`,
+`page/2.1.0` thay vì bản mới hơn mà Desktop 2.157 dùng (`2.12.0`, `3.4.0`, `2.3.1`).
+Lý do: ba bản mới **chưa được Microsoft publish**, tải về trả HTTP 404, nên
+`powerbi-report-author` không lấy được schema và **bỏ qua hẳn lớp kiểm JSON Schema**.
+Giữ bản cũ để còn lớp kiểm đó, chính nó đã bắt được lỗi thiếu `reportVersionAtImport`
+khi dựng project này.
 
 ## Chụp lại ảnh các trang
 
