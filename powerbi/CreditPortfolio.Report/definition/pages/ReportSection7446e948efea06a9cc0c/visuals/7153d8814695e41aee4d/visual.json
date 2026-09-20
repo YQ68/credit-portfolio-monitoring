@@ -21,7 +21,7 @@
                   {
                     "value": "2. Kênh bán: tăng trưởng và rủi ro",
                     "textStyle": {
-                      "fontSize": 16,
+                      "fontSize": "16pt",
                       "fontWeight": "bold",
                       "color": "#0b0b0b"
                     }
@@ -29,7 +29,7 @@
                   {
                     "value": "   So sánh BẮT BUỘC kiểm soát cơ cấu sản phẩm (M08, M12)",
                     "textStyle": {
-                      "fontSize": 10,
+                      "fontSize": "10pt",
                       "color": "#898781"
                     }
                   }

@@ -1,96 +1,116 @@
 /// Phễu duyệt hồ sơ theo kênh (M12). Grain: kênh x sản phẩm x loại khách x nhóm lãi suất.
 table Funnel
+	lineageTag: b99a09b4-8fea-433d-8b31-4fbda6a94fd0
 
 	/// Số hồ sơ nộp vào.
-	measure 'Applications' = SUM(Funnel[n_applications])
+	measure Applications = SUM(Funnel[n_applications])
 		formatString: #,##0
+		lineageTag: ff98fcc5-8e68-4927-b043-0cbc734e4844
 
 	/// Số hồ sơ đã có quyết định: duyệt, duyệt nhưng khách không dùng, hoặc từ chối.
 	/// Đây là mẫu số của Approval Rate.
-	measure 'Decided' = SUM(Funnel[n_decided])
+	measure Decided = SUM(Funnel[n_decided])
 		formatString: #,##0
+		lineageTag: 5e15ce10-193e-4876-9f65-8e7e208d280c
 
 	/// Số hồ sơ được duyệt, tính cả trường hợp khách không nhận tiền.
-	measure 'Offered' = SUM(Funnel[n_offered])
+	measure Offered = SUM(Funnel[n_offered])
 		formatString: #,##0
+		lineageTag: 4f4debe0-6643-4cb3-86fe-4e42d884a3c0
 
 	/// M12. Tỷ lệ duyệt = (duyệt + duyệt nhưng không dùng) / đã có quyết định.
 	/// Cộng tử và mẫu trước rồi mới chia, không lấy trung bình cột approval_rate.
 	measure 'Approval Rate' = DIVIDE([Offered], [Decided])
 		formatString: 0.0%
+		lineageTag: 2c0a31b0-2e2d-41d7-af45-c9e06d6282fb
 
 	/// M12. Trong số hồ sơ được duyệt, bao nhiêu phần trăm khách thật sự nhận tiền.
 	measure 'Take-up Rate' = DIVIDE(SUM(Funnel[n_approved]), [Offered])
 		formatString: 0.0%
+		lineageTag: faedba0a-be3c-4a74-9600-a9b9365b15e9
 
 	/// Tổng hạn mức đã duyệt. Visual tự chọn đơn vị hiển thị.
 	measure 'Credit Approved' = SUM(Funnel[credit_amount_approved_total])
 		formatString: #,##0
+		lineageTag: 6c0e5fb1-e490-4f6b-8c04-206ac2ba6623
 
 	/// Kênh bán đã gom nhóm. ẨN: slicer dùng Dim Channel[Kênh].
 	column channel_type
 		dataType: string
 		isHidden
+		lineageTag: aa9e1f63-46c6-4c61-929e-c29feee6ded4
 		sourceColumn: channel_type
 
 	/// Loại sản phẩm. ẨN: slicer dùng Dim Product[Sản phẩm].
 	column contract_type
 		dataType: string
 		isHidden
+		lineageTag: 5555fe2f-247a-40c5-9dda-d5f8b6d65789
 		sourceColumn: contract_type
 
 	/// Khách mới hay khách cũ.
 	column client_type
 		dataType: string
+		lineageTag: f0084764-5054-4a2a-b649-32f4f4ececc4
 		sourceColumn: client_type
 
 	/// Nhóm lãi suất do Home Credit gán.
 	column yield_group
 		dataType: string
+		lineageTag: 24a99021-3518-4138-9181-be1f78c61103
 		sourceColumn: yield_group
 
 	column n_applications
 		dataType: int64
+		lineageTag: f74d6468-1f09-4987-b2fa-677464310e26
 		summarizeBy: sum
 		sourceColumn: n_applications
 
 	column n_approved
 		dataType: int64
+		lineageTag: ca9af36e-2dcc-45d1-b32c-2f2e9789f4c1
 		summarizeBy: sum
 		sourceColumn: n_approved
 
 	column n_unused_offer
 		dataType: int64
+		lineageTag: db1948a0-1a31-4bba-a736-72138fcdcd33
 		summarizeBy: sum
 		sourceColumn: n_unused_offer
 
 	column n_refused
 		dataType: int64
+		lineageTag: cc4e4e5b-67eb-4515-8d55-37ef82d56202
 		summarizeBy: sum
 		sourceColumn: n_refused
 
 	column n_canceled
 		dataType: int64
+		lineageTag: 3bdbc931-e626-4699-981f-d1350dd5c299
 		summarizeBy: sum
 		sourceColumn: n_canceled
 
 	column credit_amount_approved_total
 		dataType: double
+		lineageTag: 23fb7fc3-aa56-4424-9577-78e829b45077
 		summarizeBy: sum
 		sourceColumn: credit_amount_approved_total
 
 	column credit_amount_approved_median
 		dataType: double
+		lineageTag: 8ffac509-d939-47b2-9ede-dc80e2b43366
 		summarizeBy: none
 		sourceColumn: credit_amount_approved_median
 
 	column n_offered
 		dataType: int64
+		lineageTag: 263209fc-7e87-4593-8ac1-1856cd607f61
 		summarizeBy: sum
 		sourceColumn: n_offered
 
 	column n_decided
 		dataType: int64
+		lineageTag: 77335f94-74de-41ce-aef5-304b12806914
 		summarizeBy: sum
 		sourceColumn: n_decided
 
@@ -98,6 +118,7 @@ table Funnel
 	column approval_rate
 		dataType: double
 		isHidden
+		lineageTag: f0dc9b3f-54c0-4aa4-ac60-046b8b257df6
 		summarizeBy: none
 		sourceColumn: approval_rate
 
@@ -105,19 +126,21 @@ table Funnel
 	column take_up_rate
 		dataType: double
 		isHidden
+		lineageTag: 2766863e-4ffc-44ff-ad47-2550b6a86b68
 		summarizeBy: none
 		sourceColumn: take_up_rate
 
 	partition Funnel = m
 		mode: import
 		source =
-			let
-				// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
-				#"Đã đọc file CSV" = Csv.Document(
-					File.Contents(DataFolder & "\mart_funnel_by_channel.csv"),
-					[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
-				),
-				#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
-				#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"channel_type", type text}, {"contract_type", type text}, {"client_type", type text}, {"yield_group", type text}, {"n_applications", Int64.Type}, {"n_approved", Int64.Type}, {"n_unused_offer", Int64.Type}, {"n_refused", Int64.Type}, {"n_canceled", Int64.Type}, {"credit_amount_approved_total", type number}, {"credit_amount_approved_median", type number}, {"n_offered", Int64.Type}, {"n_decided", Int64.Type}, {"approval_rate", type number}, {"take_up_rate", type number}})
-			in
-				#"Đã ép kiểu dữ liệu từng cột"
+				let
+					// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
+					#"Đã đọc file CSV" = Csv.Document(
+						File.Contents(DataFolder & "\mart_funnel_by_channel.csv"),
+						[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+					),
+					#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
+					#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"channel_type", type text}, {"contract_type", type text}, {"client_type", type text}, {"yield_group", type text}, {"n_applications", Int64.Type}, {"n_approved", Int64.Type}, {"n_unused_offer", Int64.Type}, {"n_refused", Int64.Type}, {"n_canceled", Int64.Type}, {"credit_amount_approved_total", type number}, {"credit_amount_approved_median", type number}, {"n_offered", Int64.Type}, {"n_decided", Int64.Type}, {"approval_rate", type number}, {"take_up_rate", type number}})
+				in
+					#"Đã ép kiểu dữ liệu từng cột"
+

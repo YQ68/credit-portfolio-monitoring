@@ -34,7 +34,7 @@ Cần Power BI Desktop (bản miễn phí là đủ, không cần Pro hay Fabric
 
 ## Nội dung
 
-Semantic model: 7 bảng (5 fact, 2 danh mục), 10 quan hệ, 26 measure.
+Semantic model: 7 bảng (5 fact, 2 danh mục), 10 quan hệ, 27 measure.
 
 | Bảng | Nguồn CSV | Trả lời |
 |---|---|---|
@@ -100,6 +100,26 @@ Cài hai CLI một lần:
 ```powershell
 npm install -g @microsoft/powerbi-report-authoring-cli@latest @microsoft/powerbi-desktop-bridge-cli@latest
 ```
+
+## Vì sao mở Desktop xong git lại hiện diff
+
+Mở file bằng Power BI Desktop là Desktop sẽ ghi lại file theo dạng chuẩn của nó.
+Hai thay đổi luôn xuất hiện, cả hai đều vô hại:
+
+1. **Thêm `lineageTag`** (một GUID) cho mọi bảng, cột và measure trong TMDL.
+   Đây là định danh nội bộ của model. Generator cố tình không sinh chúng, Desktop
+   tự gán ở lần lưu đầu. Bản trong repo đã có sẵn tag; chạy lại
+   `build_pbip_model.py` sẽ xoá đi và Desktop gán lại bộ mới ở lần mở kế tiếp.
+
+2. **Nâng URL `$schema` của PBIR.** Desktop 2.157 ghi `visualContainer/2.12.0`,
+   `report/3.4.0`, `page/2.3.1`. Generator cố tình giữ `2.9.0`, `3.3.0`, `2.1.0`
+   vì ba bản mới **chưa được Microsoft publish** (tải về HTTP 404), nên
+   `powerbi-report-author` không lấy được schema và **bỏ qua hẳn lớp kiểm JSON
+   Schema**. Giữ bản cũ để còn lớp kiểm đó, chính nó đã bắt được lỗi thiếu
+   `reportVersionAtImport` khi dựng project này.
+
+Diff loại này commit hay bỏ (`git checkout -- powerbi/`) đều được, không ảnh hưởng
+tới nội dung báo cáo.
 
 ## Chụp lại ảnh các trang
 

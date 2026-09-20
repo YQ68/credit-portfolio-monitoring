@@ -21,7 +21,7 @@
                   {
                     "value": "4. Chuyển nhóm và thu hồi",
                     "textStyle": {
-                      "fontSize": 16,
+                      "fontSize": "16pt",
                       "fontWeight": "bold",
                       "color": "#0b0b0b"
                     }
@@ -29,7 +29,7 @@
                   {
                     "value": "   Ma trận roll rate giữa hai tháng liền kề (M09, M10)",
                     "textStyle": {
-                      "fontSize": 10,
+                      "fontSize": "10pt",
                       "color": "#898781"
                     }
                   }

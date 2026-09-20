@@ -17,6 +17,14 @@ SCHEMA_PLAT = "https://developer.microsoft.com/json-schemas/fabric/gitIntegratio
 
 THEME_NAME = "CreditPortfolio-7c1a9e3b.json"
 
+# Phiên bản schema PBIR: cố tình dùng bản Microsoft ĐÃ PUBLISH, không dùng bản mà
+# Power BI Desktop 2.157 tự ghi ra (visualContainer 2.12.0, report 3.4.0, page 2.3.1).
+# Bản mới hơn trả về HTTP 404 trên developer.microsoft.com, nên powerbi-report-author
+# không tải được và BỎ QUA hẳn lớp kiểm JSON Schema. Giữ bản cũ để còn lớp kiểm đó
+# (chính nó đã bắt được lỗi thiếu reportVersionAtImport khi dựng project này).
+# Hệ quả: mỗi lần mở Desktop, nó nâng URL schema lên và git hiện diff. Diff đó vô hại,
+# commit hay bỏ đều được.
+
 def jw(path, obj):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(obj, indent=2, ensure_ascii=False), encoding="utf-8", newline="\n")
@@ -94,7 +102,8 @@ def card(page, key, table, measure, label, x, y, w, h, z):
 
 
 def run(text, size=11, bold=False, color=None, italic=False):
-    st = {"fontSize": size}
+    # Desktop ghi fontSize của textbox dạng chuỗi có đơn vị ("16pt"), không phải số
+    st = {"fontSize": "%dpt" % size}
     if bold: st["fontWeight"] = "bold"
     if italic: st["fontStyle"] = "italic"
     if color: st["color"] = color
@@ -243,7 +252,8 @@ jw(DEF / "report.json", {
     "themeCollection": {"customTheme": {"name": THEME_NAME, "reportVersionAtImport": {"visual": "2.9.0", "report": "3.3.0", "page": "2.1.0"}, "type": "RegisteredResources"}},
     "resourcePackages": [{"name": "RegisteredResources", "type": "RegisteredResources",
         "items": [{"name": THEME_NAME, "path": THEME_NAME, "type": "CustomTheme"}]}],
-    "settings": {"useStylableVisualContainerHeader": True, "defaultFilterActionIsDataFilter": True}})
+    "settings": {"useStylableVisualContainerHeader": True, "defaultFilterActionIsDataFilter": True,
+                 "useEnhancedTooltips": False}})
 
 jw(RPT / "definition.pbir", {"$schema": SCHEMA_PBIR, "version": "4.0",
     "datasetReference": {"byPath": {"path": "../CreditPortfolio.SemanticModel"}}})

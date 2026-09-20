@@ -21,7 +21,7 @@
                   {
                     "value": "1. Tổng quan danh mục",
                     "textStyle": {
-                      "fontSize": 16,
+                      "fontSize": "16pt",
                       "fontWeight": "bold",
                       "color": "#0b0b0b"
                     }
@@ -29,7 +29,7 @@
                   {
                     "value": "   Ảnh chụp tại tháng quan sát gần nhất (M02, M06)",
                     "textStyle": {
-                      "fontSize": 10,
+                      "fontSize": "10pt",
                       "color": "#898781"
                     }
                   }

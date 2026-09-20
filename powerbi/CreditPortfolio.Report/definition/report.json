@@ -26,6 +26,7 @@
   ],
   "settings": {
     "useStylableVisualContainerHeader": true,
-    "defaultFilterActionIsDataFilter": true
+    "defaultFilterActionIsDataFilter": true,
+    "useEnhancedTooltips": false
   }
 }

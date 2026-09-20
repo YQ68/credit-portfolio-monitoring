@@ -1,0 +1,4 @@
+# Mọi file sinh ra bằng script đều ghi LF. Chuẩn hoá để git không cảnh báo
+# "LF will be replaced by CRLF" trên mỗi lần add ở Windows.
+* text=auto eol=lf
+*.png binary

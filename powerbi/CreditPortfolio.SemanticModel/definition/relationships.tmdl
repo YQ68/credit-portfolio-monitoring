@@ -37,3 +37,4 @@ relationship 'Dim Channel to Snapshot'
 relationship 'Dim Product to Snapshot'
 	fromColumn: Snapshot.contract_type
 	toColumn: 'Dim Product'.'Sản phẩm'
+

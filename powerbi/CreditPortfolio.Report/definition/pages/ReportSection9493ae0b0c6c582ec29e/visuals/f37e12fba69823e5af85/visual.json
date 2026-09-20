@@ -21,7 +21,7 @@
                   {
                     "value": "⚠ ",
                     "textStyle": {
-                      "fontSize": 11,
+                      "fontSize": "11pt",
                       "fontWeight": "bold",
                       "color": "#eda100"
                     }
@@ -29,7 +29,7 @@
                   {
                     "value": "Mẫu số vintage đã loại hợp đồng có cờ dim_loan.is_partial_history. Đường cong duỗi dần ở MOB cao vì số hợp đồng quan sát đủ giảm đi, không phải vì rủi ro dừng lại. Đọc kèm cột Vintage Loans MOB12 để biết mẫu số.",
                     "textStyle": {
-                      "fontSize": 10,
+                      "fontSize": "10pt",
                       "color": "#52514e"
                     }
                   }

@@ -1,2 +1,3 @@
-database CreditPortfolio
-	compatibilityLevel: 1550
+database
+	compatibilityLevel: 1606
+
