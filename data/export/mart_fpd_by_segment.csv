@@ -1,0 +1,178 @@
+contract_type,channel_type,client_type,yield_group,n_loans,n_fpd30,fpd30_rate,n_fpd30_late_rule,fpd30_late_rule_rate,n_approved_no_installment
+Consumer loans,Stone,Repeater,high,22904,4,0.00017464198393293747,32,0.0013971358714634998,446
+Consumer loans,Country-wide,Repeater,high,66578,11,0.00016521974225720208,63,0.0009462585238367028,3328
+Consumer loans,Country-wide,New,high,64366,7,0.00010875306839014387,69,0.0010719945312742752,345
+Cash loans,Credit and cash offices,Refreshed,high,3827,0,0.0,2,0.0005226025607525476,170
+Cash loans,Stone,Repeater,low_action,62,0,0.0,0,0.0,4
+Consumer loans,Country-wide,Unknown,high,18,0,0.0,0,0.0,14
+Cash loans,Stone,Refreshed,high,35,0,0.0,0,0.0,1
+Consumer loans,Regional / Local,Unknown,middle,21,0,0.0,0,0.0,6
+Cash loans,Credit and cash offices,Unknown,high,4,0,0.0,0,0.0,1
+Cash loans,AP+ (Cash loan),Unknown,middle,3,0,0.0,0,0.0,1
+Cash loans,Contact center,Unknown,low_normal,2,0,0.0,0,0.0,1
+Cash loans,Country-wide,Refreshed,low_action,14,0,0.0,0,0.0,0
+Cash loans,Country-wide,New,low_action,4,0,0.0,0,0.0,0
+Cash loans,Regional / Local,Refreshed,low_action,2,0,0.0,0,0.0,0
+Consumer loans,Country-wide,Repeater,middle,44381,3,6.759649399517812e-05,17,0.00038304679930600935,2884
+Consumer loans,Regional / Local,Repeater,low_action,6979,1,0.0001432870038687491,0,0.0,289
+Consumer loans,Country-wide,New,middle,31634,1,3.1611557185306946e-05,17,0.0005373964721502181,307
+Consumer loans,Stone,Repeater,middle,31945,6,0.00018782282047268744,13,0.0004069494443574894,1125
+Consumer loans,Stone,New,low_action,3066,0,0.0,1,0.00032615786040443573,29
+Cash loans,Credit and cash offices,Refreshed,middle,9743,0,0.0,3,0.0003079133737041979,484
+Consumer loans,Regional / Local,Refreshed,low_action,1626,0,0.0,0,0.0,69
+Cash loans,AP+ (Cash loan),Repeater,low_normal,4700,0,0.0,1,0.0002127659574468085,288
+Consumer loans,Country-wide,Refreshed,low_action,3996,0,0.0,0,0.0,227
+Cash loans,Contact center,Repeater,low_normal,3986,2,0.0005017561465127947,0,0.0,1113
+Cash loans,Contact center,Refreshed,low_normal,622,1,0.001607717041800643,0,0.0,158
+Cash loans,AP+ (Cash loan),Refreshed,low_action,59,0,0.0,0,0.0,6
+Cash loans,Credit and cash offices,Unknown,middle,30,0,0.0,0,0.0,18
+Cash loans,Stone,Refreshed,middle,109,0,0.0,0,0.0,9
+Cash loans,Contact center,New,low_normal,19,0,0.0,0,0.0,2
+Consumer loans,Country-wide,Unknown,middle,70,0,0.0,0,0.0,30
+Cash loans,Stone,New,low_action,2,0,0.0,0,0.0,1
+Consumer loans,Regional / Local,Unknown,high,2,0,0.0,0,0.0,1
+Cash loans,Contact center,Repeater,high,1568,0,0.0,1,0.0006377551020408163,689
+Cash loans,AP+ (Cash loan),Repeater,high,3792,0,0.0,7,0.0018459915611814346,230
+Consumer loans,Stone,Refreshed,low_action,872,0,0.0,0,0.0,32
+Consumer loans,Regional / Local,New,low_action,5369,0,0.0,3,0.0005587632706276774,55
+Cash loans,Credit and cash offices,Repeater,low_action,5712,0,0.0,0,0.0,808
+Cash loans,Credit and cash offices,New,low_action,298,0,0.0,0,0.0,4
+Cash loans,Country-wide,Repeater,low_action,130,0,0.0,0,0.0,13
+Cash loans,Khác,Refreshed,low_action,27,0,0.0,0,0.0,4
+Cash loans,Contact center,Refreshed,high,230,0,0.0,0,0.0,55
+Cash loans,Khác,New,low_action,93,0,0.0,0,0.0,6
+Cash loans,Regional / Local,Repeater,low_action,55,0,0.0,0,0.0,4
+Cash loans,Contact center,New,high,250,0,0.0,0,0.0,21
+Consumer loans,Regional / Local,Unknown,low_normal,16,1,0.0625,0,0.0,6
+Cash loans,Contact center,Unknown,middle,4,0,0.0,0,0.0,2
+Consumer loans,Stone,Unknown,low_action,4,0,0.0,0,0.0,1
+Cash loans,AP+ (Cash loan),New,low_action,48,0,0.0,0,0.0,0
+Cash loans,AP+ (Cash loan),Unknown,low_normal,1,0,0.0,0,0.0,0
+Cash loans,Credit and cash offices,Repeater,low_normal,52128,15,0.0002877532228360958,6,0.00011510128913443831,5466
+Consumer loans,Regional / Local,New,low_normal,9396,0,0.0,5,0.0005321413367390379,83
+Consumer loans,Stone,Refreshed,low_normal,5788,0,0.0,4,0.000691085003455425,205
+Consumer loans,Country-wide,Refreshed,high,10595,2,0.00018876828692779613,9,0.0008494572911750826,536
+Consumer loans,Stone,New,high,23679,1,4.223151315511635e-05,26,0.001098019342033025,99
+Consumer loans,Regional / Local,Repeater,high,8251,4,0.0004847897224578839,9,0.0010907768755302387,237
+Cash loans,AP+ (Cash loan),Refreshed,high,598,0,0.0,1,0.0016722408026755853,31
+Cash loans,Regional / Local,Repeater,low_normal,505,0,0.0,0,0.0,36
+Cash loans,Credit and cash offices,New,low_normal,1225,0,0.0,1,0.0008163265306122449,36
+Cash loans,Khác,New,low_normal,492,0,0.0,0,0.0,20
+Cash loans,Stone,Repeater,middle,781,0,0.0,0,0.0,36
+Cash loans,Khác,Refreshed,low_normal,141,0,0.0,0,0.0,21
+Cash loans,Country-wide,New,middle,267,0,0.0,1,0.003745318352059925,12
+Cash loans,Country-wide,Refreshed,middle,979,0,0.0,0,0.0,62
+Cash loans,AP+ (Cash loan),New,low_normal,257,0,0.0,0,0.0,2
+Cash loans,Country-wide,Repeater,low_normal,2053,0,0.0,0,0.0,125
+Consumer loans,Regional / Local,Refreshed,high,1189,0,0.0,0,0.0,36
+Cash loans,Stone,New,high,79,0,0.0,0,0.0,1
+Consumer loans,Stone,Unknown,low_normal,29,0,0.0,0,0.0,8
+Cash loans,Regional / Local,Refreshed,middle,93,0,0.0,0,0.0,10
+Consumer loans,Regional / Local,Unknown,low_action,11,0,0.0,0,0.0,6
+Cash loans,Khác,Unknown,low_action,1,0,0.0,0,0.0,0
+Cash loans,Regional / Local,Unknown,low_normal,1,0,0.0,0,0.0,0
+Consumer loans,Country-wide,New,low_action,15409,2,0.0001297942760724252,7,0.0004542799662534882,172
+Consumer loans,Stone,New,middle,24678,0,0.0,14,0.0005673069130399546,135
+Consumer loans,Country-wide,Refreshed,middle,9470,0,0.0,2,0.00021119324181626187,587
+Consumer loans,Country-wide,Repeater,low_action,18256,1,5.477651183172656e-05,1,5.477651183172656e-05,983
+Cash loans,Country-wide,New,high,1809,0,0.0,2,0.001105583195135434,45
+Consumer loans,Regional / Local,Repeater,middle,16692,0,0.0,7,0.0004193625688952792,814
+Cash loans,Country-wide,Refreshed,high,862,0,0.0,0,0.0,42
+Consumer loans,Regional / Local,Refreshed,middle,3454,0,0.0,3,0.0008685581933989577,146
+Consumer loans,Stone,Repeater,low_action,3394,0,0.0,1,0.0002946375957572186,112
+Cash loans,AP+ (Cash loan),Refreshed,middle,1560,0,0.0,3,0.0019230769230769232,48
+Cash loans,Credit and cash offices,Refreshed,low_action,621,0,0.0,0,0.0,68
+Cash loans,Khác,Repeater,low_normal,564,0,0.0,0,0.0,111
+Cash loans,Stone,Repeater,high,390,0,0.0,0,0.0,19
+Consumer loans,Country-wide,Unknown,low_action,37,0,0.0,0,0.0,10
+Cash loans,Regional / Local,New,low_normal,16,0,0.0,1,0.0625,1
+Consumer loans,Khác,Repeater,low_normal,75,0,0.0,0,0.0,24
+Cash loans,Regional / Local,Refreshed,high,45,0,0.0,0,0.0,6
+Consumer loans,Khác,New,low_normal,101,0,0.0,0,0.0,13
+Cash loans,Stone,New,middle,18,0,0.0,0,0.0,2
+Cash loans,Stone,Refreshed,low_action,10,0,0.0,0,0.0,0
+Cash loans,Credit and cash offices,Unknown,low_action,1,0,0.0,0,0.0,0
+Consumer loans,Khác,Refreshed,low_action,1,0,0.0,0,0.0,0
+(không rõ),(không rõ),(không rõ),(không rõ),4319,3,0.0006946052326927529,9,0.002083815698078259,0
+Cash loans,Credit and cash offices,Repeater,middle,82970,7,8.436784379896348e-05,17,0.00020489333494033989,6462
+Cash loans,Country-wide,Repeater,middle,11147,5,0.0004485511796896026,12,0.0010765228312550462,375
+Consumer loans,Regional / Local,New,middle,11967,0,0.0,2,0.00016712626389237068,90
+Consumer loans,Stone,Refreshed,middle,6443,0,0.0,2,0.0003104144032283098,212
+Cash loans,Regional / Local,Repeater,middle,681,0,0.0,0,0.0,53
+Cash loans,AP+ (Cash loan),New,middle,515,1,0.001941747572815534,0,0.0,5
+Cash loans,Stone,Repeater,low_normal,614,0,0.0,0,0.0,48
+Cash loans,Credit and cash offices,New,middle,2721,0,0.0,2,0.000735023888276369,30
+Cash loans,Regional / Local,Refreshed,low_normal,86,0,0.0,0,0.0,5
+Cash loans,Country-wide,Refreshed,low_normal,310,1,0.0032258064516129032,0,0.0,15
+Consumer loans,Stone,Unknown,middle,36,0,0.0,0,0.0,12
+Cash loans,Khác,Refreshed,middle,15,0,0.0,0,0.0,1
+Cash loans,Khác,New,middle,78,0,0.0,0,0.0,2
+Cash loans,Khác,Repeater,high,7,0,0.0,0,0.0,3
+Cash loans,Regional / Local,New,high,46,0,0.0,2,0.043478260869565216,0
+Cash loans,Country-wide,New,low_normal,20,0,0.0,0,0.0,0
+Cash loans,Contact center,Repeater,low_action,530,0,0.0,0,0.0,96
+Cash loans,Credit and cash offices,Repeater,high,47055,3,6.37551801083838e-05,26,0.0005525448942726597,3657
+Cash loans,Country-wide,Repeater,high,11100,1,9.009009009009009e-05,21,0.0018918918918918919,393
+Consumer loans,Stone,New,low_normal,24552,1,4.072987943955686e-05,18,0.0007331378299120235,116
+Cash loans,Credit and cash offices,New,high,6029,0,0.0,9,0.0014927848731132857,45
+Consumer loans,Regional / Local,Repeater,low_normal,11717,1,8.534607834769993e-05,3,0.0002560382350430998,503
+Consumer loans,Regional / Local,New,high,7634,1,0.00013099292638197538,2,0.00026198585276395077,40
+Cash loans,AP+ (Cash loan),Refreshed,low_normal,969,0,0.0,0,0.0,49
+Consumer loans,Country-wide,Refreshed,low_normal,5573,0,0.0,3,0.0005383097075183922,364
+Consumer loans,Regional / Local,Refreshed,low_normal,2596,0,0.0,0,0.0,94
+Cash loans,Regional / Local,Repeater,high,362,0,0.0,1,0.0027624309392265192,29
+Consumer loans,Stone,Refreshed,high,2578,0,0.0,2,0.0007757951900698216,60
+Cash loans,Khác,Repeater,middle,70,0,0.0,0,0.0,9
+Cash loans,AP+ (Cash loan),New,high,1821,0,0.0,3,0.0016474464579901153,25
+Cash loans,AP+ (Cash loan),Repeater,low_action,442,0,0.0,0,0.0,25
+Cash loans,Khác,Refreshed,high,1,0,0.0,0,0.0,1
+Cash loans,Contact center,Refreshed,low_action,71,0,0.0,0,0.0,15
+Consumer loans,Stone,Unknown,high,3,0,0.0,0,0.0,1
+Cash loans,Khác,New,high,1,0,0.0,0,0.0,0
+Cash loans,Regional / Local,New,middle,14,0,0.0,0,0.0,0
+Cash loans,Stone,New,low_normal,13,0,0.0,0,0.0,0
+Cash loans,Contact center,New,low_action,2,0,0.0,0,0.0,0
+Cash loans,Country-wide,Unknown,middle,2,0,0.0,0,0.0,0
+Consumer loans,Country-wide,New,low_normal,33594,3,8.93016610108948e-05,24,0.0007144132880871584,338
+Consumer loans,Stone,Repeater,low_normal,27920,1,3.581661891117478e-05,8,0.00028653295128939826,988
+Consumer loans,Country-wide,Repeater,low_normal,34460,7,0.00020313406848520023,24,0.0006964596633778294,2210
+Cash loans,AP+ (Cash loan),Repeater,middle,7616,0,0.0,2,0.0002626050420168067,346
+Cash loans,Credit and cash offices,Refreshed,low_normal,6757,1,0.0001479946721918011,0,0.0,474
+Cash loans,Contact center,Repeater,middle,3837,1,0.00026062027625749283,0,0.0,1390
+Cash loans,Contact center,Refreshed,middle,610,0,0.0,0,0.0,171
+Cash loans,Contact center,New,middle,210,0,0.0,0,0.0,25
+Consumer loans,Country-wide,Unknown,low_normal,47,0,0.0,0,0.0,9
+Cash loans,Khác,Repeater,low_action,161,0,0.0,0,0.0,43
+Cash loans,Credit and cash offices,Unknown,low_normal,31,0,0.0,0,0.0,23
+Cash loans,Stone,Refreshed,low_normal,70,0,0.0,0,0.0,4
+Consumer loans,Khác,Refreshed,low_normal,5,0,0.0,0,0.0,1
+Consumer loans,Khác,Repeater,low_action,15,0,0.0,0,0.0,4
+Consumer loans,Khác,New,low_action,19,0,0.0,0,0.0,3
+Cash loans,Regional / Local,New,low_action,3,0,0.0,0,0.0,0
+Revolving loans,Credit and cash offices,Refreshed,Unknown,0,0,,0,,2319
+Revolving loans,Country-wide,New,Unknown,0,0,,0,,1562
+Revolving loans,Country-wide,Unknown,Unknown,0,0,,0,,4
+Revolving loans,Country-wide,Repeater,Unknown,0,0,,0,,4513
+Revolving loans,Regional / Local,Unknown,Unknown,0,0,,0,,2
+Revolving loans,AP+ (Cash loan),Repeater,Unknown,0,0,,0,,2174
+Revolving loans,Contact center,Repeater,Unknown,0,0,,0,,1314
+Revolving loans,Khác,Refreshed,Unknown,0,0,,0,,62
+Cash loans,Credit and cash offices,Refreshed,Unknown,0,0,,0,,2
+Revolving loans,Khác,New,Unknown,0,0,,0,,171
+Cash loans,Credit and cash offices,Repeater,Unknown,0,0,,0,,2
+Revolving loans,Regional / Local,Refreshed,Unknown,0,0,,0,,387
+Revolving loans,Credit and cash offices,Repeater,Unknown,0,0,,0,,17290
+Revolving loans,Stone,Refreshed,Unknown,0,0,,0,,204
+Revolving loans,Regional / Local,New,Unknown,0,0,,0,,487
+Revolving loans,Regional / Local,Repeater,Unknown,0,0,,0,,1340
+Revolving loans,Credit and cash offices,New,Unknown,0,0,,0,,182
+Revolving loans,Stone,Repeater,Unknown,0,0,,0,,926
+Revolving loans,Stone,New,Unknown,0,0,,0,,268
+Revolving loans,Credit and cash offices,Unknown,Unknown,0,0,,0,,11
+Revolving loans,AP+ (Cash loan),Refreshed,Unknown,0,0,,0,,644
+Revolving loans,AP+ (Cash loan),New,Unknown,0,0,,0,,60
+Revolving loans,AP+ (Cash loan),Unknown,Unknown,0,0,,0,,2
+Revolving loans,Contact center,Refreshed,Unknown,0,0,,0,,18
+Revolving loans,Khác,Unknown,Unknown,0,0,,0,,2
+Revolving loans,Country-wide,Refreshed,Unknown,0,0,,0,,1179
+Revolving loans,Khác,Repeater,Unknown,0,0,,0,,203

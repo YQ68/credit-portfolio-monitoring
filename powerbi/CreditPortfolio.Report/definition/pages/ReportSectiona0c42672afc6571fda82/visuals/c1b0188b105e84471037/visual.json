@@ -1,0 +1,44 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "c1b0188b105e84471037",
+  "position": {
+    "x": 24,
+    "y": 16,
+    "z": 9000,
+    "width": 1232,
+    "height": 46,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "1. Tổng quan danh mục",
+                    "textStyle": {
+                      "fontSize": 16,
+                      "fontWeight": "bold",
+                      "color": "#0b0b0b"
+                    }
+                  },
+                  {
+                    "value": "   Ảnh chụp tại tháng quan sát gần nhất (M02, M06)",
+                    "textStyle": {
+                      "fontSize": 10,
+                      "color": "#898781"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

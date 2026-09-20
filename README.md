@@ -57,6 +57,9 @@ Nếu đường dẫn thư mục project có dấu tiếng Việt (ví dụ thư
 dashboard/
   index.html              dashboard tĩnh 4 trang, mở thẳng bằng trình duyệt, không cần server
   README.md                cách dựng lại dashboard bằng Power BI từ data/export/
+powerbi/                  bản Power BI dạng PBIP: TMDL + PBIR, mở bằng CreditPortfolio.pbip
+  README.md                cách mở, 3 lớp kiểm tra, quy tắc khi sửa
+  _brief/report-spec.md    bản chốt thiết kế 4 trang
 data/
   export/                  CSV xuất từ 4 mart, dùng cho Power BI (không commit, xem .gitignore)
 docs/
@@ -88,7 +91,9 @@ sql/
 - [x] Mart: FPD30 theo kênh, sản phẩm
 - [x] Mart: vintage ever 30+ theo MOB
 - [x] Mart: roll rate và cure rate
-- [x] Dashboard
+- [x] Dashboard HTML tĩnh
+- [x] Mart: ảnh chụp danh mục theo bucket (cho trang 1 bản Power BI)
+- [x] Bản Power BI dạng PBIP trong `powerbi/`, ảnh từng trang trong `docs/screenshots/`
 - [x] Memo insight 1 trang
 - [x] Bộ tài liệu học từng bước trong `docs/walkthrough/`
 

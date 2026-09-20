@@ -1,0 +1,79 @@
+contract_type,channel_type,dpd_bucket,dpd_bucket_order,n_loans,exposure,n_30_plus,exposure_30_plus
+(không rõ),(không rõ),B0 Current,0,6618,174244185.36,0,
+(không rõ),(không rõ),B1 1-30,1,49,6796660.140000002,0,
+(không rõ),(không rõ),B2 31-60,2,2,640.8,2,640.8
+(không rõ),(không rõ),B4 90+,4,141,712927.6650000003,141,712927.6650000003
+Cash loans,AP+ (Cash loan),B0 Current,0,3764,1372157885.249999,0,
+Cash loans,AP+ (Cash loan),B1 1-30,1,48,15639745.004999999,0,
+Cash loans,AP+ (Cash loan),B2 31-60,2,3,2282799.6,3,2282799.6
+Cash loans,AP+ (Cash loan),B3 61-90,3,3,4760912.205,3,4760912.205
+Cash loans,AP+ (Cash loan),B4 90+,4,2,563789.16,2,563789.16
+Cash loans,Contact center,B0 Current,0,3315,1830677028.8400002,0,
+Cash loans,Contact center,B1 1-30,1,36,15986753.46,0,
+Cash loans,Contact center,B2 31-60,2,2,2377235.25,2,2377235.25
+Cash loans,Contact center,B3 61-90,3,2,827758.575,2,827758.575
+Cash loans,Contact center,B4 90+,4,1,420075.31500000006,1,420075.31500000006
+Cash loans,Country-wide,B0 Current,0,1739,465077016.6300001,0,
+Cash loans,Country-wide,B1 1-30,1,18,4863153.96,0,
+Cash loans,Country-wide,B2 31-60,2,3,1372973.85,3,1372973.85
+Cash loans,Country-wide,B4 90+,4,4,27885.6,4,27885.6
+Cash loans,Credit and cash offices,B0 Current,0,33362,17119721079.314993,0,
+Cash loans,Credit and cash offices,B1 1-30,1,453,221849063.415,0,
+Cash loans,Credit and cash offices,B2 31-60,2,45,37548432.45,45,37548432.45
+Cash loans,Credit and cash offices,B3 61-90,3,34,26051815.305,34,26051815.305
+Cash loans,Credit and cash offices,B4 90+,4,28,12826299.51,28,12826299.51
+Cash loans,Khác,B0 Current,0,365,178386896.88000003,0,
+Cash loans,Khác,B1 1-30,1,1,1992190.9500000002,0,
+Cash loans,Regional / Local,B0 Current,0,411,148469502.87,0,
+Cash loans,Regional / Local,B1 1-30,1,3,2063830.32,0,
+Cash loans,Regional / Local,B3 61-90,3,1,439551.0,1,439551.0
+Cash loans,Stone,B0 Current,0,449,169074149.89499998,0,
+Cash loans,Stone,B1 1-30,1,5,2185696.2150000003,0,
+Cash loans,Stone,B2 31-60,2,1,1306948.5,1,1306948.5
+Consumer loans,Country-wide,B0 Current,0,23749,1555311318.0750005,0,
+Consumer loans,Country-wide,B1 1-30,1,193,10486436.535,0,
+Consumer loans,Country-wide,B2 31-60,2,7,111647.87999999999,7,111647.87999999999
+Consumer loans,Country-wide,B3 61-90,3,2,72963.18000000001,2,72963.18000000001
+Consumer loans,Country-wide,B4 90+,4,66,23062.725000000002,66,23062.725000000002
+Consumer loans,Khác,B0 Current,0,4,2817278.1,0,
+Consumer loans,Regional / Local,B0 Current,0,7734,547559576.685,0,
+Consumer loans,Regional / Local,B1 1-30,1,57,4000896.63,0,
+Consumer loans,Regional / Local,B2 31-60,2,3,197059.185,3,197059.185
+Consumer loans,Regional / Local,B3 61-90,3,2,229334.04,2,229334.04
+Consumer loans,Regional / Local,B4 90+,4,14,0.0,14,0.0
+Consumer loans,Stone,B0 Current,0,11339,1049882034.6450002,0,
+Consumer loans,Stone,B1 1-30,1,98,8427226.455,0,
+Consumer loans,Stone,B2 31-60,2,5,926981.1,5,926981.1
+Consumer loans,Stone,B3 61-90,3,4,382909.41,4,382909.41
+Consumer loans,Stone,B4 90+,4,45,0.0,45,0.0
+Revolving loans,AP+ (Cash loan),B0 Current,0,3922,527791838.12999994,0,
+Revolving loans,AP+ (Cash loan),B1 1-30,1,37,7098034.5,0,
+Revolving loans,AP+ (Cash loan),B2 31-60,2,2,0.0,2,0.0
+Revolving loans,AP+ (Cash loan),B4 90+,4,4,631.0799999999999,4,631.0799999999999
+Revolving loans,Contact center,B0 Current,0,5262,426707541.585,0,
+Revolving loans,Contact center,B1 1-30,1,56,8558597.7,0,
+Revolving loans,Contact center,B2 31-60,2,6,920009.565,6,920009.565
+Revolving loans,Contact center,B3 61-90,3,1,367847.145,1,367847.145
+Revolving loans,Contact center,B4 90+,4,35,156040.15500000003,35,156040.15500000003
+Revolving loans,Country-wide,B0 Current,0,10012,432942553.6200001,0,
+Revolving loans,Country-wide,B1 1-30,1,77,10338418.35,0,
+Revolving loans,Country-wide,B2 31-60,2,2,343.71,2,343.71
+Revolving loans,Country-wide,B3 61-90,3,2,433.8,2,433.8
+Revolving loans,Country-wide,B4 90+,4,51,7710.75,51,7710.75
+Revolving loans,Credit and cash offices,B0 Current,0,25793,4074053589.9449997,0,
+Revolving loans,Credit and cash offices,B1 1-30,1,182,40091018.04,0,
+Revolving loans,Credit and cash offices,B2 31-60,2,6,249229.44,6,249229.44
+Revolving loans,Credit and cash offices,B3 61-90,3,3,245.475,3,245.475
+Revolving loans,Credit and cash offices,B4 90+,4,19,818635.5,19,818635.5
+Revolving loans,Khác,B0 Current,0,347,18009151.605,0,
+Revolving loans,Khác,B1 1-30,1,1,47894.355,0,
+Revolving loans,Regional / Local,B0 Current,0,2107,108518151.51,0,
+Revolving loans,Regional / Local,B1 1-30,1,22,2516403.24,0,
+Revolving loans,Regional / Local,B2 31-60,2,1,0.0,1,0.0
+Revolving loans,Regional / Local,B3 61-90,3,3,127.935,3,127.935
+Revolving loans,Regional / Local,B4 90+,4,7,969.66,7,969.66
+Revolving loans,Stone,B0 Current,0,2182,91710596.20499998,0,
+Revolving loans,Stone,B1 1-30,1,26,3227899.95,0,
+Revolving loans,Stone,B2 31-60,2,1,0.0,1,0.0
+Revolving loans,Stone,B3 61-90,3,1,0.0,1,0.0
+Revolving loans,Stone,B4 90+,4,21,3526.1099999999997,21,3526.1099999999997

@@ -1,0 +1,101 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "46882904908f2708804f",
+  "position": {
+    "x": 24,
+    "y": 544,
+    "z": 2200,
+    "width": 608,
+    "height": 152,
+    "tabOrder": 2200
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RollRate"
+                    }
+                  },
+                  "Property": "from_state"
+                }
+              },
+              "queryRef": "RollRate.from_state",
+              "nativeQueryRef": "from_state"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RollRate"
+                    }
+                  },
+                  "Property": "Roll Base Loans"
+                }
+              },
+              "queryRef": "RollRate.Roll Base Loans",
+              "nativeQueryRef": "Roll Base Loans"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RollRate"
+                    }
+                  },
+                  "Property": "Cure Rate"
+                }
+              },
+              "queryRef": "RollRate.Cure Rate",
+              "nativeQueryRef": "Cure Rate"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RollRate"
+                    }
+                  },
+                  "Property": "Exposure From"
+                }
+              },
+              "queryRef": "RollRate.Exposure From",
+              "nativeQueryRef": "Exposure From"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Quy mô từng bucket xuất phát'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

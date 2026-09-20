@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "ReportSection7446e948efea06a9cc0c",
+  "displayName": "2. Kênh bán và rủi ro",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280
+}

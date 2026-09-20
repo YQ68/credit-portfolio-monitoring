@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "ReportSectiona0c42672afc6571fda82",
+  "displayName": "1. Tổng quan danh mục",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280
+}

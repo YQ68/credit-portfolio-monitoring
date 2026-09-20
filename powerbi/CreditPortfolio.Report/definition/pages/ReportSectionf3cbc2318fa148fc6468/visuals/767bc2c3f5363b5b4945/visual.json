@@ -1,0 +1,95 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "767bc2c3f5363b5b4945",
+  "position": {
+    "x": 24,
+    "y": 138,
+    "z": 2000,
+    "width": 608,
+    "height": 396,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RollRate"
+                    }
+                  },
+                  "Property": "from_state"
+                }
+              },
+              "queryRef": "RollRate.from_state",
+              "nativeQueryRef": "from_state"
+            }
+          ]
+        },
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RollRate"
+                    }
+                  },
+                  "Property": "to_state"
+                }
+              },
+              "queryRef": "RollRate.to_state",
+              "nativeQueryRef": "to_state"
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RollRate"
+                    }
+                  },
+                  "Property": "Roll Rate"
+                }
+              },
+              "queryRef": "RollRate.Roll Rate",
+              "nativeQueryRef": "Roll Rate"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Từ bucket tháng t (dòng) sang bucket tháng t+1 (cột)'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "8707dbd5bba5acb508f2",
+  "position": {
+    "x": 24,
+    "y": 16,
+    "z": 9000,
+    "width": 1232,
+    "height": 46,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "4. Chuyển nhóm và thu hồi",
+                    "textStyle": {
+                      "fontSize": 16,
+                      "fontWeight": "bold",
+                      "color": "#0b0b0b"
+                    }
+                  },
+                  {
+                    "value": "   Ma trận roll rate giữa hai tháng liền kề (M09, M10)",
+                    "textStyle": {
+                      "fontSize": 10,
+                      "color": "#898781"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

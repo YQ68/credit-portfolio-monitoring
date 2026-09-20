@@ -1,0 +1,159 @@
+/// Ma trận chuyển nhóm nợ giữa hai tháng liền kề (M09) và cure rate (M10).
+/// Grain: nguồn x sản phẩm x kênh x bucket xuất phát x bucket đích.
+table RollRate
+
+	/// Số hợp đồng chuyển từ bucket xuất phát sang bucket đích.
+	measure 'Roll Loans' = SUM(RollRate[n_loans])
+		formatString: #,##0
+
+	/// Mẫu số của roll rate: tổng hợp đồng ở bucket xuất phát, cộng qua MỌI bucket đích.
+	/// Dùng REMOVEFILTERS chứ KHÔNG cộng cột n_from: n_from là window sum lặp lại trên từng dòng to_state,
+	/// cộng thẳng sẽ nhân số lên nhiều lần.
+	/// PHẢI bỏ lọc cả to_order: to_state có sortByColumn là to_order nên bộ lọc cột trong ma trận
+	/// kéo theo cả hai; chỉ bỏ to_state thì mẫu số vẫn bị ghim về một ô và mọi ô ra 100%.
+	measure 'Roll Base Loans' = ```
+			CALCULATE(
+			    SUM(RollRate[n_loans]),
+			    REMOVEFILTERS(RollRate[to_state], RollRate[to_order])
+			)
+			```
+		formatString: #,##0
+
+	/// M09. Tỷ lệ chuyển từ bucket xuất phát sang bucket đích trong tháng kế tiếp.
+	measure 'Roll Rate' = DIVIDE([Roll Loans], [Roll Base Loans])
+		formatString: 0.0%
+
+	/// M10. Trong số hợp đồng đang quá hạn ở bucket xuất phát, bao nhiêu phần trăm quay về B0 Current tháng sau.
+	/// Lọc bỏ from_state = B0 Current khi đọc, vì B0 về B0 không phải là cure.
+	measure 'Cure Rate' = ```
+			DIVIDE(
+			    CALCULATE(
+			        SUM(RollRate[n_loans]),
+			        REMOVEFILTERS(RollRate[to_state], RollRate[to_order]),
+			        RollRate[to_state] = "B0 Current"
+			    ),
+			    [Roll Base Loans]
+			)
+			```
+		formatString: 0.0%
+
+	/// Dư nợ proxy ở bucket xuất phát. Visual tự chọn đơn vị hiển thị.
+	measure 'Exposure From' = SUM(RollRate[exposure_from])
+		formatString: #,##0
+
+	column source
+		dataType: string
+		sourceColumn: source
+
+	column contract_type
+		dataType: string
+		isHidden
+		sourceColumn: contract_type
+
+	column channel_type
+		dataType: string
+		isHidden
+		sourceColumn: channel_type
+
+	/// Bucket nợ ở tháng t.
+	column from_state
+		dataType: string
+		sortByColumn: 'from_order'
+		sourceColumn: from_state
+
+	/// Thứ tự bucket xuất phát, dùng để sắp xếp.
+	column from_order
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: from_order
+
+	/// Bucket nợ ở tháng t+1, có thêm Closed, Missing, Other.
+	column to_state
+		dataType: string
+		sortByColumn: 'to_order'
+		sourceColumn: to_state
+
+	/// Thứ tự bucket đích, dùng để sắp xếp.
+	column to_order
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: to_order
+
+	column n_loans
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_loans
+
+	/// Window sum lặp lại trên mỗi dòng to_state. ẨN có chủ đích: cộng cột này sẽ nhân số lên. Dùng [Roll Base Loans].
+	column n_from
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: n_from
+
+	/// ẨN có chủ đích: dùng measure [Roll Rate].
+	column roll_rate
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: roll_rate
+
+	column n_month_gap
+		dataType: int64
+		isHidden
+		summarizeBy: sum
+		sourceColumn: n_month_gap
+
+	column n_exposure_null
+		dataType: int64
+		isHidden
+		summarizeBy: sum
+		sourceColumn: n_exposure_null
+
+	column n_exposure_null_from
+		dataType: int64
+		isHidden
+		summarizeBy: sum
+		sourceColumn: n_exposure_null_from
+
+	column exposure_from
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: exposure_from
+
+	column exposure_from_total
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: exposure_from_total
+
+	/// ẨN có chủ đích.
+	column exposure_roll_rate
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: exposure_roll_rate
+
+	column exposure_to
+		dataType: double
+		isHidden
+		summarizeBy: sum
+		sourceColumn: exposure_to
+
+	partition RollRate = m
+		mode: import
+		source =
+			let
+				// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
+				#"Đã đọc file CSV" = Csv.Document(
+					File.Contents(DataFolder & "\mart_roll_rate.csv"),
+					[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				),
+				#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
+				#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"source", type text}, {"contract_type", type text}, {"channel_type", type text}, {"from_state", type text}, {"from_order", Int64.Type}, {"to_state", type text}, {"to_order", Int64.Type}, {"n_loans", Int64.Type}, {"n_from", Int64.Type}, {"roll_rate", type number}, {"n_month_gap", Int64.Type}, {"n_exposure_null", Int64.Type}, {"n_exposure_null_from", Int64.Type}, {"exposure_from", type number}, {"exposure_from_total", type number}, {"exposure_roll_rate", type number}, {"exposure_to", type number}})
+			in
+				#"Đã ép kiểu dữ liệu từng cột"

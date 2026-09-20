@@ -1,0 +1,12 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+
+ref table 'Dim Channel'
+ref table 'Dim Product'
+ref table Funnel
+ref table FPD
+ref table Vintage
+ref table RollRate
+ref table Snapshot

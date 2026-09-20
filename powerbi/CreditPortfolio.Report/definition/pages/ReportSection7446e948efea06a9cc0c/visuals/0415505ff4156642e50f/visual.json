@@ -1,0 +1,113 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "0415505ff4156642e50f",
+  "position": {
+    "x": 24,
+    "y": 138,
+    "z": 2000,
+    "width": 608,
+    "height": 396,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Channel"
+                    }
+                  },
+                  "Property": "Kênh"
+                }
+              },
+              "queryRef": "Dim Channel.Kênh",
+              "nativeQueryRef": "Kênh"
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Funnel"
+                    }
+                  },
+                  "Property": "Approval Rate"
+                }
+              },
+              "queryRef": "Funnel.Approval Rate",
+              "nativeQueryRef": "Approval Rate"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Vintage"
+                    }
+                  },
+                  "Property": "Ever 30 Plus MOB12"
+                }
+              },
+              "queryRef": "Vintage.Ever 30 Plus MOB12",
+              "nativeQueryRef": "Ever 30 Plus MOB12"
+            }
+          ]
+        },
+        "Size": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Funnel"
+                    }
+                  },
+                  "Property": "Applications"
+                }
+              },
+              "queryRef": "Funnel.Applications",
+              "nativeQueryRef": "Applications"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Duyệt nhiều có đi kèm rủi ro cao? (bong bóng = số hồ sơ)'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

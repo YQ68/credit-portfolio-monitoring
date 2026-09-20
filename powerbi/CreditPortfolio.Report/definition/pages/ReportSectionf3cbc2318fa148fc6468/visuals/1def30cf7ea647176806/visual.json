@@ -1,0 +1,77 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "1def30cf7ea647176806",
+  "position": {
+    "x": 648,
+    "y": 138,
+    "z": 2100,
+    "width": 608,
+    "height": 396,
+    "tabOrder": 2100
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RollRate"
+                    }
+                  },
+                  "Property": "from_state"
+                }
+              },
+              "queryRef": "RollRate.from_state",
+              "nativeQueryRef": "from_state"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RollRate"
+                    }
+                  },
+                  "Property": "Cure Rate"
+                }
+              },
+              "queryRef": "RollRate.Cure Rate",
+              "nativeQueryRef": "Cure Rate"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Cure rate rơi rất nhanh theo độ sâu quá hạn'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

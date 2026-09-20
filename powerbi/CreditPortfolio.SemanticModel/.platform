@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "CreditPortfolio"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "e1c42f24-aeb0-402e-946f-165cc53b07ae"
+  }
+}

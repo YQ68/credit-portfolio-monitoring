@@ -1,0 +1,123 @@
+/// Phễu duyệt hồ sơ theo kênh (M12). Grain: kênh x sản phẩm x loại khách x nhóm lãi suất.
+table Funnel
+
+	/// Số hồ sơ nộp vào.
+	measure 'Applications' = SUM(Funnel[n_applications])
+		formatString: #,##0
+
+	/// Số hồ sơ đã có quyết định: duyệt, duyệt nhưng khách không dùng, hoặc từ chối.
+	/// Đây là mẫu số của Approval Rate.
+	measure 'Decided' = SUM(Funnel[n_decided])
+		formatString: #,##0
+
+	/// Số hồ sơ được duyệt, tính cả trường hợp khách không nhận tiền.
+	measure 'Offered' = SUM(Funnel[n_offered])
+		formatString: #,##0
+
+	/// M12. Tỷ lệ duyệt = (duyệt + duyệt nhưng không dùng) / đã có quyết định.
+	/// Cộng tử và mẫu trước rồi mới chia, không lấy trung bình cột approval_rate.
+	measure 'Approval Rate' = DIVIDE([Offered], [Decided])
+		formatString: 0.0%
+
+	/// M12. Trong số hồ sơ được duyệt, bao nhiêu phần trăm khách thật sự nhận tiền.
+	measure 'Take-up Rate' = DIVIDE(SUM(Funnel[n_approved]), [Offered])
+		formatString: 0.0%
+
+	/// Tổng hạn mức đã duyệt. Visual tự chọn đơn vị hiển thị.
+	measure 'Credit Approved' = SUM(Funnel[credit_amount_approved_total])
+		formatString: #,##0
+
+	/// Kênh bán đã gom nhóm. ẨN: slicer dùng Dim Channel[Kênh].
+	column channel_type
+		dataType: string
+		isHidden
+		sourceColumn: channel_type
+
+	/// Loại sản phẩm. ẨN: slicer dùng Dim Product[Sản phẩm].
+	column contract_type
+		dataType: string
+		isHidden
+		sourceColumn: contract_type
+
+	/// Khách mới hay khách cũ.
+	column client_type
+		dataType: string
+		sourceColumn: client_type
+
+	/// Nhóm lãi suất do Home Credit gán.
+	column yield_group
+		dataType: string
+		sourceColumn: yield_group
+
+	column n_applications
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_applications
+
+	column n_approved
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_approved
+
+	column n_unused_offer
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_unused_offer
+
+	column n_refused
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_refused
+
+	column n_canceled
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_canceled
+
+	column credit_amount_approved_total
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: credit_amount_approved_total
+
+	column credit_amount_approved_median
+		dataType: double
+		summarizeBy: none
+		sourceColumn: credit_amount_approved_median
+
+	column n_offered
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_offered
+
+	column n_decided
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_decided
+
+	/// Tỷ lệ tính sẵn ở grain gốc. ẨN có chủ đích: gộp nhiều dòng phải dùng measure [Approval Rate], không được lấy trung bình cột này.
+	column approval_rate
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: approval_rate
+
+	/// Tỷ lệ tính sẵn ở grain gốc. ẨN có chủ đích, xem [Take-up Rate].
+	column take_up_rate
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: take_up_rate
+
+	partition Funnel = m
+		mode: import
+		source =
+			let
+				// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
+				#"Đã đọc file CSV" = Csv.Document(
+					File.Contents(DataFolder & "\mart_funnel_by_channel.csv"),
+					[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				),
+				#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
+				#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"channel_type", type text}, {"contract_type", type text}, {"client_type", type text}, {"yield_group", type text}, {"n_applications", Int64.Type}, {"n_approved", Int64.Type}, {"n_unused_offer", Int64.Type}, {"n_refused", Int64.Type}, {"n_canceled", Int64.Type}, {"credit_amount_approved_total", type number}, {"credit_amount_approved_median", type number}, {"n_offered", Int64.Type}, {"n_decided", Int64.Type}, {"approval_rate", type number}, {"take_up_rate", type number}})
+			in
+				#"Đã ép kiểu dữ liệu từng cột"

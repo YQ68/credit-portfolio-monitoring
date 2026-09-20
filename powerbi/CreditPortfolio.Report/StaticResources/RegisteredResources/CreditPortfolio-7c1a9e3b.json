@@ -1,0 +1,105 @@
+{
+  "name": "CreditPortfolio-7c1a9e3b.json",
+  "dataColors": [
+    "#2a78d6",
+    "#eb6834",
+    "#1baf7a",
+    "#5598e7",
+    "#1c5cab",
+    "#86b6ef",
+    "#104281",
+    "#c98500"
+  ],
+  "good": "#1baf7a",
+  "neutral": "#eda100",
+  "bad": "#eb6834",
+  "maximum": "#104281",
+  "center": "#5598e7",
+  "minimum": "#e8f1fc",
+  "null": "#e1e0d9",
+  "background": "#fcfcfb",
+  "secondaryBackground": "#f9f9f7",
+  "firstLevelElements": "#0b0b0b",
+  "secondLevelElements": "#52514e",
+  "thirdLevelElements": "#e1e0d9",
+  "fourthLevelElements": "#898781",
+  "tableAccent": "#2a78d6",
+  "textClasses": {
+    "callout": {
+      "fontSize": 32,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#0b0b0b"
+    },
+    "title": {
+      "fontSize": 11,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#0b0b0b"
+    },
+    "header": {
+      "fontSize": 11,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#0b0b0b"
+    },
+    "label": {
+      "fontSize": 10,
+      "fontFace": "Segoe UI",
+      "color": "#0b0b0b"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#fcfcfb"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#e1e0d9"
+              }
+            },
+            "radius": 6
+          }
+        ],
+        "visualHeader": [
+          {
+            "show": false
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#f9f9f7"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "outspace": [
+          {
+            "color": {
+              "solid": {
+                "color": "#f9f9f7"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

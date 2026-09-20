@@ -1,0 +1,44 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "7153d8814695e41aee4d",
+  "position": {
+    "x": 24,
+    "y": 16,
+    "z": 9000,
+    "width": 1232,
+    "height": 46,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "2. Kênh bán: tăng trưởng và rủi ro",
+                    "textStyle": {
+                      "fontSize": 16,
+                      "fontWeight": "bold",
+                      "color": "#0b0b0b"
+                    }
+                  },
+                  {
+                    "value": "   So sánh BẮT BUỘC kiểm soát cơ cấu sản phẩm (M08, M12)",
+                    "textStyle": {
+                      "fontSize": 10,
+                      "color": "#898781"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

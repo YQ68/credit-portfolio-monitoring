@@ -1,0 +1,39 @@
+relationship 'Dim Channel to Funnel'
+	fromColumn: Funnel.channel_type
+	toColumn: 'Dim Channel'.Kênh
+
+relationship 'Dim Product to Funnel'
+	fromColumn: Funnel.contract_type
+	toColumn: 'Dim Product'.'Sản phẩm'
+
+relationship 'Dim Channel to FPD'
+	fromColumn: FPD.channel_type
+	toColumn: 'Dim Channel'.Kênh
+
+relationship 'Dim Product to FPD'
+	fromColumn: FPD.contract_type
+	toColumn: 'Dim Product'.'Sản phẩm'
+
+relationship 'Dim Channel to Vintage'
+	fromColumn: Vintage.channel_type
+	toColumn: 'Dim Channel'.Kênh
+
+relationship 'Dim Product to Vintage'
+	fromColumn: Vintage.contract_type
+	toColumn: 'Dim Product'.'Sản phẩm'
+
+relationship 'Dim Channel to RollRate'
+	fromColumn: RollRate.channel_type
+	toColumn: 'Dim Channel'.Kênh
+
+relationship 'Dim Product to RollRate'
+	fromColumn: RollRate.contract_type
+	toColumn: 'Dim Product'.'Sản phẩm'
+
+relationship 'Dim Channel to Snapshot'
+	fromColumn: Snapshot.channel_type
+	toColumn: 'Dim Channel'.Kênh
+
+relationship 'Dim Product to Snapshot'
+	fromColumn: Snapshot.contract_type
+	toColumn: 'Dim Product'.'Sản phẩm'

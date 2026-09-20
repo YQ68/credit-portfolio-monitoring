@@ -1,0 +1,3 @@
+/// Thư mục chứa 5 file CSV xuất từ mart (scripts/build_dashboard.py và scripts/export_snapshot.py).
+/// Đổi giá trị này nếu clone repo về máy khác.
+expression DataFolder = "C:\\path\\to\\credit-portfolio-monitoring\\data\\export" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]

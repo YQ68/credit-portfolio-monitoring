@@ -2,7 +2,13 @@
 __pycache__/
 .ipynb_checkpoints/
 
-# Dữ liệu Kaggle không được đưa lên GitHub
-data/
+# Dữ liệu Kaggle không được đưa lên GitHub.
+# Dùng data/* chứ không dùng data/: git không thể re-include file nằm trong
+# thư mục đã bị loại, nên phải loại từng mục con rồi mới mở lại data/export/.
+data/*
+!data/export/
+data/export/*
+# Ngoại lệ: 5 file CSV tổng hợp nhỏ (~1,4 MB) để PBIP mở được ngay sau khi clone
+!data/export/*.csv
 *.duckdb
 *.duckdb.wal

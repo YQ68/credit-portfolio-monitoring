@@ -1,0 +1,26 @@
+/// Danh mục kênh bán dùng chung. Slicer nên lấy từ bảng này để lọc đồng thời cả bốn bảng mart.
+table 'Dim Channel'
+
+	/// Danh mục kênh bán dùng chung. Slicer nên lấy từ bảng này để lọc đồng thời cả bốn bảng mart.
+	column 'Kênh'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Kênh
+
+	partition 'Dim Channel' = m
+		mode: import
+		source =
+			let
+				// Gom giá trị từ cả bốn bảng mart để không thiếu giá trị nào chỉ có ở một bảng
+				#"Đã gộp giá trị từ bốn bảng mart" = Table.Combine({
+					Table.SelectColumns(Funnel, {"channel_type"}),
+					Table.SelectColumns(FPD, {"channel_type"}),
+					Table.SelectColumns(Vintage, {"channel_type"}),
+					Table.SelectColumns(RollRate, {"channel_type"}),
+					Table.SelectColumns(Snapshot, {"channel_type"})
+				}),
+				#"Đã bỏ giá trị trùng" = Table.Distinct(#"Đã gộp giá trị từ bốn bảng mart"),
+				#"Đã sắp xếp theo thứ tự chữ cái" = Table.Sort(#"Đã bỏ giá trị trùng", {{"channel_type", Order.Ascending}}),
+				#"Đã đổi tên cột cho dễ đọc" = Table.RenameColumns(#"Đã sắp xếp theo thứ tự chữ cái", {{"channel_type", "Kênh"}})
+			in
+				#"Đã đổi tên cột cho dễ đọc"

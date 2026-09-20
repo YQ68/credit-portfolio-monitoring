@@ -1,0 +1,95 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "be12ca234ba812f9e972",
+  "position": {
+    "x": 648,
+    "y": 138,
+    "z": 2100,
+    "width": 608,
+    "height": 396,
+    "tabOrder": 2100
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Channel"
+                    }
+                  },
+                  "Property": "Kênh"
+                }
+              },
+              "queryRef": "Dim Channel.Kênh",
+              "nativeQueryRef": "Kênh"
+            }
+          ]
+        },
+        "Series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Product"
+                    }
+                  },
+                  "Property": "Sản phẩm"
+                }
+              },
+              "queryRef": "Dim Product.Sản phẩm",
+              "nativeQueryRef": "Sản phẩm"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Vintage"
+                    }
+                  },
+                  "Property": "Ever 30 Plus MOB12"
+                }
+              },
+              "queryRef": "Vintage.Ever 30 Plus MOB12",
+              "nativeQueryRef": "Ever 30 Plus MOB12"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Ever 30+@MOB12 theo kênh, TÁCH THEO sản phẩm'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

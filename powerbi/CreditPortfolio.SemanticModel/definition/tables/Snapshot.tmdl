@@ -1,0 +1,89 @@
+/// Ảnh chụp danh mục đang mở tại tháng quan sát gần nhất (months_balance = -1), theo bucket quá hạn.
+/// Mã chỉ tiêu M02 và M06. Grain: sản phẩm x kênh x bucket.
+table Snapshot
+
+	/// Số hợp đồng đang mở tại tháng quan sát gần nhất.
+	measure 'Open Loans' = SUM(Snapshot[n_loans])
+		formatString: #,##0
+
+	/// Số hợp đồng đang quá hạn trên 30 ngày tại tháng quan sát.
+	measure 'Loans 30+' = SUM(Snapshot[n_30_plus])
+		formatString: #,##0
+
+	/// M06. Tỷ lệ 30+ coincident: đang quá hạn trên 30 ngày trên tổng hợp đồng đang mở.
+	/// Đây là ảnh chụp một thời điểm, khác với vintage vốn nhìn theo tuổi hợp đồng.
+	measure 'Rate 30+ Coincident' = DIVIDE([Loans 30+], [Open Loans])
+		formatString: 0.00%
+
+	/// Dư nợ proxy của hợp đồng đang mở. Visual tự chọn đơn vị hiển thị.
+	measure 'Open Exposure' = SUM(Snapshot[exposure])
+		formatString: #,##0
+
+	/// Dư nợ proxy đang quá hạn trên 30 ngày.
+	measure 'Exposure 30+' = SUM(Snapshot[exposure_30_plus])
+		formatString: #,##0
+
+	/// M06 tính theo dư nợ thay vì theo số hợp đồng. Thường cao hơn bản đếm hợp đồng
+	/// vì hợp đồng quá hạn hay có dư nợ lớn hơn trung bình.
+	measure 'Exposure Rate 30+' = DIVIDE([Exposure 30+], [Open Exposure])
+		formatString: 0.00%
+
+	/// Loại sản phẩm. ẨN: slicer dùng Dim Product[Sản phẩm].
+	column contract_type
+		dataType: string
+		isHidden
+		sourceColumn: contract_type
+
+	/// Kênh bán. ẨN: slicer dùng Dim Channel[Kênh].
+	column channel_type
+		dataType: string
+		isHidden
+		sourceColumn: channel_type
+
+	/// Nhóm quá hạn theo số ngày: B0 Current, B1 1-30, B2 31-60, B3 61-90, B4 90+.
+	column dpd_bucket
+		dataType: string
+		sortByColumn: 'dpd_bucket_order'
+		sourceColumn: dpd_bucket
+
+	/// Thứ tự bucket, dùng để sắp xếp.
+	column dpd_bucket_order
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: dpd_bucket_order
+
+	column n_loans
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_loans
+
+	column exposure
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: exposure
+
+	column n_30_plus
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_30_plus
+
+	column exposure_30_plus
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: exposure_30_plus
+
+	partition Snapshot = m
+		mode: import
+		source =
+			let
+				// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
+				#"Đã đọc file CSV" = Csv.Document(
+					File.Contents(DataFolder & "\mart_portfolio_snapshot.csv"),
+					[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				),
+				#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
+				#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"contract_type", type text}, {"channel_type", type text}, {"dpd_bucket", type text}, {"dpd_bucket_order", Int64.Type}, {"n_loans", Int64.Type}, {"exposure", type number}, {"n_30_plus", Int64.Type}, {"exposure_30_plus", type number}})
+			in
+				#"Đã ép kiểu dữ liệu từng cột"
