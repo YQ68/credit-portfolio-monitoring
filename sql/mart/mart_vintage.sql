@@ -16,12 +16,13 @@
 --   - is_partial_history: thiếu lịch sử đầu nên MOB không đáng tin (cắt trái theo cửa sổ dữ liệu,
 --     hoặc đã trả kỳ ngay tại tháng mở đầu tiên). 93.751 hợp đồng.
 --   - end_state = 'never_open': chưa bao giờ ở trạng thái mở nên không có MOB 0. 4.029 hợp đồng.
---   Tổng cộng loại 95.695 hợp đồng trên 1.040.632, mẫu số gốc còn 944.937.
+--   Tổng cộng loại 95.695 hợp đồng trên 1.040.632, mẫu số gốc còn 944.937. Hai nhóm giao nhau
+--   2.085 hợp đồng, nên tổng loại không phải 93.751 + 4.029.
 --   Chi tiết ghi ở docs/metric_dictionary.md mục M08.
 --
 -- Cột n_observed_full tách riêng số hợp đồng ĐÃ QUAN SÁT ĐỦ đến MOB n (max_mob >= n), khác với
--- n_loans vốn còn gồm cả hợp đồng tất toán sớm. Tại MOB 24 chỉ còn khoảng 72.721 hợp đồng quan sát
--- đủ trên 715.058 của mẫu số, người đọc phải thấy được độ mỏng này trước khi diễn giải đường cong.
+-- n_loans vốn còn gồm cả hợp đồng tất toán sớm. Tại MOB 24 chỉ có 70.635 hợp đồng quan sát đủ
+-- trên 679.223 của mẫu số, người đọc phải thấy được độ mỏng này trước khi diễn giải đường cong.
 --
 -- Cột ..._tolerant tính theo dpd_tolerant (SK_DPD_DEF, DPD có dung sai) để đối chiếu, xem
 -- docs/data_notes.md mục 7. Chỉ tiêu chính vẫn theo cột dpd (SK_DPD).

@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Bat xung dot ten trong semantic model TMDL truoc khi mo Power BI Desktop.
+"""Bắt xung đột tên trong semantic model TMDL trước khi mở Power BI Desktop.
 
-Ba quy tac ma powerbi-report-author validate va MCP ConnectFolder KHONG bat duoc,
-chi lo ra khi Desktop dung database Analysis Services that:
+Ba quy tắc mà powerbi-report-author validate và MCP ConnectFolder KHÔNG bắt được,
+chỉ lộ ra khi Desktop dựng database Analysis Services thật:
 
-  1. measure trung ten voi cot trong CUNG bang (khong phan biet hoa thuong)
-  2. measure trung ten voi ten mot BANG bat ky trong model
-  3. measure trung ten measure khac o bat ky bang nao (measure la namespace toan model)
+  1. measure trùng tên với cột trong CÙNG bảng (không phân biệt hoa thường)
+  2. measure trùng tên với tên một BẢNG bất kỳ trong model
+  3. measure trùng tên measure khác ở bất kỳ bảng nào (measure là namespace toàn model)
 
-Chay: python check_names.py <duong-dan-thu-muc-.SemanticModel>
+Chạy: python scripts/check_model_names.py <đường-dẫn-thư-mục-.SemanticModel>
+Ví dụ: python scripts/check_model_names.py powerbi/CreditPortfolio.SemanticModel
 """
 import glob
 import os
@@ -18,7 +19,7 @@ from collections import defaultdict
 
 
 def parse(path):
-    """Tra ve (ten_bang, [measure], [cot]) tu mot file .tmdl."""
+    """Trả về (tên_bảng, [measure], [cột]) từ một file .tmdl."""
     with open(path, encoding="utf-8") as fh:
         src = fh.read()
     m = re.search(r"^table\s+'([^']+)'|^table\s+(\S+)", src, re.M)
@@ -31,12 +32,13 @@ def parse(path):
 
 
 def main():
+    sys.stdout.reconfigure(encoding="utf-8")
     root = sys.argv[1] if len(sys.argv) > 1 else "."
     files = sorted(glob.glob(os.path.join(root, "definition", "tables", "*.tmdl")))
     if not files:
         files = sorted(glob.glob(os.path.join(root, "tables", "*.tmdl")))
     if not files:
-        print("Khong tim thay file bang nao trong", root)
+        print("Không tìm thấy file bảng nào trong", root)
         return 2
 
     tables, all_measures = {}, defaultdict(list)
@@ -55,27 +57,27 @@ def main():
             key = x.casefold()
             if key in col_fold:
                 problems.append(
-                    "[1] bang '%s': measure '%s' trung cot '%s' (khong phan biet hoa thuong) -- %s"
+                    "[1] bảng '%s': measure '%s' trùng cột '%s' (không phân biệt hoa thường), file %s"
                     % (table, x, col_fold[key], os.path.basename(f)))
             if key in table_fold:
                 problems.append(
-                    "[2] measure '%s' (bang '%s') trung ten bang '%s'"
+                    "[2] measure '%s' (bảng '%s') trùng tên bảng '%s'"
                     % (x, table, table_fold[key]))
 
     for key, hits in sorted(all_measures.items()):
         if len(hits) > 1:
-            problems.append("[3] measure '%s' bi khai bao %d lan: %s"
+            problems.append("[3] measure '%s' bị khai báo %d lần: %s"
                             % (hits[0][1], len(hits), ", ".join(t for t, _ in hits)))
 
     n_m = sum(len(v[0]) for v in tables.values())
     n_c = sum(len(v[1]) for v in tables.values())
-    print("Da kiem %d bang, %d measure, %d cot." % (len(tables), n_m, n_c))
+    print("Đã kiểm %d bảng, %d measure, %d cột." % (len(tables), n_m, n_c))
     if problems:
-        print("\nCO %d XUNG DOT:" % len(problems))
+        print("\nCÓ %d XUNG ĐỘT:" % len(problems))
         for p in problems:
             print("  " + p)
         return 1
-    print("Khong co xung dot ten.")
+    print("Không có xung đột tên.")
     return 0
 
 

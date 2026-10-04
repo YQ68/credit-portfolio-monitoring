@@ -1,5 +1,5 @@
 -- severity: error
--- Bắt buộc theo SPEC: tổng tỷ lệ chuyển trạng thái của mỗi hàng ma trận phải bằng 1.
+-- Bắt buộc theo metric dictionary (M09): tổng tỷ lệ chuyển trạng thái của mỗi hàng ma trận phải bằng 1.
 -- Nếu lệch, nghĩa là có dòng bị loại âm thầm (thường là các dòng không có tháng kế tiếp).
 -- Dung sai 1e-9 cho sai số dấu phẩy động.
 select

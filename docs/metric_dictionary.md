@@ -2,7 +2,7 @@
 
 Nguồn chuẩn cho định nghĩa và công thức của mọi chỉ tiêu trong project. Dashboard, memo và SQL đều phải dùng đúng các định nghĩa này. Mọi thay đổi định nghĩa ghi vào [Changelog](#changelog).
 
-**Owner:** (tên bạn) | **Phiên bản:** 0.2 | **Cập nhật:** 2026-09-20
+**Owner:** Lien | **Phiên bản:** 0.3 | **Cập nhật:** 2026-10-03
 
 ## Quy ước chung
 
@@ -21,17 +21,17 @@ Nguồn chuẩn cho định nghĩa và công thức của mọi chỉ tiêu tron
 | Mã | Tên | Nhóm | Trạng thái |
 |---|---|---|---|
 | [M01](#m01-dpd) | DPD | Nền tảng | Có trong `core` |
-| [M02](#m02-dpd-bucket) | DPD bucket | Nền tảng | Có trong `core` |
+| [M02](#m02-dpd-bucket) | DPD bucket | Nền tảng | Có trong `core` và `mart.portfolio_snapshot` |
 | [M03](#m03-nhóm-nợ-proxy) | Nhóm nợ (proxy theo DPD) | Nền tảng | Có trong `core` |
 | [M04](#m04-mob) | MOB | Nền tảng | Có trong `core` |
 | [M05](#m05-exposure-proxy) | Exposure proxy | Nền tảng | Có trong `core` |
-| [M06](#m06-tỷ-lệ-30-coincident) | Tỷ lệ 30+ coincident | Chất lượng danh mục | Chưa có mart |
+| [M06](#m06-tỷ-lệ-30-coincident) | Tỷ lệ 30+ coincident | Chất lượng danh mục | Có trong `mart.portfolio_snapshot` (tại tháng `-1`) |
 | [M07](#m07-tỷ-lệ-30-lagged) | Tỷ lệ 30+ lagged | Chất lượng danh mục | Chưa có mart |
 | [M08](#m08-vintage-ever-30mobn) | Vintage ever 30+@MOBn | Chất lượng danh mục | Có trong `mart.vintage` |
 | [M09](#m09-roll-rate) | Roll rate | Chất lượng danh mục | Có trong `mart.roll_rate` |
 | [M10](#m10-cure-rate) | Cure rate | Collections | Có trong `mart.roll_rate` |
-| [M11](#m11-fpd30) | FPD30 | Rủi ro sớm | Có trong mart |
-| [M12](#m12-approval-rate-và-take-up-rate) | Approval rate, take-up rate | Funnel | Có trong mart |
+| [M11](#m11-fpd30) | FPD30 | Rủi ro sớm | Có trong `mart.fpd_by_segment` |
+| [M12](#m12-approval-rate-và-take-up-rate) | Approval rate, take-up rate | Funnel | Có trong `mart.funnel_by_channel` |
 
 ---
 
@@ -53,7 +53,7 @@ Nguồn chuẩn cho định nghĩa và công thức của mọi chỉ tiêu tron
 
 - **Định nghĩa:** nhóm DPD thành các khoảng để theo dõi và tính chuyển trạng thái.
 - **Grain:** hợp đồng × tháng.
-- **Nguồn:** `core.fct_loan_month.dpd_bucket` (nhãn), `dpd_bucket_order` (0 đến 4, dùng để sắp xếp và so sánh).
+- **Nguồn:** `core.fct_loan_month.dpd_bucket` (nhãn), `dpd_bucket_order` (0 đến 4, dùng để sắp xếp và so sánh). Cơ cấu bucket của danh mục đang mở tại tháng `-1` có sẵn ở `mart.portfolio_snapshot` ([M06](#m06-tỷ-lệ-30-coincident)).
 - **Công thức:**
 
   | Bucket | DPD |
@@ -65,7 +65,7 @@ Nguồn chuẩn cho định nghĩa và công thức của mọi chỉ tiêu tron
   | B4 90+ | trên 90 |
 
 - **Edge case:** ranh giới tính cả hai đầu: DPD = 30 thuộc B1, DPD = 31 thuộc B2.
-- **Kiểm tra:** `fct_loan_month__dpd_valid`.
+- **Kiểm tra:** `fct_loan_month__dpd_valid`, `portfolio_snapshot__counts_consistent`.
 
 ### M03. Nhóm nợ (proxy)
 
@@ -117,6 +117,7 @@ Nguồn chuẩn cho định nghĩa và công thức của mọi chỉ tiêu tron
 - **Câu hỏi trả lời:** hiện tại bao nhiêu phần danh mục đang trễ hạn nghiêm trọng?
 - **Grain báo cáo:** kỳ quan sát × phân khúc.
 - **Nguồn:** `core.fct_loan_month`.
+- **Mart:** [`sql/mart/mart_portfolio_snapshot.sql`](../sql/mart/mart_portfolio_snapshot.sql) tạo bảng `mart.portfolio_snapshot`, grain sản phẩm × kênh × bucket, chỉ tại tháng gần nhất `months_balance = -1`. Cột `n_loans`, `n_30_plus`, `exposure`, `exposure_30_plus` là số đếm và số tiền để cộng rồi chia lại. Kỳ khác tháng `-1` vẫn lấy từ `core.fct_loan_month` bằng SQL mẫu bên dưới.
 - **Công thức:**
   - Theo số lượng: `count(is_open and is_30_plus) / count(is_open)`
   - Theo exposure: `sum(exposure_proxy where is_open and is_30_plus) / sum(exposure_proxy where is_open)`
@@ -141,6 +142,7 @@ Nguồn chuẩn cho định nghĩa và công thức của mọi chỉ tiêu tron
   - Hợp đồng có `exposure_proxy` NULL bị bỏ qua khi cộng exposure. Báo cáo số lượng nếu đáng kể.
   - Hiệu ứng mẫu số: danh mục tăng nhanh làm tỷ lệ giảm dù chất lượng không đổi. Đọc cùng M07 và M08.
   - Với dữ liệu này, "kỳ quan sát" là tháng tương đối, không phải tháng lịch.
+- **Kiểm tra:** `portfolio_snapshot__unique_grain`, `portfolio_snapshot__counts_consistent`, `portfolio_snapshot__reconciles_with_core`.
 
 ### M07. Tỷ lệ 30+ lagged
 
@@ -166,6 +168,8 @@ Nguồn chuẩn cho định nghĩa và công thức của mọi chỉ tiêu tron
   |---|---|
   | `is_partial_history` (cắt trái theo cửa sổ dữ liệu, hoặc đã trả kỳ ngay tại tháng mở đầu tiên nên MOB thấp hơn thực tế) | 93.751 |
   | `end_state = 'never_open'` (chưa bao giờ ở trạng thái mở nên không có MOB 0) | 4.029 |
+
+  Hai nhóm giao nhau 2.085 hợp đồng (vừa `never_open` vừa `is_partial_history`), nên tổng loại là 95.695 chứ không phải 93.751 + 4.029.
 
   Không lọc theo nhãn `end_state` cho phần còn lại. Nhãn `unknown` (183.144 hợp đồng) không phải lỗi dữ liệu mà chỉ là lịch sử dừng sớm ở tháng `-2` hoặc `-3`, tức cũng là cắt phải giống `censored`.
 - **Hai mẫu số phải in cùng nhau:**
@@ -389,6 +393,7 @@ Nguồn chuẩn cho định nghĩa và công thức của mọi chỉ tiêu tron
 | Phiên bản | Ngày | Thay đổi |
 |---|---|---|
 | 0.1 | 2026-09-13 | Khởi tạo quy ước chung và M01 đến M12 |
-| 0.2 | 2026-09-20 | Đổi cột DPD chính từ `SK_DPD_DEF` sang `SK_DPD`. Lý do: theo cột có dung sai, tỷ lệ từng quá hạn trên 30 ngày chỉ 0,055% và tử số khi cắt theo phân khúc chỉ còn vài chục hợp đồng, không phân tích được. `SK_DPD_DEF` chuyển thành chỉ tiêu phụ ở cột `dpd_tolerant` và cờ `is_30_plus_tolerant`. Thêm cờ `dim_loan.is_partial_history` cho mẫu số vintage |
+| 0.2 | 2026-09-20 | Đổi cột DPD chính từ `SK_DPD_DEF` sang `SK_DPD`. Lý do: theo cột có dung sai, tỷ lệ từng quá hạn trên 30 ngày chỉ 0,053% (395 trên 744.208 hợp đồng tại MOB 12) và tử số khi cắt theo phân khúc chỉ còn vài chục hợp đồng, không phân tích được. `SK_DPD_DEF` chuyển thành chỉ tiêu phụ ở cột `dpd_tolerant` và cờ `is_30_plus_tolerant`. Thêm cờ `dim_loan.is_partial_history` cho mẫu số vintage |
 | 0.2 | 2026-09-20 | M08 vintage: chốt mẫu số (`max_mob >= n` hoặc `end_state = 'closed'`), loại `is_partial_history` và `never_open`, thêm cột `n_observed_full` tách hợp đồng quan sát đủ khỏi hợp đồng tất toán sớm. M09 roll rate: dòng không có tháng kế tiếp vào trạng thái `Missing`, loại tháng `-1` khỏi trạng thái xuất phát vì là cắt phải, thêm tỷ lệ theo exposure kèm cột đếm dòng thiếu `exposure_proxy`. M10 cure rate: lấy trực tiếp từ `mart.roll_rate`, không làm mart riêng |
 | 0.2 | 2026-09-20 | Thêm 4 mart mới, mỗi mart tương ứng một chỉ tiêu trong bảng danh sách chỉ tiêu ở trên: `mart.funnel_by_channel` (M12, approval rate và take-up rate), `mart.fpd_by_segment` (M11, FPD30), `mart.vintage` (M08, vintage ever 30+@MOBn), `mart.roll_rate` (M09 roll rate, M10 cure rate). Cả 4 mart đã build sạch trên dữ liệu thật, có data test và được dùng trực tiếp trong dashboard (`scripts/build_dashboard.py`) và memo (`docs/insight_memo.md`) |
+| 0.3 | 2026-10-03 | Thêm mart thứ 5 `mart.portfolio_snapshot` (M02, M06): cơ cấu bucket quá hạn của danh mục đang mở tại tháng `-1`, theo sản phẩm × kênh × bucket. Mart được đưa vào danh sách `MODELS` của `scripts/build.py` và có 3 data test (`portfolio_snapshot__unique_grain`, `portfolio_snapshot__counts_consistent`, `portfolio_snapshot__reconciles_with_core`). M06 đổi trạng thái từ "Chưa có mart" thành "Có trong `mart.portfolio_snapshot`"; M11, M12 ghi rõ tên bảng mart. Đính chính số liệu của bản 0.2: tỷ lệ ever 30+ tại MOB 12 theo `SK_DPD_DEF` là 0,053% (395 trên 744.208), không phải 0,055% (428 trên 782.119, số đo trước khi loại `is_partial_history`). Ghi rõ hai nhóm loại khỏi mẫu số vintage giao nhau 2.085 hợp đồng. Điền tên Owner |

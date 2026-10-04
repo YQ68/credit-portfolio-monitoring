@@ -5,7 +5,8 @@
 --
 -- Lưu tử số, mẫu số dạng số đếm để cộng dồn được khi gom nhóm lớn hơn.
 --
--- CANH BAO QUAN TRONG (xem docs/data_notes.md mục 11 và profile_findings.md mục 7):
+-- CẢNH BÁO QUAN TRỌNG (xem docs/data_notes.md mục 11, dòng "Khả năng đo FPD30", và
+-- docs/metric_dictionary.md mục M11):
 -- bảng stg.installments_payments gần như chỉ ghi các kỳ ĐÃ TRẢ. Hợp đồng bỏ hẳn
 -- kỳ 1 (không trả một đồng nào) thì không có dòng nào trong bảng này, nên biến mất
 -- khỏi mẫu số thay vì được tính là vỡ nợ. Vì vậy fpd30_rate trong mart này là

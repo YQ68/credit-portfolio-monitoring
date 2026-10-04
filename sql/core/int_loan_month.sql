@@ -3,6 +3,11 @@
 --
 -- Quy tắc 1: hợp đồng có trong credit_card_balance lấy dữ liệu thẻ, bỏ bản ghi POS của cùng hợp đồng.
 -- Quy tắc 2: nếu một tháng có nhiều dòng, giữ dòng có DPD cao nhất (thận trọng về rủi ro).
+--   DPD chính của project là dpd_raw (SK_DPD), nên xếp theo dpd_raw trước; dpd_def chỉ làm tiêu chí phụ khi hòa.
+-- Trên dữ liệu thật, cả hai quy tắc quan sát được 0 trường hợp: không có hợp đồng nào ở cả hai bảng
+-- (tests/sources__loan_in_both.sql) và không có cặp (hợp đồng, tháng) nào trùng
+-- (tests/sources__duplicate_months.sql). Hai quy tắc là phòng vệ, chưa từng loại dòng nào và
+-- không ảnh hưởng số liệu hiện tại.
 -- Kiểm tra: tests/int_loan_month__reconciles_with_sources.sql
 
 create or replace table core.int_loan_month as
@@ -45,5 +50,5 @@ select *
 from unioned
 qualify row_number() over (
     partition by sk_id_prev, months_balance
-    order by dpd_def desc nulls last, dpd_raw desc nulls last
+    order by dpd_raw desc nulls last, dpd_def desc nulls last
 ) = 1;

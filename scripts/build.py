@@ -1,4 +1,4 @@
-"""Build các bảng stg, core (và mart khi có) rồi chạy data test.
+"""Build các bảng stg, core, mart rồi chạy data test.
 
 Cách dùng:
     python scripts/build.py               # build tất cả và chạy test
@@ -33,6 +33,7 @@ MODELS = [
     "mart/mart_fpd_by_segment.sql",
     "mart/mart_vintage.sql",
     "mart/mart_roll_rate.sql",
+    "mart/mart_portfolio_snapshot.sql",
 ]
 
 

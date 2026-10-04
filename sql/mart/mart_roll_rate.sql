@@ -19,9 +19,15 @@
 --   Other      có dòng tháng t + 1 nhưng trạng thái không mở và không Completed
 --              (ví dụ 'Returned to the store', 'Canceled').
 --   Missing    KHÔNG có dòng cho đúng tháng t + 1. Gồm hai trường hợp, đếm riêng ở cột n_month_gap:
---              (a) lịch sử hợp đồng dừng hẳn ở tháng t (1.036.603 dòng trên toàn bảng);
---              (b) hở tháng, dòng kế tiếp cách hơn 1 tháng (375 cặp, 0,003%).
+--              (a) lịch sử hợp đồng dừng hẳn ở tháng t: 182.821 dòng đang mở ở tháng t <= -2;
+--              (b) hở tháng, dòng kế tiếp cách hơn 1 tháng: 26 dòng trong ma trận (toàn bảng có 375 cặp
+--                  hở tháng, 0,003%, phần lớn không xuất phát từ tháng đang mở).
+--              Tổng Missing trong ma trận là 182.847 dòng (182.821 + 26).
 --              Không được loại âm thầm các dòng này, nếu loại thì tổng mỗi hàng không còn bằng 1.
+--              Đừng nhầm với con số 1.036.603: đó là số dòng không có tháng kế tiếp đếm trên TOÀN BẢNG
+--              core.fct_loan_month (mỗi hợp đồng có đúng một dòng cuối). Nó gồm cả 144.421 dòng đang mở ở
+--              tháng -1 (bị loại khỏi trạng thái xuất phát, xem phần dưới) và 709.361 dòng không ở trạng
+--              thái mở. Chỉ 182.821 dòng trong đó đi vào ma trận dưới nhãn Missing.
 --
 -- PHÂN BIỆT QUAN TRỌNG giữa 'Missing' và tháng bị loại:
 --   Tháng t = -1 bị LOẠI KHỎI trạng thái xuất phát. Dữ liệu kết thúc ở tháng -1 nên về nguyên tắc
