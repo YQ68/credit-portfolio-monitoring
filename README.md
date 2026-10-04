@@ -4,13 +4,13 @@ Giám sát chất lượng danh mục cho vay tiêu dùng trên dữ liệu côn
 
 **Stack:** Python, DuckDB, SQL (pipeline raw, stg, core, mart kèm 27 data test), Power BI dạng PBIP (Power BI Project: model TMDL, report PBIR, sinh bằng script), dashboard HTML/SVG tĩnh.
 
-**Xem nhanh:** [Kết quả chính](#kết-quả-chính) · [Memo gửi lãnh đạo](docs/insight_memo.md) · [Phương pháp](docs/methodology.md) · [Dashboard HTML](dashboard/index.html) · [Bản Power BI](powerbi/README.md)
+**Xem nhanh:** [Kết quả chính](#kết-quả-chính) · [Memo gửi lãnh đạo](docs/insight_memo.md) · [Phương pháp](docs/methodology.md) · [Dashboard trực tiếp](https://yq68.github.io/credit-portfolio-monitoring/dashboard/) · [Bản Power BI](powerbi/README.md)
 
 ![Trang Tổng quan danh mục của bản Power BI](docs/screenshots/01-tong-quan.png)
 
-**Xem dashboard:** [`dashboard/index.html`](dashboard/index.html) là một file HTML tự chứa (biểu đồ vẽ sẵn bằng SVG, số liệu nhúng trong file), tải về và mở bằng trình duyệt là xem được. Trên GitHub, file HTML chỉ hiện dạng mã nguồn; muốn xem trực tiếp cần bật GitHub Pages (Settings, Pages, Source: *Deploy from a branch*, chọn nhánh `main` và thư mục `/ (root)`).
+**Xem dashboard trực tiếp:** https://yq68.github.io/credit-portfolio-monitoring/dashboard/
 
-> Bản xem trực tiếp: `https://<tên-người-dùng>.github.io/<tên-repo>/dashboard/` **(CẦN ĐIỀN sau khi bật GitHub Pages)**
+Nguồn là file [`dashboard/index.html`](dashboard/index.html), tự chứa (biểu đồ vẽ sẵn bằng SVG, số liệu nhúng trong file), tải về mở bằng trình duyệt cũng xem được không cần mạng.
 
 ## Kết quả chính
 
