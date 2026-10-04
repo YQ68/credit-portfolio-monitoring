@@ -12,3 +12,10 @@ data/export/*
 !data/export/*.csv
 *.duckdb
 *.duckdb.wal
+
+# Power BI PBIP: file cục bộ do Desktop ghi, không đưa lên git (khuyến nghị của Microsoft).
+# localSettings.json chứa securityBindingsSignature gắn với tài khoản Windows của chủ máy.
+# cache.abf là bản nhị phân của dữ liệu đã nạp, đổi mỗi lần mở Desktop.
+# editorSettings.json thì giữ lại theo dõi.
+**/.pbi/localSettings.json
+**/.pbi/cache.abf

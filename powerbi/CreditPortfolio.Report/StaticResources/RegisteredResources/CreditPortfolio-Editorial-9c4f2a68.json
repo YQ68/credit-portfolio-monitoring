@@ -1,0 +1,113 @@
+{
+  "name": "CreditPortfolio-Editorial-9c4f2a68.json",
+  "dataColors": [
+    "#0F172A",
+    "#5C5349",
+    "#938A7F",
+    "#C2B9AC",
+    "#D4A30A",
+    "#78716C",
+    "#A8A29E",
+    "#E0D8C9"
+  ],
+  "good": "#4D7C0F",
+  "neutral": "#D4A30A",
+  "bad": "#9A3412",
+  "maximum": "#0F172A",
+  "center": "#938A7F",
+  "minimum": "#F0EADC",
+  "null": "#E0D8C9",
+  "background": "#FAF7F0",
+  "secondaryBackground": "#F0EADC",
+  "firstLevelElements": "#0F172A",
+  "secondLevelElements": "#5C5349",
+  "thirdLevelElements": "#E3DACB",
+  "fourthLevelElements": "#8A817A",
+  "tableAccent": "#0F172A",
+  "textClasses": {
+    "callout": {
+      "fontSize": 32,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#0F172A"
+    },
+    "title": {
+      "fontSize": 13,
+      "fontFace": "Cambria",
+      "color": "#0F172A"
+    },
+    "header": {
+      "fontSize": 10,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#0F172A"
+    },
+    "label": {
+      "fontSize": 9,
+      "fontFace": "Segoe UI",
+      "color": "#5C5349"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "show": false
+          }
+        ],
+        "border": [
+          {
+            "show": false
+          }
+        ],
+        "visualHeader": [
+          {
+            "show": false
+          }
+        ]
+      }
+    },
+    "tableEx": {
+      "*": {
+        "columnHeaders": [
+          {
+            "autoSizeColumnWidth": true,
+            "columnAdjustment": "growToFit"
+          }
+        ]
+      }
+    },
+    "pivotTable": {
+      "*": {
+        "columnHeaders": [
+          {
+            "autoSizeColumnWidth": true,
+            "columnAdjustment": "growToFit"
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#FAF7F0"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "outspace": [
+          {
+            "color": {
+              "solid": {
+                "color": "#F0EADC"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

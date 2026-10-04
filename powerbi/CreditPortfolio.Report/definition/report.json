@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
   "themeCollection": {
     "customTheme": {
-      "name": "CreditPortfolio-7c1a9e3b.json",
+      "name": "CreditPortfolio-Editorial-9c4f2a68.json",
       "reportVersionAtImport": {
         "visual": "2.9.0",
         "report": "3.3.0",
@@ -17,13 +17,28 @@
       "type": "RegisteredResources",
       "items": [
         {
-          "name": "CreditPortfolio-7c1a9e3b.json",
-          "path": "CreditPortfolio-7c1a9e3b.json",
+          "name": "CreditPortfolio-Editorial-9c4f2a68.json",
+          "path": "CreditPortfolio-Editorial-9c4f2a68.json",
           "type": "CustomTheme"
         }
       ]
     }
   ],
+  "objects": {
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
   "settings": {
     "useStylableVisualContainerHeader": true,
     "defaultFilterActionIsDataFilter": true,
