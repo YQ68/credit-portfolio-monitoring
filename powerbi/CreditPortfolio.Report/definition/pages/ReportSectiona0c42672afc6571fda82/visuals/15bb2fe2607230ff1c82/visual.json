@@ -3,10 +3,10 @@
   "name": "15bb2fe2607230ff1c82",
   "position": {
     "x": 24,
-    "y": 632,
+    "y": 624,
     "z": 900,
     "width": 1232,
-    "height": 48,
+    "height": 88,
     "tabOrder": 900
   },
   "visual": {
@@ -22,16 +22,16 @@
                     "value": "LƯU Ý   ",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
-                      "fontSize": "9pt",
+                      "fontSize": "8pt",
                       "color": "#D4A30A",
                       "fontWeight": "bold"
                     }
                   },
                   {
-                    "value": "Ảnh chụp tại tháng quan sát gần nhất của từng hợp đồng. Tỷ lệ 30+ ở đây là coincident, đo tại một thời điểm, khác với tỷ lệ vintage theo tuổi hợp đồng ở trang 3. Biểu đồ xếp hạng kênh đã lọc bỏ nhóm (không rõ) vì nhóm đó không biết được phân khúc; bốn thẻ KPI vẫn tính đủ danh mục.",
+                    "value": "Ảnh chụp tại tháng quan sát gần nhất (144.421 hợp đồng mở). Hai thẻ tỷ lệ tính trên cùng một tập 144.311 hợp đồng có dư nợ proxy, tức bỏ 110 hợp đồng thiếu dư nợ chứa 24 trên 159 ca 30+, toàn bộ thuộc nhóm (không rõ); bỏ hẳn nhóm (không rõ) cũng ra 0,094% (130 / 137.611). Biểu đồ kênh và bảng sản phẩm tính trên mọi hợp đồng mở (30+ là 0,110%); khoảng tin cậy giữa các kênh chồng nhau và mỗi kênh bán một rổ sản phẩm khác nhau, nên biểu đồ không dùng để xếp hạng kênh. Nhóm (không rõ) chiếm 4,72% hợp đồng mở nhưng 29 trên 159 ca 30+: giữ trong bảng, loại khỏi biểu đồ kênh. Độ nhạy: nếu không áp ngưỡng trọng yếu (SK_DPD) thì có 585 hợp đồng 30+ và B4 90+ là 438 thay vì 56, nhưng tỷ lệ dư nợ 30+ chỉ từ 0,301% lên 0,312%: phần chênh là khoản dư lẻ.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "9pt",
+                      "fontSize": "8pt",
                       "color": "#5C5349"
                     }
                   }

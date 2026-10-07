@@ -6,6 +6,15 @@
 --
 -- CẢNH BÁO KHI GOM NHÓM: chỉ được cộng n_loans và exposure rồi chia lại.
 --
+-- ĐỊNH NGHĨA QUÁ HẠN CHÍNH: SK_DPD_DEF (dpd_bucket, n_30_plus, exposure_30_plus).
+-- Cột hậu tố _no_threshold đếm 30+ theo SK_DPD (không áp ngưỡng trọng yếu), chỉ để phân tích độ
+-- nhạy; chúng KHÔNG khớp với dpd_bucket của dòng (dòng B0 vẫn có thể có n_30_plus_no_threshold > 0).
+--
+-- HAI THẺ KPI PHẢI CÙNG TẬP: exposure_proxy NULL ở hợp đồng POS không khớp hồ sơ (thiếu
+-- annuity_amount), gần như toàn bộ nằm trong nhóm '(không rõ)'. Tỷ lệ 30+ theo hợp đồng và theo dư
+-- nợ chỉ so được với nhau khi tính trên cùng tập hợp đồng có exposure: dùng n_loans_exposure_known
+-- và n_30_plus_exposure_known làm cặp tử, mẫu theo hợp đồng đi cùng exposure_30_plus / exposure.
+--
 -- Bảng này sinh ra để trang 1 của báo cáo Power BI bám đúng trang 1 của
 -- dashboard/index.html, vốn đọc thẳng core.fct_loan_month chứ không qua mart.
 --
@@ -38,7 +47,15 @@ select
     count(*)                                          as n_loans,
     sum(f.exposure_proxy)                             as exposure,
     count(*) filter (where f.is_30_plus)              as n_30_plus,
-    sum(f.exposure_proxy) filter (where f.is_30_plus) as exposure_30_plus
+    sum(f.exposure_proxy) filter (where f.is_30_plus) as exposure_30_plus,
+    -- cùng tập với exposure: chỉ hợp đồng có exposure_proxy khác NULL
+    count(f.exposure_proxy)                           as n_loans_exposure_known,
+    count(f.exposure_proxy) filter (where f.is_30_plus)
+                                                      as n_30_plus_exposure_known,
+    -- độ nhạy: 30+ theo SK_DPD, không áp ngưỡng trọng yếu
+    count(*) filter (where f.is_30_plus_no_threshold) as n_30_plus_no_threshold,
+    sum(f.exposure_proxy) filter (where f.is_30_plus_no_threshold)
+                                                      as exposure_30_plus_no_threshold
 from core.fct_loan_month f
 join loans l
   on f.sk_id_prev = l.sk_id_prev

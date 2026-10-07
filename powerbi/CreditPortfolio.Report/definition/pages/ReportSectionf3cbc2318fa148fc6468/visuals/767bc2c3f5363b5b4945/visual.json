@@ -361,7 +361,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Ma trận chuyển nhóm: dòng là nhóm quá hạn tháng này, cột là nhóm tháng sau. B1 1-30 có 50,1% quay về B0 Current và 38,5% ở lại B1.'"
+                  "Value": "'Ma trận chuyển nhóm: dòng là nhóm quá hạn tháng này, cột là nhóm tháng sau. Hơn một nửa B1 quay về B0 Current, rất ít rơi tiếp sang B2.'"
                 }
               }
             }
@@ -381,7 +381,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Từ nhóm quá hạn tháng t (dòng) sang nhóm tháng t+1 (cột)'"
+                  "Value": "'B1 hiếm khi rơi tiếp: mỗi tháng chỉ 0,709% sang B2, 57,7% quay về B0'"
                 }
               }
             },
@@ -393,6 +393,13 @@
                       "Value": "'#0F172A'"
                     }
                   }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }

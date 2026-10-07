@@ -1,6 +1,6 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
-  "name": "fd30dd1c1c04036c4d41",
+  "name": "fea9b89554adfc1c9e0c",
   "position": {
     "x": 648,
     "y": 384,
@@ -34,30 +34,60 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Vintage"
+                      "Entity": "Funnel"
                     }
                   },
-                  "Property": "Ever 30 Plus MOB12"
+                  "Property": "Applications"
                 }
               },
-              "queryRef": "Vintage.Ever 30 Plus MOB12",
-              "nativeQueryRef": "Ever 30 Plus MOB12",
-              "displayName": "Từng 30+ tại MOB 12"
+              "queryRef": "Funnel.Applications",
+              "nativeQueryRef": "Applications",
+              "displayName": "Số hồ sơ"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Vintage"
+                      "Entity": "Funnel"
                     }
                   },
-                  "Property": "Vintage Loans MOB12"
+                  "Property": "Approval Rate"
                 }
               },
-              "queryRef": "Vintage.Vintage Loans MOB12",
-              "nativeQueryRef": "Vintage Loans MOB12",
-              "displayName": "Mẫu số tại MOB 12"
+              "queryRef": "Funnel.Approval Rate",
+              "nativeQueryRef": "Approval Rate",
+              "displayName": "Tỷ lệ duyệt thô"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Funnel"
+                    }
+                  },
+                  "Property": "Approval Standardized Ratio"
+                }
+              },
+              "queryRef": "Funnel.Approval Standardized Ratio",
+              "nativeQueryRef": "Approval Standardized Ratio",
+              "displayName": "Duyệt so với kỳ vọng"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Funnel"
+                    }
+                  },
+                  "Property": "Take-up Rate Consumer"
+                }
+              },
+              "queryRef": "Funnel.Take-up Rate Consumer",
+              "nativeQueryRef": "Take-up Rate Consumer",
+              "displayName": "Take-up vay tiêu dùng"
             }
           ]
         }
@@ -69,10 +99,10 @@
               "Measure": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "Vintage"
+                    "Entity": "Funnel"
                   }
                 },
-                "Property": "Ever 30 Plus MOB12"
+                "Property": "Applications"
               }
             },
             "direction": "Descending"
@@ -109,7 +139,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "9D"
+                  "Value": "8D"
                 }
               }
             },
@@ -151,7 +181,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "9D"
+                  "Value": "8D"
                 }
               }
             },
@@ -246,6 +276,19 @@
             }
           }
         }
+      ],
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -328,7 +371,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Bảng xếp hạng bảy kênh theo tỷ lệ từng quá hạn 30+ tại MOB 12, kèm cột mẫu số là số hợp đồng quan sát được tại đúng MOB 12.'"
+                  "Value": "'Bảng phễu duyệt theo kênh: số hồ sơ, tỷ lệ duyệt thô, tỷ số duyệt so với kỳ vọng theo cơ cấu sản phẩm và take-up của vay tiêu dùng.'"
                 }
               }
             }
@@ -348,7 +391,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Xếp hạng kênh tại MOB 12, kèm mẫu số ghim cùng ngữ cảnh'"
+                  "Value": "'Tỷ lệ duyệt chênh do cơ cấu sản phẩm: chuẩn hoá thì Credit and cash offices 1,00 và Stone 1,01 lần kỳ vọng'"
                 }
               }
             },
@@ -360,6 +403,13 @@
                       "Value": "'#0F172A'"
                     }
                   }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }
@@ -397,7 +447,7 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "Filterfd30dd1c1c04036c4d4149d8",
+        "name": "Filterfea9b89554adfc1c9e0c3377",
         "field": {
           "Column": {
             "Expression": {

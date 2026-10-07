@@ -82,6 +82,9 @@ def main():
         sys.exit(f"{args.db} not found. Run scripts/load_raw.py first.")
 
     con = duckdb.connect(str(args.db))
+    # Một luồng: tổng số thực (sum trên double) của DuckDB không tất định khi chạy đa luồng, vì thứ
+    # tự cộng thay đổi giữa các lần chạy. scripts/build_dashboard.py và compute_findings.py cũng vậy.
+    con.execute("PRAGMA threads=1")
     if not args.tests_only:
         run_models(con)
     n_failed = run_tests(con)

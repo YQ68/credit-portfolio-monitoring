@@ -1,148 +1,319 @@
-/// Vintage: tỷ lệ TỪNG quá hạn 30+ theo tuổi hợp đồng (M08). Mẫu số đã loại hợp đồng có cờ is_partial_history.
+/// Vintage: tỷ lệ TỪNG quá hạn 30+ theo tuổi hợp đồng (M08), định nghĩa SK_DPD_DEF.
+/// Mẫu số: hợp đồng đã biết kết quả đến MOB n, đã loại is_partial_history.
 table Vintage
-	lineageTag: f3d19c8d-02d5-44fd-a6a3-f9498b217d1a
 
 	/// Số hợp đồng trong mẫu số vintage tại MOB đang lọc.
 	measure 'Vintage Loans' = SUM(Vintage[n_loans])
 		formatString: #,##0
-		lineageTag: 1f86bf50-8f0b-461a-85c1-1dbaa80d1a58
 
-	/// Số hợp đồng từng quá hạn trên 30 ngày tính đến MOB đang lọc.
+	/// Số hợp đồng từng quá hạn trên 30 ngày (SK_DPD_DEF) tính đến MOB đang lọc.
 	measure 'Ever 30 Plus Loans' = SUM(Vintage[n_ever_30_plus])
 		formatString: #,##0
-		lineageTag: e10c0f53-1af8-4ceb-8aa0-172c8ebbd719
 
 	/// M08. Tỷ lệ từng quá hạn 30+ tại MOB đang lọc. Cộng tử và mẫu trước rồi chia.
 	/// Không có bộ lọc MOB thì số này gộp mọi MOB và vô nghĩa, hãy dùng [Ever 30 Plus MOB12].
 	measure 'Ever 30 Plus Rate' = DIVIDE([Ever 30 Plus Loans], [Vintage Loans])
-		formatString: 0.0%
-		lineageTag: efff712e-ad06-46dd-8ea5-d72a830adbdf
+		formatString: 0.000%
 
-	/// M08 tại MOB 12, trục rủi ro chính của project.
-	/// Cố định đúng mob = 12 bằng CALCULATE nên không phụ thuộc slicer MOB.
-	/// Dùng thay FPD30 vì FPD có thiên lệch sống sót.
-	measure 'Ever 30 Plus MOB12' =
-			DIVIDE(
-			    CALCULATE(SUM(Vintage[n_ever_30_plus]), Vintage[mob] = 12),
-			    CALCULATE(SUM(Vintage[n_loans]), Vintage[mob] = 12)
-			)
-		formatString: 0.0%
-		lineageTag: 0fbfd3cb-19e3-44cf-8621-600b4047927b
+	/// Số ca từng 30+ tại MOB 12. Đây là số ca QUAN SÁT (O) của SMR.
+	measure 'Ever 30 Plus Loans MOB12' = CALCULATE(SUM(Vintage[n_ever_30_plus]), Vintage[mob] = 12)
+		formatString: #,##0
 
 	/// Mẫu số của [Ever 30 Plus MOB12]. Dùng cột này khi đặt cạnh tỷ lệ tại MOB 12:
 	/// [Vintage Loans] cộng qua MỌI mob nên lớn hơn nhiều lần và không phải mẫu số của tỷ lệ bên cạnh.
 	measure 'Vintage Loans MOB12' = CALCULATE(SUM(Vintage[n_loans]), Vintage[mob] = 12)
 		formatString: #,##0
-		lineageTag: 3d98ca2d-ff8b-4fc2-89e9-cb0c39ea3cd2
 
-	/// Bản dùng cột DPD có dung sai (SK_DPD_DEF). Chỉ tiêu PHỤ để đối chiếu, không phải trục chính.
-	measure 'Ever 30 Plus MOB12 Tolerant' =
+	/// M08 tại MOB 12, trục rủi ro chính của project.
+	/// Cố định đúng mob = 12 bằng CALCULATE nên không phụ thuộc slicer MOB.
+	measure 'Ever 30 Plus MOB12' = DIVIDE([Ever 30 Plus Loans MOB12], [Vintage Loans MOB12])
+		formatString: 0.000%
+
+	/// Độ nhạy: cùng mẫu số nhưng tử số theo SK_DPD (không áp ngưỡng trọng yếu).
+	/// Phần chênh so với [Ever 30 Plus MOB12] phần lớn là khoản dư lẻ sau kỳ trả cuối.
+	measure 'Ever 30 Plus MOB12 No Threshold' = ```
 			DIVIDE(
-			    CALCULATE(SUM(Vintage[n_ever_30_plus_tolerant]), Vintage[mob] = 12),
-			    CALCULATE(SUM(Vintage[n_loans]), Vintage[mob] = 12)
+			    CALCULATE(SUM(Vintage[n_ever_30_plus_no_threshold]), Vintage[mob] = 12),
+			    [Vintage Loans MOB12]
 			)
-		formatString: 0.0%
-		lineageTag: 8f7129a9-da2f-4d91-9502-572fae75a671
+			```
+		formatString: 0.000%
+
+	/// Số ca KỲ VỌNG (E) tại MOB 12 nếu kênh có tỷ lệ của từng sản phẩm trên toàn danh mục.
+	/// Khớp channel_comparison.mob12.smr_by_channel[].primary.expected trong findings.json.
+	measure 'Expected 30 Plus MOB12' = ```
+			SUMX(
+			    VALUES(Vintage[contract_type]),
+			    VAR loans = [Vintage Loans MOB12]
+			    VAR productRate =
+			        CALCULATE(
+			            [Ever 30 Plus MOB12],
+			            REMOVEFILTERS('Dim Channel'),
+			            REMOVEFILTERS(Vintage[channel_type])
+			        )
+			    RETURN loans * productRate
+			)
+			```
+		formatString: #,##0.0
+
+	/// SMR = O / E. Trên 1: kênh xấu hơn mức sản phẩm của chính nó. Tử số dưới 10 thì không kết luận.
+	measure 'SMR MOB12' = DIVIDE([Ever 30 Plus Loans MOB12], [Expected 30 Plus MOB12])
+		formatString: 0.00
+
+	/// Cận dưới khoảng tin cậy 95% của SMR, xấp xỉ Byar (cùng công thức với compute_findings.py).
+	measure 'SMR MOB12 CI Low' = ```
+			VAR O = [Ever 30 Plus Loans MOB12]
+			VAR E = [Expected 30 Plus MOB12]
+			VAR z = 1.959963985
+			RETURN
+			    IF(E > 0, IF(O = 0, 0, O * POWER(1 - 1 / (9 * O) - z / (3 * SQRT(O)), 3) / E))
+			```
+		formatString: 0.00
+
+	/// Cận trên khoảng tin cậy 95% của SMR, xấp xỉ Byar.
+	measure 'SMR MOB12 CI High' = ```
+			VAR O1 = [Ever 30 Plus Loans MOB12] + 1
+			VAR E = [Expected 30 Plus MOB12]
+			VAR z = 1.959963985
+			RETURN
+			    IF(E > 0, O1 * POWER(1 - 1 / (9 * O1) + z / (3 * SQRT(O1)), 3) / E)
+			```
+		formatString: 0.00
+
+	/// Định nghĩa giữa: cùng mẫu số, tử số là SK_DPD 30+ ở tháng còn kỳ phải trả.
+	measure 'Ever 30 Plus MOB12 Due Only' = ```
+			DIVIDE(
+			    CALCULATE(SUM(Vintage[n_ever_30_plus_due_only]), Vintage[mob] = 12),
+			    [Vintage Loans MOB12]
+			)
+			```
+		formatString: 0.000%
+
+	/// Số ca KỲ VỌNG (E) tại MOB 12 nếu kênh có tỷ lệ của từng tầng sản phẩm × đợt mở 12 tháng trên toàn danh mục.
+	/// Khớp origination_cohort.mob12.smr_by_channel.product_x_cut12.primary[].expected trong findings.json.
+	measure 'Expected 30 Plus MOB12 Cohort' = ```
+			SUMX(
+			    SUMMARIZE(Vintage, Vintage[contract_type], Vintage[origination_cohort]),
+			    VAR loans = [Vintage Loans MOB12]
+			    VAR stratumRate =
+			        CALCULATE(
+			            [Ever 30 Plus MOB12],
+			            REMOVEFILTERS('Dim Channel'),
+			            REMOVEFILTERS(Vintage[channel_type])
+			        )
+			    RETURN loans * stratumRate
+			)
+			```
+		formatString: #,##0.0
+
+	/// SMR kiểm soát cả sản phẩm lẫn đợt mở = O / E theo tầng sản phẩm × đợt. Tử số dưới 10 thì không kết luận.
+	measure 'SMR MOB12 Cohort' = DIVIDE([Ever 30 Plus Loans MOB12], [Expected 30 Plus MOB12 Cohort])
+		formatString: 0.00
+
+	/// Cận dưới khoảng tin cậy 95% của [SMR MOB12 Cohort], xấp xỉ Byar.
+	measure 'SMR MOB12 Cohort CI Low' = ```
+			VAR O = [Ever 30 Plus Loans MOB12]
+			VAR E = [Expected 30 Plus MOB12 Cohort]
+			VAR z = 1.959963985
+			RETURN
+			    IF(E > 0, IF(O = 0, 0, O * POWER(1 - 1 / (9 * O) - z / (3 * SQRT(O)), 3) / E))
+			```
+		formatString: 0.00
+
+	/// Cận trên khoảng tin cậy 95% của [SMR MOB12 Cohort], xấp xỉ Byar.
+	measure 'SMR MOB12 Cohort CI High' = ```
+			VAR O1 = [Ever 30 Plus Loans MOB12] + 1
+			VAR E = [Expected 30 Plus MOB12 Cohort]
+			VAR z = 1.959963985
+			RETURN
+			    IF(E > 0, O1 * POWER(1 - 1 / (9 * O1) + z / (3 * SQRT(O1)), 3) / E)
+			```
+		formatString: 0.00
+
+	/// Tỷ số thô tỷ lệ từng 30+ tại MOB 12 của sản phẩm đang lọc so với vay tiền mặt (định nghĩa chính).
+	measure 'Ratio vs Cash Crude' = ```
+			DIVIDE(
+			    [Ever 30 Plus MOB12],
+			    CALCULATE([Ever 30 Plus MOB12], REMOVEFILTERS('Dim Product'), Vintage[contract_type] = "Cash loans")
+			)
+			```
+		formatString: 0.00
+
+	/// Tỷ số Mantel-Haenszel so với vay tiền mặt, gộp qua đợt mở 12 tháng (định nghĩa chính).
+	/// Khớp origination_cohort.mob12.product_ratio_vs_cash.<sản phẩm>.primary.mh_cut12.ratio.
+	measure 'Ratio vs Cash MH Cohort' = ```
+			VAR cashRows = CALCULATETABLE(Vintage, REMOVEFILTERS('Dim Product'), Vintage[contract_type] = "Cash loans", Vintage[mob] = 12)
+			VAR prodRows = CALCULATETABLE(Vintage, Vintage[mob] = 12)
+			VAR strata = DISTINCT(SELECTCOLUMNS(CALCULATETABLE(Vintage, REMOVEFILTERS('Dim Product'), Vintage[mob] = 12), "c", Vintage[origination_cohort_start]))
+			VAR num =
+			    SUMX(strata,
+			        VAR c = [c]
+			        VAR k1 = SUMX(FILTER(prodRows, Vintage[origination_cohort_start] = c), Vintage[n_ever_30_plus])
+			        VAR n1 = SUMX(FILTER(prodRows, Vintage[origination_cohort_start] = c), Vintage[n_loans])
+			        VAR n0 = SUMX(FILTER(cashRows, Vintage[origination_cohort_start] = c), Vintage[n_loans])
+			        RETURN IF(n1 + n0 > 0, k1 * n0 / (n1 + n0)))
+			VAR den =
+			    SUMX(strata,
+			        VAR c = [c]
+			        VAR k0 = SUMX(FILTER(cashRows, Vintage[origination_cohort_start] = c), Vintage[n_ever_30_plus])
+			        VAR n1 = SUMX(FILTER(prodRows, Vintage[origination_cohort_start] = c), Vintage[n_loans])
+			        VAR n0 = SUMX(FILTER(cashRows, Vintage[origination_cohort_start] = c), Vintage[n_loans])
+			        RETURN IF(n1 + n0 > 0, k0 * n1 / (n1 + n0)))
+			RETURN
+			    IF(SELECTEDVALUE(Vintage[contract_type]) <> "Cash loans", DIVIDE(num, den))
+			```
+		formatString: 0.00
+
+	/// Tỷ số thô so với vay tiền mặt theo định nghĩa giữa.
+	measure 'Ratio vs Cash Due Only' = ```
+			DIVIDE(
+			    [Ever 30 Plus MOB12 Due Only],
+			    CALCULATE([Ever 30 Plus MOB12 Due Only], REMOVEFILTERS('Dim Product'), Vintage[contract_type] = "Cash loans")
+			)
+			```
+		formatString: 0.00
+
+	/// Tỷ số thô so với vay tiền mặt khi không áp ngưỡng trọng yếu (SK_DPD).
+	measure 'Ratio vs Cash No Threshold' = ```
+			DIVIDE(
+			    [Ever 30 Plus MOB12 No Threshold],
+			    CALCULATE([Ever 30 Plus MOB12 No Threshold], REMOVEFILTERS('Dim Product'), Vintage[contract_type] = "Cash loans")
+			)
+			```
+		formatString: 0.00
+
+	/// [Ever 30 Plus Rate] của một đợt mở, chỉ tại MOB mà mọi hợp đồng của đợt đã đủ tuổi
+	/// (tháng cuối của đợt <= -1 - MOB). Khớp origination_cohort.curve_by_cohort_labeled_products.
+	measure 'Cohort Ever 30 Plus Rate' = ```
+			VAR m = SELECTEDVALUE(Vintage[mob])
+			VAR s = MIN(Vintage[origination_cohort_start])
+			RETURN
+			    IF(NOT ISBLANK(m) && HASONEVALUE(Vintage[origination_cohort]) && s + 11 <= -1 - m, [Ever 30 Plus Rate])
+			```
+		formatString: 0.000%
+
+	/// Trình bày: [Ever 30 Plus MOB12] chỉ cho Contact center và Stone (trang 2), để tô mustard.
+	measure 'Highlight Ever 30 Plus MOB12' = IF(SELECTEDVALUE('Dim Channel'[Kênh]) IN {"Contact center", "Stone"}, [Ever 30 Plus MOB12])
+		formatString: 0.000%
+
+	/// Trình bày: [Ever 30 Plus MOB12] cho các kênh còn lại (trang 2), tô xám.
+	measure 'Base Ever 30 Plus MOB12' = IF(NOT(SELECTEDVALUE('Dim Channel'[Kênh]) IN {"Contact center", "Stone"}), [Ever 30 Plus MOB12])
+		formatString: 0.000%
+
+	/// Trình bày: [Ever 30 Plus Rate] chỉ cho Contact center (trang 3), để tô mustard.
+	measure 'Highlight Ever 30 Plus Rate' = IF(SELECTEDVALUE('Dim Channel'[Kênh]) = "Contact center", [Ever 30 Plus Rate])
+		formatString: 0.000%
+
+	/// Trình bày: [Ever 30 Plus Rate] cho các kênh còn lại (trang 3), tô mực.
+	measure 'Base Ever 30 Plus Rate' = IF(SELECTEDVALUE('Dim Channel'[Kênh]) <> "Contact center", [Ever 30 Plus Rate])
+		formatString: 0.000%
 
 	/// pos_cash hay credit_card, cho biết hợp đồng đến từ bảng nguồn nào.
 	column source
 		dataType: string
-		lineageTag: 24bad64e-eac7-474c-82d3-35da1b6d6f18
 		sourceColumn: source
 
 	column contract_type
 		dataType: string
 		isHidden
-		lineageTag: 1bd9c324-7edb-4996-831d-3bd868528a8c
 		sourceColumn: contract_type
 
 	column channel_type
 		dataType: string
 		isHidden
-		lineageTag: 66e0d50d-b10e-4e19-9208-2bef59b0841c
 		sourceColumn: channel_type
 
 	column client_type
 		dataType: string
-		lineageTag: 52455ac6-e832-4be7-a26f-80aa32e208cf
 		sourceColumn: client_type
 
 	column yield_group
 		dataType: string
-		lineageTag: ffbec50b-ca99-439f-8afa-e7d8e2879085
 		sourceColumn: yield_group
 
 	/// Nhóm kỳ hạn.
 	column tenor_group
 		dataType: string
-		lineageTag: a14d0760-8224-4f25-b013-54061f83ee1c
 		sourceColumn: tenor_group
+
+	/// Đợt mở: nhóm 12 tháng của tháng mở hợp đồng, tính tương đối so với ngày nộp hồ sơ hiện tại.
+	column origination_cohort
+		dataType: string
+		sortByColumn: 'origination_cohort_start'
+		sourceColumn: origination_cohort
+
+	/// Tháng tương đối đầu đợt mở, dùng để sắp xếp đợt.
+	column origination_cohort_start
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: origination_cohort_start
 
 	/// Months on book: hợp đồng đã chạy bao nhiêu tháng.
 	column mob
 		dataType: int64
 		formatString: 0
-		lineageTag: 5716b84a-b0b9-4acf-9ff1-84627c5d783f
 		summarizeBy: none
 		sourceColumn: mob
 
 	column n_loans
 		dataType: int64
-		lineageTag: 611ff390-bb8c-443b-a854-c0331b19757e
 		summarizeBy: sum
 		sourceColumn: n_loans
 
 	column n_observed_full
 		dataType: int64
-		lineageTag: 5014b0a1-d2dd-41c9-93cf-a07c8bfb5421
 		summarizeBy: sum
 		sourceColumn: n_observed_full
 
 	column n_closed_early
 		dataType: int64
-		lineageTag: 545623a8-00bd-4c05-bd63-f47782d2d88b
 		summarizeBy: sum
 		sourceColumn: n_closed_early
 
+	/// Từng 30+ theo SK_DPD_DEF (định nghĩa chính).
 	column n_ever_30_plus
 		dataType: int64
-		lineageTag: 295f44c7-6cf9-4544-80ef-24e151991e84
 		summarizeBy: sum
 		sourceColumn: n_ever_30_plus
 
-	column n_ever_30_plus_tolerant
+	/// Từng 30+ theo SK_DPD, chỉ dùng làm độ nhạy.
+	column n_ever_30_plus_no_threshold
 		dataType: int64
-		lineageTag: 91767bef-d69c-47c1-b02a-868d835b2995
 		summarizeBy: sum
-		sourceColumn: n_ever_30_plus_tolerant
+		sourceColumn: n_ever_30_plus_no_threshold
+
+	/// Từng 30+ theo định nghĩa giữa (SK_DPD 30+ ở tháng còn kỳ phải trả).
+	column n_ever_30_plus_due_only
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_ever_30_plus_due_only
 
 	/// ẨN có chủ đích: dùng measure [Ever 30 Plus Rate].
 	column ever_30_plus_rate
 		dataType: double
 		isHidden
-		lineageTag: 4e690eac-2e96-4d0c-8d9f-3e7a652599f5
 		summarizeBy: none
 		sourceColumn: ever_30_plus_rate
 
 	/// ẨN có chủ đích.
-	column ever_30_plus_rate_tolerant
+	column ever_30_plus_rate_no_threshold
 		dataType: double
 		isHidden
-		lineageTag: d43d73af-670c-4077-bbb8-62d982d37755
 		summarizeBy: none
-		sourceColumn: ever_30_plus_rate_tolerant
+		sourceColumn: ever_30_plus_rate_no_threshold
 
 	partition Vintage = m
 		mode: import
 		source =
-				let
-					// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
-					#"Đã đọc file CSV" = Csv.Document(
-						File.Contents(DataFolder & "\mart_vintage.csv"),
-						[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
-					),
-					#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
-					#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"source", type text}, {"contract_type", type text}, {"channel_type", type text}, {"client_type", type text}, {"yield_group", type text}, {"tenor_group", type text}, {"mob", Int64.Type}, {"n_loans", Int64.Type}, {"n_observed_full", Int64.Type}, {"n_closed_early", Int64.Type}, {"n_ever_30_plus", Int64.Type}, {"n_ever_30_plus_tolerant", Int64.Type}, {"ever_30_plus_rate", type number}, {"ever_30_plus_rate_tolerant", type number}})
-				in
-					#"Đã ép kiểu dữ liệu từng cột"
-
+			let
+				// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
+				#"Đã đọc file CSV" = Csv.Document(
+					File.Contents(DataFolder & "\mart_vintage.csv"),
+					[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				),
+				#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
+				#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"source", type text}, {"contract_type", type text}, {"channel_type", type text}, {"client_type", type text}, {"yield_group", type text}, {"tenor_group", type text}, {"origination_cohort", type text}, {"origination_cohort_start", Int64.Type}, {"mob", Int64.Type}, {"n_loans", Int64.Type}, {"n_observed_full", Int64.Type}, {"n_closed_early", Int64.Type}, {"n_ever_30_plus", Int64.Type}, {"n_ever_30_plus_no_threshold", Int64.Type}, {"n_ever_30_plus_due_only", Int64.Type}, {"ever_30_plus_rate", type number}, {"ever_30_plus_rate_no_threshold", type number}}, "en-US")
+			in
+				#"Đã ép kiểu dữ liệu từng cột"

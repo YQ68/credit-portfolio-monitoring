@@ -1,5 +1,4 @@
-/// Thư mục chứa 5 file CSV xuất từ mart (scripts/build_dashboard.py và scripts/export_snapshot.py).
-/// Đổi giá trị này nếu clone repo về máy khác.
+/// Thư mục chứa 5 file CSV xuất từ mart (scripts/build_dashboard.py).
+/// Giá trị trong git là đường dẫn mẫu: đổi thành đường dẫn tuyệt đối tới data/export trên máy bạn,
+/// hoặc sinh lại bằng: python scripts/build_pbip_model.py --data-folder <đường dẫn>.
 expression DataFolder = "C:\\path\\to\\credit-portfolio-monitoring\\data\\export" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
-	lineageTag: 5dde4788-2a12-42a7-a956-9d882f325c10
-

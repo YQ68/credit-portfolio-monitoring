@@ -5,34 +5,48 @@
 --
 -- Lưu tử số, mẫu số dạng số đếm để cộng dồn được khi gom nhóm lớn hơn.
 --
--- CẢNH BÁO QUAN TRỌNG (xem docs/data_notes.md mục 11, dòng "Khả năng đo FPD30", và
--- docs/metric_dictionary.md mục M11):
--- bảng stg.installments_payments gần như chỉ ghi các kỳ ĐÃ TRẢ. Hợp đồng bỏ hẳn
--- kỳ 1 (không trả một đồng nào) thì không có dòng nào trong bảng này, nên biến mất
--- khỏi mẫu số thay vì được tính là vỡ nợ. Vì vậy fpd30_rate trong mart này là
--- CHẶN DƯỚI của FPD30 thật, không phải con số cuối cùng. Cột n_approved_no_installment
--- đo quy mô của vùng mù này: số hồ sơ Approved cùng phân khúc mà không có dòng kỳ 1
--- nào trong installments_payments (toàn danh mục khoảng 77.885 hồ sơ, 7,52%).
+-- HỒ SƠ DUYỆT KHÔNG CÓ DÒNG KỲ 1 (sửa 2026-10-04): trước đây nhóm này (77.885 hồ sơ) bị gọi là
+-- "vùng mù" và fpd30_rate bị gọi là chặn dưới, với giả định đó là hợp đồng xấu bỏ hẳn kỳ 1. Kiểm
+-- tra lại: 77.884 trên 77.885 hồ sơ không có lịch trả (DAYS_FIRST_DUE là 365243 hoặc trống, tức
+-- stg.previous_application.days_first_due IS NULL), nghĩa là được duyệt nhưng không giải ngân hoặc
+-- chưa kích hoạt. Chúng không bao giờ thuộc mẫu số FPD và không phải hợp đồng xấu biến mất. Đếm
+-- riêng ở hai cột:
+--   n_approved_not_activated             duyệt, không có lịch trả, không có dòng kỳ 1
+--   n_approved_scheduled_no_installment  duyệt, CÓ lịch trả nhưng không có dòng kỳ 1 (phần thực sự
+--                                        không quan sát được, 1 hồ sơ trên toàn danh mục)
 --
--- Quy tắc kỳ 1: installment_number = 1, bỏ installment_version = 0 (thẻ tín dụng),
--- lấy version nhỏ nhất còn lại. Một kỳ có thể trả nhiều lần: cộng các lần trả có
--- days_late <= 30 trước khi so với installment_amount, dung sai 5%.
+-- Quy tắc kỳ 1: installment_number = 1, bỏ installment_version = 0 (thẻ tín dụng, theo mô tả cột
+-- NUM_INSTALMENT_VERSION), lấy ĐÚNG version nhỏ nhất còn lại của hợp đồng (lịch trả gốc). Trước
+-- 2026-10-04 code cộng tiền trả qua mọi version và lấy max(installment_amount), ngược với tài liệu.
+-- 18.903 hợp đồng có từ 2 version kỳ 1; ở 18.595 hợp đồng trong số đó cùng một lần trả được ghi
+-- lặp nguyên ở mỗi version, còn số tiền phải trả bị tách ra giữa các version (tổng installment_amount
+-- các version đúng bằng số tiền trả), nên cộng qua version làm phồng tiền đã trả. Một kỳ có thể trả nhiều lần: cộng các lần trả có days_late <= 30 trong version đó trước khi
+-- so với installment_amount, dung sai 5%.
 -- Mẫu số: hợp đồng có kỳ 1 đến hạn trước thời điểm quan sát ít nhất 30 ngày
 -- (days_due <= -30) và installment_amount > 0.
 -- Hợp đồng không khớp được previous_application nhận nhãn phân khúc '(không rõ)'.
 
 create or replace table mart.fpd_by_segment as
-with first_installment as (
-    -- Kỳ 1 của mỗi hợp đồng trả góp. Một kỳ có thể được trả thành nhiều lần: cộng lại.
+with first_installment_rows as (
+    -- Các dòng kỳ 1, kèm version nhỏ nhất (khác 0) của từng hợp đồng.
+    select
+        *,
+        min(installment_version) over (partition by sk_id_prev) as min_version
+    from stg.installments_payments
+    where installment_number = 1
+      and installment_version > 0          -- version 0 là thẻ tín dụng
+),
+
+first_installment as (
+    -- Kỳ 1 theo lịch trả gốc (version nhỏ nhất). Một kỳ có thể được trả thành nhiều lần: cộng lại.
     select
         sk_id_prev,
         min(days_due)                                              as days_due,
         max(installment_amount)                                    as installment_amount,
         coalesce(sum(payment_amount) filter (where days_late <= 30), 0) as paid_within_30d,
         max(days_late)                                             as max_days_late
-    from stg.installments_payments
-    where installment_number = 1
-      and installment_version > 0          -- version 0 là thẻ tín dụng
+    from first_installment_rows
+    where installment_version = min_version
     group by sk_id_prev
 ),
 
@@ -63,16 +77,14 @@ loans as (
 
 any_first_installment as (
     -- Sự tồn tại của dòng kỳ 1, KHÔNG lọc installment_version (khác first_installment ở trên,
-    -- vốn bỏ version 0 vì mục đích tính FPD30). Cột n_approved_no_installment là chỉ báo về
-    -- việc "hoàn toàn không có dòng kỳ 1 nào được ghi nhận", nên phải tính trên toàn bộ dòng.
+    -- vốn bỏ version 0 vì mục đích tính FPD30): đây là chỉ báo "hoàn toàn không có dòng kỳ 1".
     select distinct sk_id_prev
     from stg.installments_payments
     where installment_number = 1
 ),
 
 approved_no_installment as (
-    -- Hồ sơ Approved không có dòng kỳ 1 nào trong installments_payments: rủi ro sớm
-    -- không quan sát được (xem cảnh báo đầu file). Đếm theo cùng phân khúc để so sánh.
+    -- Hồ sơ Approved không có dòng kỳ 1 nào, tách theo có hay không có lịch trả (xem đầu file).
     select
         coalesce(a.contract_type, 'Unknown') as contract_type,
         case
@@ -81,7 +93,8 @@ approved_no_installment as (
         end                                  as channel_type,
         coalesce(a.client_type, 'Unknown')   as client_type,
         coalesce(a.yield_group, 'Unknown')   as yield_group,
-        count(*) as n_approved_no_installment
+        count(*) filter (where a.days_first_due is null)     as n_approved_not_activated,
+        count(*) filter (where a.days_first_due is not null) as n_approved_scheduled_no_installment
     from stg.previous_application a
     left join any_first_installment f on f.sk_id_prev = a.sk_id_prev
     where a.application_status = 'Approved'
@@ -115,7 +128,8 @@ select
     coalesce(f.n_fpd30, 0) / nullif(coalesce(f.n_loans, 0), 0)              as fpd30_rate,
     coalesce(f.n_fpd30_late_rule, 0)           as n_fpd30_late_rule,
     coalesce(f.n_fpd30_late_rule, 0) / nullif(coalesce(f.n_loans, 0), 0)    as fpd30_late_rule_rate,
-    coalesce(n.n_approved_no_installment, 0)   as n_approved_no_installment
+    coalesce(n.n_approved_not_activated, 0)    as n_approved_not_activated,
+    coalesce(n.n_approved_scheduled_no_installment, 0) as n_approved_scheduled_no_installment
 from fpd_agg f
 full outer join approved_no_installment n
     on f.contract_type = n.contract_type

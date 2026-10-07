@@ -110,6 +110,47 @@
               }
             ]
           }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#C2B9AC'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "RollRate"
+                          }
+                        },
+                        "Property": "from_state"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "'B3 61-90'"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
         }
       ],
       "categoryAxis": [
@@ -355,7 +396,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Biểu đồ thanh cure rate theo nhóm quá hạn xuất phát, đã bỏ B0 Current. B1 1-30 đạt 50,1% và được tô mustard, B2 17,3%, B3 7,0%, B4 2,0%.'"
+                  "Value": "'Biểu đồ thanh cure rate theo nhóm quá hạn xuất phát, đã bỏ B0 Current. B1 1-30 tô mustard; B3 61-90 tô xám nhạt vì dưới ngưỡng mẫu.'"
                 }
               }
             }
@@ -375,7 +416,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Cửa sổ thu hồi đóng nhanh: 50,1% ở B1 còn 7,0% ở B3'"
+                  "Value": "'Cure 57,7% ở B1, 27,8% ở B2, 1,2% ở B4; B3 chỉ 403 lượt, chưa đủ mẫu'"
                 }
               }
             },
@@ -387,6 +428,13 @@
                       "Value": "'#0F172A'"
                     }
                   }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }

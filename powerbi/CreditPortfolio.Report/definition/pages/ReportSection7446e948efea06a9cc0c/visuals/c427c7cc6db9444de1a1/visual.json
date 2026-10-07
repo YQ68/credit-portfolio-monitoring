@@ -33,10 +33,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Khoảng cách thô 8,1 lần giữa các kênh co lại còn 2,0 và 4,4 lần khi so trong cùng sản phẩm",
+                    "value": "Kiểm soát cả sản phẩm lẫn đợt mở: Contact center vẫn trên kỳ vọng (SMR 1,65 [1,21; 2,18]), Stone trên kỳ vọng theo định nghĩa chính (1,36 [1,08; 1,69]), Credit and cash offices không còn khác (0,89 [0,68; 1,14])",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "11pt",
+                      "fontSize": "9pt",
                       "color": "#5C5349"
                     }
                   }

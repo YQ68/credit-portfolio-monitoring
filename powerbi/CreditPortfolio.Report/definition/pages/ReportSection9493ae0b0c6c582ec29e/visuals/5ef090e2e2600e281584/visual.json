@@ -3,7 +3,7 @@
   "name": "5ef090e2e2600e281584",
   "position": {
     "x": 24,
-    "y": 160,
+    "y": 384,
     "z": 1100,
     "width": 1232,
     "height": 208,
@@ -42,12 +42,27 @@
                       "Entity": "Vintage"
                     }
                   },
-                  "Property": "Ever 30 Plus Rate"
+                  "Property": "Base Ever 30 Plus Rate"
                 }
               },
-              "queryRef": "Vintage.Ever 30 Plus Rate",
-              "nativeQueryRef": "Ever 30 Plus Rate",
-              "displayName": "Tỷ lệ từng 30+"
+              "queryRef": "Vintage.Base Ever 30 Plus Rate",
+              "nativeQueryRef": "Base Ever 30 Plus Rate",
+              "displayName": "Kênh khác"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Vintage"
+                    }
+                  },
+                  "Property": "Highlight Ever 30 Plus Rate"
+                }
+              },
+              "queryRef": "Vintage.Highlight Ever 30 Plus Rate",
+              "nativeQueryRef": "Highlight Ever 30 Plus Rate",
+              "displayName": "Contact center"
             }
           ]
         },
@@ -75,7 +90,7 @@
       "dataPoint": [
         {
           "properties": {
-            "defaultColor": {
+            "fill": {
               "solid": {
                 "color": {
                   "expr": {
@@ -86,6 +101,27 @@
                 }
               }
             }
+          },
+          "selector": {
+            "metadata": "Vintage.Base Ever 30 Plus Rate"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#D4A30A'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Vintage.Highlight Ever 30 Plus Rate"
           }
         }
       ],
@@ -413,7 +449,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Bảy ô nhỏ, mỗi ô một kênh bán, cùng thang trục giá trị. Trục ngang là MOB từ 0 đến 37, trục dọc là tỷ lệ từng quá hạn 30 ngày trở lên. Stone và Country-wide dựng dốc trong mười hai tháng đầu rồi đi ngang.'"
+                  "Value": "'Bảy ô nhỏ, mỗi ô một kênh bán, cùng thang trục giá trị. Trục ngang là MOB, trục dọc là tỷ lệ từng quá hạn 30 ngày trở lên. Contact center tô mustard, cao nhất ở mọi MOB.'"
                 }
               }
             }
@@ -433,7 +469,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Bảy kênh trên cùng một thang: Stone và Country-wide dựng dốc sớm nhất'"
+                  "Value": "'Số thô theo kênh: Contact center cao nhất tại MOB 6, MOB 12 và MOB 24 (0,171%, 0,296%, 0,502%), nhưng 41 trên 47 ca thẻ của kênh tại MOB 12 là thẻ mở từ -60 trở về trước'"
                 }
               }
             },
@@ -445,6 +481,20 @@
                       "Value": "'#0F172A'"
                     }
                   }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
                 }
               }
             }

@@ -1,29 +1,26 @@
-/// Danh mục loại sản phẩm dùng chung. Slicer nên lấy từ bảng này để lọc đồng thời cả bốn bảng mart.
+/// Danh mục loại sản phẩm dùng chung. Slicer nên lấy từ bảng này để lọc đồng thời cả năm bảng mart.
 table 'Dim Product'
-	lineageTag: ab47bedf-62d6-46d2-a5a5-6cb3d0761fb3
 
-	/// Danh mục loại sản phẩm dùng chung. Slicer nên lấy từ bảng này để lọc đồng thời cả bốn bảng mart.
+	/// Danh mục loại sản phẩm dùng chung. Slicer nên lấy từ bảng này để lọc đồng thời cả năm bảng mart.
 	column 'Sản phẩm'
 		dataType: string
-		lineageTag: 4f3efb0b-5448-4ac5-b649-0a178149451c
 		summarizeBy: none
 		sourceColumn: Sản phẩm
 
 	partition 'Dim Product' = m
 		mode: import
 		source =
-				let
-					// Gom giá trị từ cả bốn bảng mart để không thiếu giá trị nào chỉ có ở một bảng
-					#"Đã gộp giá trị từ bốn bảng mart" = Table.Combine({
-						Table.SelectColumns(Funnel, {"contract_type"}),
-						Table.SelectColumns(FPD, {"contract_type"}),
-						Table.SelectColumns(Vintage, {"contract_type"}),
-						Table.SelectColumns(RollRate, {"contract_type"}),
-						Table.SelectColumns(Snapshot, {"contract_type"})
-					}),
-					#"Đã bỏ giá trị trùng" = Table.Distinct(#"Đã gộp giá trị từ bốn bảng mart"),
-					#"Đã sắp xếp theo thứ tự chữ cái" = Table.Sort(#"Đã bỏ giá trị trùng", {{"contract_type", Order.Ascending}}),
-					#"Đã đổi tên cột cho dễ đọc" = Table.RenameColumns(#"Đã sắp xếp theo thứ tự chữ cái", {{"contract_type", "Sản phẩm"}})
-				in
-					#"Đã đổi tên cột cho dễ đọc"
-
+			let
+				// Gom giá trị từ cả năm bảng mart để không thiếu giá trị nào chỉ có ở một bảng
+				#"Đã gộp giá trị từ năm bảng mart" = Table.Combine({
+					Table.SelectColumns(Funnel, {"contract_type"}),
+					Table.SelectColumns(FPD, {"contract_type"}),
+					Table.SelectColumns(Vintage, {"contract_type"}),
+					Table.SelectColumns(RollRate, {"contract_type"}),
+					Table.SelectColumns(Snapshot, {"contract_type"})
+				}),
+				#"Đã bỏ giá trị trùng" = Table.Distinct(#"Đã gộp giá trị từ năm bảng mart"),
+				#"Đã sắp xếp theo thứ tự chữ cái" = Table.Sort(#"Đã bỏ giá trị trùng", {{"contract_type", Order.Ascending}}),
+				#"Đã đổi tên cột cho dễ đọc" = Table.RenameColumns(#"Đã sắp xếp theo thứ tự chữ cái", {{"contract_type", "Sản phẩm"}})
+			in
+				#"Đã đổi tên cột cho dễ đọc"

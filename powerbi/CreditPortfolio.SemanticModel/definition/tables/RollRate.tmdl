@@ -1,102 +1,93 @@
-/// Ma trận chuyển nhóm nợ giữa hai tháng liền kề (M09) và cure rate (M10).
+/// Ma trận chuyển nhóm nợ giữa hai tháng liền kề (M09) và cure rate (M10), bucket theo SK_DPD_DEF.
 /// Grain: nguồn x sản phẩm x kênh x bucket xuất phát x bucket đích.
 table RollRate
-	lineageTag: a0ad201e-28de-42b8-8daa-53efefe74107
 
-	/// Số hợp đồng chuyển từ bucket xuất phát sang bucket đích.
+	/// Số lượt hợp đồng-tháng chuyển từ bucket xuất phát sang bucket đích.
 	measure 'Roll Loans' = SUM(RollRate[n_loans])
 		formatString: #,##0
-		lineageTag: d8862a6c-76b6-4ec3-8b80-fc1720beedea
 
-	/// Mẫu số của roll rate: tổng hợp đồng ở bucket xuất phát, cộng qua MỌI bucket đích.
+	/// Mẫu số của roll rate: tổng lượt ở bucket xuất phát, cộng qua MỌI bucket đích.
 	/// Dùng REMOVEFILTERS chứ KHÔNG cộng cột n_from: n_from là window sum lặp lại trên từng dòng to_state,
 	/// cộng thẳng sẽ nhân số lên nhiều lần.
 	/// PHẢI bỏ lọc cả to_order: to_state có sortByColumn là to_order nên bộ lọc cột trong ma trận
 	/// kéo theo cả hai; chỉ bỏ to_state thì mẫu số vẫn bị ghim về một ô và mọi ô ra 100%.
-	measure 'Roll Base Loans' =
+	measure 'Roll Base Loans' = ```
 			CALCULATE(
 			    SUM(RollRate[n_loans]),
 			    REMOVEFILTERS(RollRate[to_state], RollRate[to_order])
 			)
+			```
 		formatString: #,##0
-		lineageTag: 562fadda-7a83-4f22-aefe-b674a1c8bb5b
 
 	/// M09. Tỷ lệ chuyển từ bucket xuất phát sang bucket đích trong tháng kế tiếp.
 	measure 'Roll Rate' = DIVIDE([Roll Loans], [Roll Base Loans])
 		formatString: 0.0%
-		lineageTag: 423396b8-a9d1-445a-87bc-3edbeb2c939c
 
-	/// M10. Trong số hợp đồng đang quá hạn ở bucket xuất phát, bao nhiêu phần trăm quay về B0 Current tháng sau.
-	/// Lọc bỏ from_state = B0 Current khi đọc, vì B0 về B0 không phải là cure.
-	measure 'Cure Rate' =
+	/// M10. Trong số lượt đang quá hạn ở bucket xuất phát, bao nhiêu phần trăm quay về B0 Current tháng sau.
+	/// Chỉ tính trên B1 đến B4: dòng B0 Current trả về trống (B0 về B0 không phải cure),
+	/// dòng tổng là cure chung của mọi lượt đang quá hạn.
+	measure 'Cure Rate' = ```
 			DIVIDE(
 			    CALCULATE(
 			        SUM(RollRate[n_loans]),
 			        REMOVEFILTERS(RollRate[to_state], RollRate[to_order]),
-			        RollRate[to_state] = "B0 Current"
+			        RollRate[to_state] = "B0 Current",
+			        KEEPFILTERS(RollRate[from_state] <> "B0 Current")
 			    ),
-			    [Roll Base Loans]
+			    CALCULATE([Roll Base Loans], KEEPFILTERS(RollRate[from_state] <> "B0 Current"))
 			)
+			```
 		formatString: 0.0%
-		lineageTag: ad95d4d1-f1c1-4b2e-8016-03df36148dd0
 
-	/// Dư nợ proxy ở bucket xuất phát. Visual tự chọn đơn vị hiển thị.
+	/// Dư nợ proxy ở bucket xuất phát, CỘNG DỒN qua mọi tháng: một hợp đồng ở B0 nhiều tháng
+	/// được cộng mỗi tháng một lần. Không phải dư nợ tại một thời điểm.
 	measure 'Exposure From' = SUM(RollRate[exposure_from])
 		formatString: #,##0
-		lineageTag: 0bcf9aec-dd1d-4109-a4e9-00d5e8b506af
 
 	column source
 		dataType: string
-		lineageTag: 7863e711-ec09-45e4-8aed-de692cdb9567
 		sourceColumn: source
 
 	column contract_type
 		dataType: string
 		isHidden
-		lineageTag: b9a63096-9f7d-415c-88c0-c575b6de7912
 		sourceColumn: contract_type
 
 	column channel_type
 		dataType: string
 		isHidden
-		lineageTag: 0e84ba66-c8cd-4f68-baaf-74c60f70bc98
 		sourceColumn: channel_type
 
 	/// Bucket nợ ở tháng t.
 	column from_state
 		dataType: string
-		lineageTag: 3c0bf213-21c7-472b-8d58-4924e77d1f36
+		sortByColumn: 'from_order'
 		sourceColumn: from_state
-		sortByColumn: from_order
 
 	/// Thứ tự bucket xuất phát, dùng để sắp xếp.
 	column from_order
 		dataType: int64
 		isHidden
 		formatString: 0
-		lineageTag: 7e0ee3ec-c392-46d8-b78a-4afdb17fc06a
 		summarizeBy: none
 		sourceColumn: from_order
 
 	/// Bucket nợ ở tháng t+1, có thêm Closed, Missing, Other.
 	column to_state
 		dataType: string
-		lineageTag: d368c9e2-ae21-47c1-be95-4c3917cb9235
+		sortByColumn: 'to_order'
 		sourceColumn: to_state
-		sortByColumn: to_order
 
 	/// Thứ tự bucket đích, dùng để sắp xếp.
 	column to_order
 		dataType: int64
 		isHidden
 		formatString: 0
-		lineageTag: f1a66447-94c7-46e4-a503-94d790b64248
 		summarizeBy: none
 		sourceColumn: to_order
 
 	column n_loans
 		dataType: int64
-		lineageTag: a9ad3061-0b9c-4838-a69c-e835cfe43f9c
 		summarizeBy: sum
 		sourceColumn: n_loans
 
@@ -104,7 +95,6 @@ table RollRate
 	column n_from
 		dataType: int64
 		isHidden
-		lineageTag: 41238660-221a-466d-81d7-33748627a689
 		summarizeBy: none
 		sourceColumn: n_from
 
@@ -112,41 +102,35 @@ table RollRate
 	column roll_rate
 		dataType: double
 		isHidden
-		lineageTag: a323da65-bfb2-4e62-8a5e-f050c87bbc17
 		summarizeBy: none
 		sourceColumn: roll_rate
 
 	column n_month_gap
 		dataType: int64
 		isHidden
-		lineageTag: f4bbdd50-4cdd-4302-ac7a-a4b24ad2e769
 		summarizeBy: sum
 		sourceColumn: n_month_gap
 
 	column n_exposure_null
 		dataType: int64
 		isHidden
-		lineageTag: 3cb7a047-1cdd-4531-a3a5-dcf13e61e9a5
 		summarizeBy: sum
 		sourceColumn: n_exposure_null
 
 	column n_exposure_null_from
 		dataType: int64
 		isHidden
-		lineageTag: ec66ce40-0d2a-441d-92f9-b79ba26b8b70
 		summarizeBy: sum
 		sourceColumn: n_exposure_null_from
 
 	column exposure_from
 		dataType: double
-		lineageTag: e26c2620-c022-4dd9-9b8e-436d70597c66
 		summarizeBy: sum
 		sourceColumn: exposure_from
 
 	column exposure_from_total
 		dataType: double
 		isHidden
-		lineageTag: ea64125c-c3d5-47e6-be5a-798593edeae0
 		summarizeBy: none
 		sourceColumn: exposure_from_total
 
@@ -154,28 +138,25 @@ table RollRate
 	column exposure_roll_rate
 		dataType: double
 		isHidden
-		lineageTag: cb1ffb78-fd3f-40c2-9790-58dda5ac53e1
 		summarizeBy: none
 		sourceColumn: exposure_roll_rate
 
 	column exposure_to
 		dataType: double
 		isHidden
-		lineageTag: d23eda5d-ca42-46f4-a0fd-8f64d17bdc01
 		summarizeBy: sum
 		sourceColumn: exposure_to
 
 	partition RollRate = m
 		mode: import
 		source =
-				let
-					// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
-					#"Đã đọc file CSV" = Csv.Document(
-						File.Contents(DataFolder & "\mart_roll_rate.csv"),
-						[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
-					),
-					#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
-					#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"source", type text}, {"contract_type", type text}, {"channel_type", type text}, {"from_state", type text}, {"from_order", Int64.Type}, {"to_state", type text}, {"to_order", Int64.Type}, {"n_loans", Int64.Type}, {"n_from", Int64.Type}, {"roll_rate", type number}, {"n_month_gap", Int64.Type}, {"n_exposure_null", Int64.Type}, {"n_exposure_null_from", Int64.Type}, {"exposure_from", type number}, {"exposure_from_total", type number}, {"exposure_roll_rate", type number}, {"exposure_to", type number}})
-				in
-					#"Đã ép kiểu dữ liệu từng cột"
-
+			let
+				// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
+				#"Đã đọc file CSV" = Csv.Document(
+					File.Contents(DataFolder & "\mart_roll_rate.csv"),
+					[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				),
+				#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
+				#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"source", type text}, {"contract_type", type text}, {"channel_type", type text}, {"from_state", type text}, {"from_order", Int64.Type}, {"to_state", type text}, {"to_order", Int64.Type}, {"n_loans", Int64.Type}, {"n_from", Int64.Type}, {"roll_rate", type number}, {"n_month_gap", Int64.Type}, {"n_exposure_null", Int64.Type}, {"n_exposure_null_from", Int64.Type}, {"exposure_from", type number}, {"exposure_from_total", type number}, {"exposure_roll_rate", type number}, {"exposure_to", type number}}, "en-US")
+			in
+				#"Đã ép kiểu dữ liệu từng cột"

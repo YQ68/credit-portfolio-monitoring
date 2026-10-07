@@ -8,28 +8,32 @@ Sinh ra hai đầu ra:
     - dashboard/index.html
         Dashboard tĩnh 4 trang, đồng bộ với bản Power BI (powerbi/, sinh bằng
         scripts/build_pbip_report.py): cùng 4 trang, cùng tên trang, cùng dòng
-        kết luận, cùng lựa chọn biểu đồ và cùng ghi chú LƯU Ý. Mọi biểu đồ được vẽ
+        kết luận, cùng tiêu đề visual và cùng ghi chú LƯU Ý. Mọi biểu đồ được vẽ
         sẵn thành SVG từ Python, số liệu tổng hợp được nhúng thêm dưới dạng JSON
         (thẻ <script type="application/json" id="dashboard-data">). Mở thẳng file
         bằng trình duyệt là xem được, không cần server. Hỗ trợ mở thẳng từng trang
         bằng hash: index.html#page-1 đến #page-4.
     - data/export/*.csv
-        Xuất nguyên 4 mart: mart.funnel_by_channel, mart.fpd_by_segment, mart.vintage,
-        mart.roll_rate để bản PBIP trong powerbi/ đọc. Các file CSV này được commit
-        (.gitignore có ngoại lệ riêng cho data/export/*.csv). File thứ 5,
-        mart_portfolio_snapshot.csv, do scripts/export_snapshot.py xuất.
+        Xuất nguyên 5 mart: mart.funnel_by_channel, mart.fpd_by_segment, mart.vintage,
+        mart.roll_rate, mart.portfolio_snapshot để bản PBIP trong powerbi/ đọc. Các file
+        CSV này được commit (.gitignore có ngoại lệ riêng cho data/export/*.csv).
+        Bảng độ nhạy mart.roll_rate_no_threshold KHÔNG được xuất.
 
-Chạy lại nhiều lần cho cùng kết quả: mọi con số lấy trực tiếp từ mart bằng truy
-vấn xác định (deterministic), không sinh số ngẫu nhiên, không ghi cứng con số nào
-trong tiêu đề.
+CÂU CHỮ: mọi tên trang, dek, tiêu đề visual có số và ghi chú LƯU Ý lấy từ
+scripts/headlines.py, vốn sinh từ data/export/findings.json (nguồn sự thật duy
+nhất, do scripts/compute_findings.py viết). File này không gõ cứng chuỗi có số
+nào. Kiểm đồng bộ: python scripts/check_headlines_sync.py.
 
-Trục rủi ro theo kênh dùng ever 30+ tại MOB 12 (mart.vintage), KHÔNG dùng FPD30:
-FPD30 có thiên lệch sống sót (xem docs/metric_dictionary.md mục M11 và
-docs/methodology.md).
+Định nghĩa quá hạn chính là SK_DPD_DEF (DPD có ngưỡng trọng yếu, bỏ qua khoản nợ
+giá trị thấp). SK_DPD (không áp ngưỡng) chỉ xuất hiện ở phần độ nhạy, cột hậu tố
+_no_threshold.
+
+Chạy lại nhiều lần cho cùng kết quả: truy vấn xác định, một luồng, không sinh số
+ngẫu nhiên.
 
 Tông thiết kế "Editorial Newsroom", trùng hằng số màu trong
-scripts/build_pbip_report.py: nền kem, chữ mực, MỘT màu nhấn mustard tô đúng một
-đối tượng mỗi biểu đồ, phần còn lại xám.
+scripts/build_pbip_report.py: nền kem, chữ mực, MỘT màu nhấn mustard tô đúng đối
+tượng mà câu kết luận của visual nói tới, phần còn lại xám.
 
 FONT: tuyệt đối không đưa Georgia vào font stack. Georgia thiếu 19 ký tự tiếng
 Việt (ấ ầ ẩ ẫ ậ ế ề ể ễ ệ ố ồ ổ ỗ ộ ơ ư ớ ứ) nên "gấp" hiện thành "gâ´p". Tiêu đề dùng
@@ -44,6 +48,9 @@ from pathlib import Path
 
 import duckdb
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import headlines  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "data" / "warehouse.duckdb"
 DASHBOARD_DIR = ROOT / "dashboard"
@@ -54,6 +61,7 @@ MART_TABLES_TO_EXPORT = [
     "mart.fpd_by_segment",
     "mart.vintage",
     "mart.roll_rate",
+    "mart.portfolio_snapshot",
 ]
 
 UNKNOWN = "(không rõ)"
@@ -73,27 +81,19 @@ PRODUCT_LABEL_VN = {
     "Revolving loans": "Thẻ quay vòng",
 }
 
-# Đối tượng được tô mustard (chữ ký highlight-and-grey). Trùng lựa chọn trong
-# scripts/build_pbip_report.py.
-HIGHLIGHT_CHANNEL = "Stone"
-HIGHLIGHT_PRODUCT = "Consumer loans"
-HIGHLIGHT_CURE_FROM = "B1 1-30"
+# Đối tượng được tô mustard ở từng trang, đúng đối tượng mà câu kết luận nói tới.
+# Trùng lựa chọn trong scripts/build_pbip_report.py.
+HL_P1_BUCKET = "B1 1-30"                       # đuôi quá hạn chủ yếu là B1
+HL_P1_CHANNEL = "Credit and cash offices"      # tỷ lệ 30+ hiện tại cao nhất
+HL_P2_CHANNELS = {"Contact center", "Stone"}   # hai kênh trên kỳ vọng sau chuẩn hoá
+HL_P3_CHANNEL = "Contact center"               # cao nhất ở mọi MOB
+HL_P3_PRODUCT = "Revolving loans"              # sản phẩm rủi ro nhất
+HL_P3_COHORT = -96                             # đợt mở cũ nhất, câu kết luận nói tới
+HL_P4_FROM = "B1 1-30"                         # nhóm còn cửa sổ thu hồi
 
-# Các cặp so sánh mà dòng kết luận trang 2 nêu (xem docs/methodology.md):
-#   - khoảng cách thô: kênh xấu nhất so với Credit and cash offices, gộp mọi sản phẩm
-#   - trong vay tiêu dùng trả góp: Stone so với Regional / Local (Credit and cash
-#     offices gần như không bán sản phẩm này)
-#   - trong vay tiền mặt: Country-wide so với Credit and cash offices
-RAW_PAIR = ("Stone", "Credit and cash offices")
-WITHIN_PAIRS = {
-    "Consumer loans": ("Stone", "Regional / Local"),
-    "Cash loans": ("Country-wide", "Credit and cash offices"),
-}
-
-SMALL_N = 1000  # mẫu số MOB 12 dưới ngưỡng này thì gắn dấu * khi diễn giải
-
-NUM_WORDS = {2: "hai", 3: "ba", 4: "bốn", 5: "năm", 6: "sáu", 7: "bảy",
-             8: "tám", 9: "chín", 10: "mười"}
+OTHER_CHANNEL = "Khác"  # nhóm kênh gộp, mẫu số nhỏ
+SMALL_N = 1000  # ngưỡng diễn giải của project (findings.json meta.min_n_to_interpret)
+THIN_K = 10     # tử số dưới ngưỡng này: tỷ số không kết luận được (theo A1, mục 9)
 
 
 # ---------------------------------------------------------------------------
@@ -130,11 +130,6 @@ def fmt_billion(raw, decimals=2):
     return fmt_num(raw / 1e9, decimals)
 
 
-def times_word(x):
-    """Số lần làm tròn ra chữ (ba, bảy...) cho câu kết luận, giống Power BI."""
-    n = round(x)
-    return NUM_WORDS.get(n, str(n))
-
 
 # ---------------------------------------------------------------------------
 # Đọc dữ liệu
@@ -160,14 +155,17 @@ select
 
 # ---- Trang 1: ảnh chụp tháng quan sát gần nhất (mart.portfolio_snapshot, cùng
 # nguồn với trang 1 Power BI). Mã chỉ tiêu M02 (DPD bucket), M06 (30+ coincident).
+# Hai thẻ tỷ lệ tính trên CÙNG một tập: hợp đồng có dư nợ proxy (cột *_exposure_known).
 SQL_P1_TOTAL = """
 select
-    sum(n_loans)                                as n_open,
-    sum(n_30_plus)                              as n_30plus,
-    sum(n_30_plus) * 1.0 / sum(n_loans)         as rate_30plus,
-    sum(exposure)                               as exposure_total,
-    sum(exposure_30_plus)                       as exposure_30plus,
-    sum(exposure_30_plus) / sum(exposure)       as exposure_rate_30plus
+    sum(n_loans)                                              as n_open,
+    sum(n_30_plus)                                            as n_30plus,
+    sum(n_loans_exposure_known)                               as n_exp_known,
+    sum(n_30_plus_exposure_known)                             as n_30plus_exp_known,
+    sum(n_30_plus_exposure_known) * 1.0 / sum(n_loans_exposure_known) as rate_30plus_same_set,
+    sum(exposure)                                             as exposure_total,
+    sum(exposure_30_plus)                                     as exposure_30plus,
+    sum(exposure_30_plus) / sum(exposure)                     as exposure_rate_30plus
 from mart.portfolio_snapshot
 """
 
@@ -179,7 +177,8 @@ order by dpd_bucket_order
 """
 
 SQL_P1_BY_CHANNEL = """
--- Xếp hạng kênh: lọc bỏ '(không rõ)' như Power BI (nhóm không biết được phân khúc).
+-- Xếp hạng kênh: lọc bỏ '(không rõ)' như Power BI (nhóm không biết được kênh).
+-- Mẫu số là mọi hợp đồng mở, đúng như snapshot.by_channel trong findings.json.
 select channel_type, sum(n_loans) as n_open, sum(n_30_plus) as n_30plus,
        sum(n_30_plus) * 1.0 / sum(n_loans) as rate_30plus
 from mart.portfolio_snapshot
@@ -198,6 +197,7 @@ order by rate_30plus desc, contract_type
 """
 
 # ---- Trang 2: kênh bán. Trục rủi ro: ever 30+ tại MOB 12 (M08). Trục duyệt: M12.
+# SMR và tỷ số duyệt chuẩn hoá lấy thẳng từ findings.json (nguồn sự thật).
 SQL_P2_CHANNEL_PRODUCT_MOB12 = """
 select channel_type, contract_type,
        sum(n_loans) as n_mob12, sum(n_ever_30_plus) as n_ever30,
@@ -208,22 +208,10 @@ group by channel_type, contract_type
 """
 
 SQL_P2_FUNNEL = """
-select channel_type,
-       sum(n_applications)                         as n_applications,
-       sum(n_decided)                              as n_decided,
-       sum(n_offered)                              as n_offered,
-       sum(n_approved)                             as n_approved,
-       sum(n_offered) * 1.0 / sum(n_decided)       as approval_rate,
-       sum(n_approved) * 1.0 / sum(n_offered)      as take_up_rate
+select channel_type, sum(n_applications) as n_applications
 from mart.funnel_by_channel
 where channel_type <> '(không rõ)'
 group by channel_type
-order by n_applications desc
-"""
-
-SQL_P2_FPD_BLIND = """
--- Vùng mù FPD: hồ sơ được duyệt nhưng không có dòng trả góp nào (M11).
-select sum(n_approved_no_installment) as n_blind from mart.fpd_by_segment
 """
 
 # ---- Trang 3: vintage theo MOB (M08).
@@ -249,13 +237,6 @@ group by contract_type, mob
 order by contract_type, mob
 """
 
-SQL_P3_UNKNOWN_MOB12 = """
--- Tỷ lệ của nhóm '(không rõ)' tại MOB 12, nêu trong ghi chú LƯU Ý trang 3.
-select sum(n_loans) as n_mob12, sum(n_ever_30_plus) * 1.0 / sum(n_loans) as rate
-from mart.vintage
-where mob = 12 and channel_type = '(không rõ)'
-"""
-
 # ---- Trang 4: roll rate (M09) và cure rate (M10), toàn danh mục.
 SQL_P4_ROLL = """
 -- Mẫu số mỗi dòng = tổng n_loans của nhóm xuất phát cộng qua MỌI nhóm đến (tính
@@ -276,10 +257,8 @@ def fetch_data(con):
         "p1_by_product": rows(con, SQL_P1_BY_PRODUCT),
         "p2_channel_product_mob12": rows(con, SQL_P2_CHANNEL_PRODUCT_MOB12),
         "p2_funnel": rows(con, SQL_P2_FUNNEL),
-        "p2_fpd_blind": one(con, SQL_P2_FPD_BLIND),
         "p3_channel_mob": rows(con, SQL_P3_CHANNEL_MOB),
         "p3_product_mob": rows(con, SQL_P3_PRODUCT_MOB),
-        "p3_unknown_mob12": one(con, SQL_P3_UNKNOWN_MOB12),
         "p4_roll": rows(con, SQL_P4_ROLL),
     }
 
@@ -291,45 +270,9 @@ def export_marts_to_csv(con):
         out_path = EXPORT_DIR / file_name
         # COPY chỉ ghi file ngoài, không đụng gì vào warehouse.duckdb (vẫn đang
         # mở ở chế độ read_only).
-        con.sql(f"copy (select * from {table}) to '{out_path.as_posix()}' (header, delimiter ',')")
+        # order by all: thứ tự dòng cố định giữa các lần chạy, diff CSV trên git mới có nghĩa.
+        con.sql(f"copy (select * from {table} order by all) to '{out_path.as_posix()}' (header, delimiter ',')")
         print(f"  export  {out_path.relative_to(ROOT)}")
-
-
-# ---------------------------------------------------------------------------
-# Tính các chỉ số dẫn xuất dùng trong tiêu đề kết luận
-# ---------------------------------------------------------------------------
-
-def derive(data):
-    d = {}
-    t = data["p1_total"]
-    buckets = {b["dpd_bucket"]: b for b in data["p1_buckets"]}
-    d["b0_share"] = buckets["B0 Current"]["n_loans"] / t["n_open"]
-    d["b4_vs_b2b3"] = buckets["B4 90+"]["n_loans"] / (
-        buckets["B2 31-60"]["n_loans"] + buckets["B3 61-90"]["n_loans"])
-    ch = {r["channel_type"]: r for r in data["p1_by_channel"]}
-    d["p1_top"] = data["p1_by_channel"][0]
-    d["p1_cco"] = ch["Credit and cash offices"]
-
-    # Rủi ro MOB 12 theo kênh (mọi sản phẩm) và theo kênh x sản phẩm.
-    mob12_ch = {r["channel_type"]: r for r in data["p3_channel_mob"] if r["mob"] == 12}
-    d["mob12_channel"] = mob12_ch
-    cp = {(r["channel_type"], r["contract_type"]): r for r in data["p2_channel_product_mob12"]}
-    d["mob12_cp"] = cp
-    d["raw_ratio"] = mob12_ch[RAW_PAIR[0]]["rate"] / mob12_ch[RAW_PAIR[1]]["rate"]
-    d["within_ratio"] = {
-        p: cp[(a, p)]["rate"] / cp[(b, p)]["rate"] for p, (a, b) in WITHIN_PAIRS.items()
-    }
-    fun = {r["channel_type"]: r for r in data["p2_funnel"]}
-    d["funnel"] = fun
-
-    mob12_p = {r["contract_type"]: r for r in data["p3_product_mob"] if r["mob"] == 12}
-    d["mob12_product"] = mob12_p
-    d["consumer_vs_cash"] = mob12_p["Consumer loans"]["rate"] / mob12_p["Cash loans"]["rate"]
-
-    grid, base = build_roll_grid(data["p4_roll"])
-    d["roll_grid"], d["roll_base"] = grid, base
-    d["cure"] = {fs: grid[(fs, "B0 Current")]["rate"] for fs in FROM_STATES}
-    return d
 
 
 def build_roll_grid(raw_rows):
@@ -435,116 +378,48 @@ def share_bar(b0_share, desc, W=360):
     out.append("</svg>")
     return "".join(out)
 
-
 # =============================================================================
-# Trang 2: scatter tỷ lệ duyệt x ever 30+ MOB 12, nhãn không đè bong bóng
+# Trang 2: SMR theo kênh, chấm và khoảng tin cậy 95%, vạch tham chiếu tại 1
 # =============================================================================
 
-def place_labels(points, bounds, px=12):
-    """Đặt nhãn cạnh bong bóng, thử lần lượt nhiều vị trí, chọn vị trí đầu tiên
-    không đè lên nhãn khác hay bong bóng khác và nằm trong khung vẽ."""
-    x0, y0, x1, y1 = bounds
-    placed = []
-    circles = [(p["cx"], p["cy"], p["r"]) for p in points]
-
-    def box_for(p, cand):
-        w, h = text_w(p["label"], px), px + 2
-        dx, dy, anchor = cand
-        tx, ty = p["cx"] + dx, p["cy"] + dy
-        bx = tx if anchor == "start" else tx - w if anchor == "end" else tx - w / 2
-        return (bx, ty - h + 3, bx + w, ty + 3), tx, ty, anchor
-
-    def hits_circle(box, own):
-        bx0, by0, bx1, by1 = box
-        for c in circles:
-            if c == own:
-                continue
-            nx, ny = min(max(c[0], bx0), bx1), min(max(c[1], by0), by1)
-            if (nx - c[0]) ** 2 + (ny - c[1]) ** 2 < (c[2] + 1) ** 2:
-                return True
-        return False
-
-    def overlaps(a, b):
-        return not (a[2] < b[0] or b[2] < a[0] or a[3] < b[1] or b[3] < a[1])
-
-    for p in sorted(points, key=lambda q: q["priority"]):
-        r = p["r"]
-        cands = [(r + 5, 4, "start"), (-r - 5, 4, "end"), (0, -r - 5, "middle"),
-                 (0, r + 14, "middle"), (r * 0.7 + 4, -r * 0.7 - 2, "start"),
-                 (-r * 0.7 - 4, -r * 0.7 - 2, "end"), (r * 0.7 + 4, r * 0.7 + 12, "start"),
-                 (-r * 0.7 - 4, r * 0.7 + 12, "end")]
-        chosen = None
-        for cand in cands:
-            box, tx, ty, anchor = box_for(p, cand)
-            inside = box[0] >= x0 and box[2] <= x1 and box[1] >= y0 and box[3] <= y1
-            if not inside or hits_circle(box, (p["cx"], p["cy"], p["r"])):
-                continue
-            if any(overlaps(box, b) for b in placed):
-                continue
-            chosen = (box, tx, ty, anchor)
-            break
-        if chosen is None:
-            chosen = box_for(p, cands[0])
-        placed.append(chosen[0])
-        p["lx"], p["ly"], p["anchor"] = chosen[1], chosen[2], chosen[3]
-    return points
-
-
-def scatter_chart(channels, fun, mob12, desc, W=540, H=330, r_max=22):
-    left, right, top, bottom = 56, 16, 16, 46
-    pw, ph = W - left - right, H - top - bottom
-    xs = [fun[c]["approval_rate"] for c in channels]
-    ys = [mob12[c]["rate"] for c in channels]
-    x_lo = math.floor(min(xs) * 10 - 0.5) / 10
-    x_hi = min(1.0, math.ceil(max(xs) * 10 + 0.3) / 10)
-    y_ticks = nice_ticks(max(ys) * 1.12, 4)
-    y_max = y_ticks[-1]
-    n_max = max(fun[c]["n_applications"] for c in channels)
+def smr_chart(items, desc, W=560, label_w=150, value_w=118, row_h=30, x_max=4.0, label_px=12.5):
+    """items: dict {label, smr, lo, hi, cls, value_txt, tip, faint}. Trục tuyến tính
+    từ 0 đến x_max; vạch đứt tại SMR = 1 (đúng bằng mức kỳ vọng của sản phẩm)."""
+    track_x, track_w = label_w, W - label_w - value_w
+    top = 6
+    H = len(items) * row_h + top + 24
 
     def sx(v):
-        return left + (v - x_lo) / (x_hi - x_lo) * pw
-
-    def sy(v):
-        return top + ph - v / y_max * ph
+        return track_x + min(v, x_max) / x_max * track_w
 
     out = [svg_open(W, H, desc)]
-    for t in y_ticks:
-        out.append(f'<line x1="{left}" x2="{W - right}" y1="{sy(t):.1f}" y2="{sy(t):.1f}" class="s-grid" />')
-        out.append(f'<text x="{left - 8}" y="{sy(t):.1f}" class="t-axis" text-anchor="end" '
-                   f'dominant-baseline="central">{pct_tick_label(t)}</text>')
-    xt = x_lo
-    while xt <= x_hi + 1e-9:
-        out.append(f'<text x="{sx(xt):.1f}" y="{H - bottom + 18}" class="t-axis" '
-                   f'text-anchor="middle">{round(xt * 100)}%</text>')
-        xt = round(xt + 0.1, 10)
-    out.append(f'<line x1="{left}" x2="{W - right}" y1="{top + ph}" y2="{top + ph}" class="s-base" />')
-    out.append(f'<text x="{left + pw / 2:.1f}" y="{H - 6}" class="t-axis" text-anchor="middle">'
-               "Tỷ lệ duyệt</text>")
-    out.append(f'<text transform="translate(14 {top + ph / 2:.1f}) rotate(-90)" class="t-axis" '
-               'text-anchor="middle">Từng 30+ tại MOB 12</text>')
-
-    pts = []
-    for c in channels:
-        r = 4 + math.sqrt(fun[c]["n_applications"] / n_max) * r_max
-        pts.append({"c": c, "label": c, "cx": sx(fun[c]["approval_rate"]),
-                    "cy": sy(mob12[c]["rate"]), "r": r,
-                    "priority": 0 if c == HIGHLIGHT_CHANNEL else 1 + (-fun[c]["n_applications"]) / 1e9})
-    place_labels(pts, (left + 2, top, W - right, top + ph - 2))
-    # Vẽ bong bóng lớn trước để bong bóng nhỏ nằm trên.
-    for p in sorted(pts, key=lambda q: -q["r"]):
-        cls = "f-accent" if p["c"] == HIGHLIGHT_CHANNEL else "f-grey"
-        out.append(f'<circle cx="{p["cx"]:.1f}" cy="{p["cy"]:.1f}" r="{p["r"]:.1f}" class="{cls} bubble" />')
-    for p in pts:
-        c = p["c"]
-        bold = " t-strong" if c == HIGHLIGHT_CHANNEL else ""
-        out.append(f'<text x="{p["lx"]:.1f}" y="{p["ly"]:.1f}" class="t-label{bold}" '
-                   f'text-anchor="{p["anchor"]}">{esc(c)}</text>')
-        t = tip(c, f"Tỷ lệ duyệt: {fmt_pct(fun[c]['approval_rate'], 1)}",
-                f"Từng 30+ tại MOB 12: {fmt_pct(mob12[c]['rate'], 2)} "
-                f"({fmt_int(mob12[c]['n_ever30'])} trên {fmt_int(mob12[c]['n_loans'])} hợp đồng)",
-                f"Số hồ sơ: {fmt_int(fun[c]['n_applications'])}")
-        out.append(f'<circle class="hit" cx="{p["cx"]:.1f}" cy="{p["cy"]:.1f}" '
-                   f'r="{max(p["r"], 12):.1f}" tabindex="0" data-tip="{t}" />')
+    for t in [0, 1, 2, 3, 4]:
+        if t <= x_max:
+            out.append(f'<text x="{sx(t):.1f}" y="{H - 6}" class="t-axis" text-anchor="middle">'
+                       f'{fmt_num(t, 0)}</text>')
+    out.append(f'<line x1="{sx(1):.1f}" x2="{sx(1):.1f}" y1="{top - 2}" y2="{H - 20}" '
+               'class="s-base" stroke-dasharray="3 3" />')
+    for i, it in enumerate(items):
+        y = top + i * row_h
+        cy = y + row_h / 2
+        tcls = "t-label t-strong" if it["cls"] == "accent" else "t-label"
+        out.append(f'<text x="{label_w - 10}" y="{cy:.1f}" class="{tcls}" text-anchor="end" '
+                   f'dominant-baseline="central" style="font-size:{label_px}px">{esc(it["label"])}</text>')
+        line_cls = "s-accent" if it["cls"] == "accent" else "s-greyl"
+        dot_cls = "f-accent" if it["cls"] == "accent" else "f-grey"
+        out.append(f'<line x1="{sx(it["lo"]):.1f}" x2="{sx(it["hi"]):.1f}" y1="{cy:.1f}" y2="{cy:.1f}" '
+                   f'class="{line_cls}" stroke-width="3" stroke-linecap="round" />')
+        if it.get("ref") is not None:
+            # Vòng rỗng: SMR khi chỉ chuẩn hoá theo sản phẩm, để thấy dịch chuyển.
+            out.append(f'<circle cx="{sx(it["ref"]):.1f}" cy="{cy:.1f}" r="4.5" fill="none" '
+                       'class="s-ink" stroke-width="1.4" />')
+        out.append(f'<circle cx="{sx(it["smr"]):.1f}" cy="{cy:.1f}" r="5.5" class="{dot_cls}" />')
+        vcls = "t-muted" if it.get("faint") else "t-value"
+        out.append(f'<text x="{W - value_w + 8}" y="{cy:.1f}" class="{vcls}" '
+                   f'dominant-baseline="central">{esc(it["value_txt"])}</text>')
+        if it.get("tip"):
+            out.append(f'<rect class="hit" x="0" y="{y}" width="{W}" height="{row_h}" '
+                       f'tabindex="0" data-tip="{it["tip"]}" />')
     out.append("</svg>")
     return "".join(out)
 
@@ -554,7 +429,7 @@ def scatter_chart(channels, fun, mob12, desc, W=540, H=330, r_max=22):
 # =============================================================================
 
 def line_chart(series, desc, y_ticks, x_max, W, H, left=44, right=14, top=10, bottom=28,
-               x_ticks=(0, 12, 24, 36), end_labels=False, x_title=None, compact=False):
+               x_ticks=(0, 12, 24, 36), end_labels=False, x_title=None):
     """series: list dict {name, rows:[{mob, rate, n_loans, n_ever30}], cls, width,
     label (bool), tip (bool)}. Vẽ theo thứ tự danh sách: phần tử sau nằm trên."""
     pw, ph = W - left - right, H - top - bottom
@@ -606,7 +481,7 @@ def line_chart(series, desc, y_ticks, x_max, W, H, left=44, right=14, top=10, bo
             for s in tip_series:
                 r = next((r for r in s["rows"] if r["mob"] == m), None)
                 if r:
-                    lines.append(f"{s['name']}: {fmt_pct(r['rate'], 2)} "
+                    lines.append(f"{s['name']}: {fmt_pct(r['rate'], 3)} "
                                  f"({fmt_int(r['n_ever30'])} trên {fmt_int(r['n_loans'])})")
             x = max(left, sx(m) - band / 2)
             w = min(band, W - right - x)
@@ -629,13 +504,13 @@ def responsive(wide_svg, narrow_svg):
 
 def viz(title, body, note=None, cls=""):
     n = f'<p class="viz-note">{note}</p>' if note else ""
-    return (f'<section class="viz {cls}"><h3 class="viz-title">{title}</h3>'
+    return (f'<section class="viz {cls}"><h3 class="viz-title">{esc(title)}</h3>'
             f"{body}{n}</section>")
 
 
 def kpi(label, value, context):
     return (f'<div class="kpi"><div class="kpi-label">{esc(label)}</div>'
-            f'<div class="kpi-value">{value}</div><div class="kpi-ctx">{context}</div></div>')
+            f'<div class="kpi-value">{value}</div><div class="kpi-ctx">{esc(context)}</div></div>')
 
 
 def table(headers, body_rows, total=None, num_from=1, cls=""):
@@ -651,88 +526,101 @@ def table(headers, body_rows, total=None, num_from=1, cls=""):
             f"<tbody>{tb}</tbody>{tf}</table></div>")
 
 
-def page_shell(n, title, dek, body, caveat):
+def page_shell(n, H, body):
+    """Khung trang: tên trang, dek, kẻ mực, nội dung, kẻ chân, LƯU Ý. Mọi câu lấy từ headlines."""
     return (
         f'<section class="page" id="sec-{n}" data-hash="page-{n}" role="tabpanel" aria-labelledby="tab-{n}">'
-        f'<header class="masthead"><h2 class="page-title">{esc(title)}</h2>'
-        f'<p class="dek">{esc(dek)}</p></header>'
+        f'<header class="masthead"><h2 class="page-title">{esc(H["title"])}</h2>'
+        f'<p class="dek">{esc(H["dek"])}</p></header>'
         f'<div class="rule-ink" role="presentation"></div>'
         f"{body}"
         f'<div class="rule-grey" role="presentation"></div>'
-        f'<p class="caveat"><span class="caveat-tag">LƯU Ý</span>{caveat}</p>'
+        f'<p class="caveat"><span class="caveat-tag">LƯU Ý</span>{esc(H["caveat"])}</p>'
         "</section>"
     )
+
+
+def interval(lo, hi, d, pct=True):
+    """'[0,137; 0,203]': cùng quy ước với headlines.py."""
+    if pct:
+        return f"[{fmt_num(lo * 100, d)}; {fmt_num(hi * 100, d)}]"
+    return f"[{fmt_num(lo, d)}; {fmt_num(hi, d)}]"
+
+
+def by(items, key):
+    return {x[key]: x for x in items}
 
 
 # =============================================================================
 # Trang 1. Tổng quan danh mục
 # =============================================================================
 
-def page1(data, d):
+def page1(data, F, H):
     t = data["p1_total"]
     n_open = t["n_open"]
     buckets = data["p1_buckets"]
-    bmap = {b["dpd_bucket"]: b for b in buckets}
-    top, cco = d["p1_top"], d["p1_cco"]
+    N = H["notes"]
 
     kpis = "".join([
-        kpi("HỢP ĐỒNG ĐANG MỞ", fmt_int(n_open), "Tại tháng quan sát gần nhất của từng hợp đồng"),
-        kpi("TỶ LỆ 30+ THEO HỢP ĐỒNG", fmt_pct(t["rate_30plus"], 2),
-            f"{fmt_int(t['n_30plus'])} trên {fmt_int(n_open)} hợp đồng đang mở"),
+        kpi("HỢP ĐỒNG ĐANG MỞ", fmt_int(n_open), N["kpi_open"]),
+        kpi("TỶ LỆ 30+ THEO HỢP ĐỒNG", fmt_pct(t["rate_30plus_same_set"], 3), N["kpi_rate"]),
         kpi("DƯ NỢ PROXY ĐANG MỞ", fmt_billion(t["exposure_total"], 1) + " tỷ",
             "Đơn vị thô của dữ liệu Kaggle, không phải VND"),
-        kpi("TỶ LỆ 30+ THEO DƯ NỢ", fmt_pct(t["exposure_rate_30plus"], 2),
-            f"{fmt_billion(t['exposure_30plus'], 2)} trên {fmt_billion(t['exposure_total'], 1)} tỷ dư nợ proxy"),
+        kpi("TỶ LỆ 30+ THEO DƯ NỢ", fmt_pct(t["exposure_rate_30plus"], 3), N["kpi_exposure_rate"]),
     ])
 
-    # Biểu đồ xếp hạng kênh: Stone mustard, còn lại xám. Đã lọc '(không rõ)'.
-    ch_items = [{
-        "label": r["channel_type"], "value": r["rate_30plus"],
-        "cls": "f-accent" if r["channel_type"] == HIGHLIGHT_CHANNEL else "f-grey",
-        "value_txt": fmt_pct(r["rate_30plus"], 2),
-        "tip": tip(r["channel_type"], f"Tỷ lệ 30+ hiện tại: {fmt_pct(r['rate_30plus'], 3)}",
-                   f"{fmt_int(r['n_30plus'])} trên {fmt_int(r['n_open'])} hợp đồng đang mở"),
-    } for r in data["p1_by_channel"]]
+    # Xếp hạng kênh: Credit and cash offices mustard (đối tượng của câu kết luận), còn lại xám.
+    snap_ch = by(F["snapshot"]["by_channel"], "channel_type")
+    ch_items = []
+    for r in data["p1_by_channel"]:
+        c = r["channel_type"]
+        ci = snap_ch[c]["primary"]["ci95"]
+        ch_items.append({
+            "label": c, "value": r["rate_30plus"],
+            "cls": "f-accent" if c == HL_P1_CHANNEL else "f-grey",
+            "value_txt": fmt_pct(r["rate_30plus"], 3),
+            "tip": tip(c, f"Tỷ lệ 30+ hiện tại: {fmt_pct(r['rate_30plus'], 3)} {interval(*ci, 3)}",
+                       f"{fmt_int(r['n_30plus'])} trên {fmt_int(r['n_open'])} hợp đồng đang mở"),
+        })
     ch_desc = ("Biểu đồ thanh tỷ lệ quá hạn 30+ hiện tại theo kênh bán, sắp giảm dần. "
-               + "; ".join(f"{r['channel_type']} {fmt_pct(r['rate_30plus'], 2)}" for r in data["p1_by_channel"])
-               + f". {HIGHLIGHT_CHANNEL} được tô màu nhấn.")
-    ch_title = (f"{top['channel_type']} dẫn đầu tỷ lệ 30+ hiện tại, {fmt_pct(top['rate_30plus'], 2)} "
-                f"so với {fmt_pct(cco['rate_30plus'], 2)} của Credit and cash offices")
-    channel_viz = viz(esc(ch_title), responsive(
+               + "; ".join(f"{it['label']} {it['value_txt']}" for it in ch_items)
+               + f". {HL_P1_CHANNEL} được tô màu nhấn.")
+    channel_viz = viz(H["visuals"]["rate_by_channel"], responsive(
         hbar_chart(ch_items, ch_desc, W=640, label_w=170, row_h=36, bar_h=22),
-        hbar_chart(ch_items, ch_desc, W=360, label_w=140, value_w=52, row_h=32, bar_h=18, label_px=12)))
+        hbar_chart(ch_items, ch_desc, W=360, label_w=140, value_w=58, row_h=32, bar_h=18, label_px=12)),
+        note="Khoảng tin cậy 95% của từng kênh hiện khi rê chuột. Các kênh ngoài Credit and cash "
+             "offices có tử số rất nhỏ, chênh lệch giữa chúng không có ý nghĩa.")
 
     # Biểu đồ chủ đạo: cơ cấu nhóm quá hạn. Thanh 100% để thấy đuôi mỏng cỡ nào,
-    # rồi phóng to riêng phần đuôi B1 đến B4 (Power BI không làm được vì B0 ép mọi
-    # thanh khác về gần 0). B4 90+ mustard.
+    # rồi phóng to riêng phần đuôi B1 đến B4. B1 1-30 mustard: câu kết luận nói về nó.
     tail = [b for b in buckets if b["dpd_bucket"] != "B0 Current"]
     tail_items = [{
         "label": b["dpd_bucket"], "value": b["n_loans"],
-        "cls": "f-accent" if b["dpd_bucket"] == "B4 90+" else "f-grey",
+        "cls": "f-accent" if b["dpd_bucket"] == HL_P1_BUCKET else "f-grey",
         "value_txt": fmt_int(b["n_loans"]),
         "tip": tip(b["dpd_bucket"], f"{fmt_int(b['n_loans'])} hợp đồng ({fmt_pct(b['n_loans'] / n_open, 3)} danh mục)",
                    f"Dư nợ proxy: {fmt_billion(b['exposure'], 3)} tỷ"),
     } for b in tail]
     n_tail = sum(b["n_loans"] for b in tail)
+    b0_share = buckets[0]["n_loans"] / n_open
     bucket_desc = ("Cơ cấu danh mục theo nhóm quá hạn: "
                    + ", ".join(f"{b['dpd_bucket']} {fmt_int(b['n_loans'])} hợp đồng" for b in buckets)
-                   + ". Nhóm B4 90+ được tô màu nhấn.")
-    hero_title = f"B4 90+ đông gấp {times_word(d['b4_vs_b2b3'])} lần B2 và B3 gộp"
+                   + f". Nhóm {HL_P1_BUCKET} được tô màu nhấn.")
     hero_body = (
-        share_bar(d["b0_share"], f"Thanh tỷ trọng: B0 Current chiếm {fmt_pct(d['b0_share'], 2)} hợp đồng đang mở.")
+        share_bar(b0_share, f"Thanh tỷ trọng: B0 Current chiếm {fmt_pct(b0_share, 2)} hợp đồng đang mở.")
         + f'<p class="viz-sub">Phóng to phần đuôi B1 đến B4 ({fmt_int(n_tail)} hợp đồng quá hạn), '
         "trục là số hợp đồng:</p>"
         + hbar_chart(tail_items, bucket_desc, W=360, label_w=70, value_w=52, row_h=34, bar_h=20)
     )
-    hero_viz = viz(esc(hero_title), hero_body)
+    hero_viz = viz(H["visuals"]["bucket_mix"], hero_body)
 
     prod_rows = []
     for r in data["p1_by_product"]:
         name = PRODUCT_LABEL_VN.get(r["contract_type"], r["contract_type"])
-        prod_rows.append([esc(name), fmt_int(r["n_open"]), fmt_pct(r["rate_30plus"], 2)])
-    product_viz = viz("Tỷ lệ 30+ theo loại sản phẩm", table(
-        ["Sản phẩm", "Số hợp đồng mở", "Tỷ lệ 30+ hiện tại"], prod_rows,
-        total=["Tổng", fmt_int(n_open), fmt_pct(t["rate_30plus"], 2)]))
+        prod_rows.append([esc(name), fmt_int(r["n_open"]), fmt_int(r["n_30plus"]), fmt_pct(r["rate_30plus"], 3)])
+    product_viz = viz(H["visuals"]["product_table"], table(
+        ["Sản phẩm", "Số hợp đồng mở", "Số hợp đồng 30+", "Tỷ lệ 30+ hiện tại"], prod_rows,
+        total=["Tổng", fmt_int(n_open), fmt_int(t["n_30plus"]), fmt_pct(t["n_30plus"] / n_open, 3)]))
 
     body = (
         '<div class="grid-p1">'
@@ -740,33 +628,28 @@ def page1(data, d):
         f'<div class="col-side">{hero_viz}{product_viz}</div>'
         "</div>"
     )
-    dek = (f"{fmt_pct(d['b0_share'], 2)} danh mục vẫn sạch, nhưng đuôi B4 90+ đông gấp "
-           f"{times_word(d['b4_vs_b2b3'])} lần B2 và B3 cộng lại")
-    caveat = ("Ảnh chụp tại tháng quan sát gần nhất của từng hợp đồng. Tỷ lệ 30+ ở đây là coincident, "
-              "đo tại một thời điểm, khác với tỷ lệ vintage theo tuổi hợp đồng ở trang 3. Biểu đồ xếp hạng "
-              "kênh đã lọc bỏ nhóm (không rõ) vì nhóm đó không biết được phân khúc; bốn thẻ KPI vẫn tính "
-              "đủ danh mục.")
-    return page_shell(1, "Tổng quan danh mục", dek, body, caveat), [dek, ch_title, hero_title]
+    return page_shell(1, H, body)
 
 
 # =============================================================================
 # Trang 2. Kênh bán và rủi ro
 # =============================================================================
 
-def page2(data, d):
-    mob12 = d["mob12_channel"]
-    cp = d["mob12_cp"]
-    fun = d["funnel"]
-    channels = sorted(mob12, key=lambda c: -mob12[c]["rate"])
-    x_max = nice_ticks(max(r["rate"] for r in cp.values()), 4)[-1]
+def page2(data, F, H):
+    cp = {(r["channel_type"], r["contract_type"]): r for r in data["p2_channel_product_mob12"]}
+    smr_rows = [r for r in F["channel_comparison"]["mob12"]["smr_by_channel"]
+                if r["channel_type"] != UNKNOWN]
+    smr_rows.sort(key=lambda r: -r["primary"]["smr"])
+    # Trellis bỏ kênh Khác: mẫu số dưới ngưỡng ở hai trong ba sản phẩm, một ca lẻ
+    # của nó kéo giãn thang chung. Khác vẫn có mặt ở biểu đồ SMR và bảng duyệt.
+    channels = [r["channel_type"] for r in smr_rows if r["channel_type"] != OTHER_CHANNEL]
+    x_max = nice_ticks(max(r["rate"] for (c, _), r in cp.items() if c in channels), 4)[-1]
 
+    # Trellis: mỗi ô một sản phẩm, cùng thang. Màu nhấn: Contact center và Stone,
+    # hai kênh mà câu kết luận của trang nói là trên kỳ vọng.
     panels = []
     for p in PRODUCTS:
         items = []
-        # Màu nhấn của mỗi ô chỉ vào đúng kênh mà chú thích của ô đó nói tới.
-        # Tô cứng Stone ở mọi ô sẽ sai ở ô vay tiền mặt: ở đó Stone thấp nhất
-        # (0,06%), còn câu chuyện là Country-wide gấp 4,4 lần.
-        focus = WITHIN_PAIRS[p][0] if p in WITHIN_PAIRS else HIGHLIGHT_CHANNEL
         for c in channels:
             r = cp.get((c, p))
             if r is None:
@@ -775,78 +658,86 @@ def page2(data, d):
             small = r["n_mob12"] < SMALL_N
             items.append({
                 "label": c, "value": r["rate"],
-                "cls": "f-accent" if c == focus else "f-grey",
-                "value_txt": fmt_pct(r["rate"], 2) + ("*" if small else ""),
+                "cls": "f-accent" if c in HL_P2_CHANNELS else "f-grey",
+                "value_txt": fmt_pct(r["rate"], 3) + ("*" if small else ""),
                 "tip": tip(f"{c} · {PRODUCT_LABEL_VN[p]}",
                            f"Từng 30+ tại MOB 12: {fmt_pct(r['rate'], 3)}",
                            f"{fmt_int(r['n_ever30'])} trên {fmt_int(r['n_mob12'])} hợp đồng",
-                           "* mẫu số dưới 1.000 hợp đồng, thận trọng" if small else None),
+                           f"* mẫu số dưới {fmt_int(SMALL_N)} hợp đồng, không diễn giải" if small else None),
             })
         desc = (f"Ô {PRODUCT_LABEL_VN[p]}: tỷ lệ từng 30+ tại MOB 12 theo kênh, cùng thang với hai ô kia. "
                 + "; ".join(f"{it['label']} {it['value_txt']}" for it in items if it["value"] is not None))
-        note = ""
-        if p in WITHIN_PAIRS:
-            a, b = WITHIN_PAIRS[p]
-            note = (f'<p class="panel-note">{esc(a)} gấp <strong>{fmt_num(d["within_ratio"][p], 1)} lần</strong> '
-                    f"{esc(b)}</p>")
         panels.append(
             f'<figure class="panel"><figcaption>{esc(PRODUCT_LABEL_VN[p])}'
             f'<span class="en">{esc(p)}</span></figcaption>'
-            + hbar_chart(items, desc, W=360, label_w=150, value_w=62, row_h=30, bar_h=16,
+            + hbar_chart(items, desc, W=360, label_w=150, value_w=66, row_h=30, bar_h=16,
                          x_max=x_max, label_px=12)
-            + note + "</figure>"
+            + "</figure>"
         )
-    trellis_title = "Cùng một sản phẩm, cùng một thang: khoảng cách co lại"
     trellis_viz = viz(
-        trellis_title,
-        f'<p class="viz-sub">Từng quá hạn 30+ tại MOB 12, mỗi ô một loại sản phẩm, thang trục giá trị '
-        f"chung từ 0 đến {pct_tick_label(x_max)}. Gộp mọi sản phẩm thì {RAW_PAIR[0]} gấp "
-        f"{fmt_num(d['raw_ratio'], 1)} lần {RAW_PAIR[1]}.</p>"
+        H["visuals"]["mix_trellis"],
+        f'<p class="viz-sub">Từng quá hạn 30+ tại MOB 12, mỗi ô một loại sản phẩm, thang chung từ 0 đến '
+        f'{pct_tick_label(x_max)}; kênh {OTHER_CHANNEL} bị bỏ vì mẫu số nhỏ. {esc(H["notes"]["trellis_sub"])}</p>'
         f'<div class="trellis-3">{"".join(panels)}</div>',
-        note="* mẫu số tại MOB 12 dưới 1.000 hợp đồng, thận trọng khi diễn giải.",
+        note=f"* mẫu số tại MOB 12 dưới {fmt_int(SMALL_N)} hợp đồng, không diễn giải.",
         cls="viz-wide")
 
-    st = HIGHLIGHT_CHANNEL
-    cco = "Credit and cash offices"
-    sc_title = (f"Duyệt rộng, rủi ro cao: {st} duyệt {fmt_pct(fun[st]['approval_rate'], 1)}, "
-                f"xấu nhất {fmt_pct(mob12[st]['rate'], 2)}")
-    sc_desc = ("Biểu đồ phân tán, trục ngang tỷ lệ duyệt, trục dọc tỷ lệ từng quá hạn 30+ tại MOB 12, "
-               "kích thước bong bóng theo số hồ sơ. "
-               + "; ".join(f"{c}: duyệt {fmt_pct(fun[c]['approval_rate'], 1)}, rủi ro {fmt_pct(mob12[c]['rate'], 2)}"
-                           for c in channels)
-               + f". {st} được tô màu nhấn.")
-    scatter_viz = viz(esc(sc_title), responsive(
-        scatter_chart(channels, fun, mob12, sc_desc),
-        scatter_chart(channels, fun, mob12, sc_desc, W=360, H=300, r_max=15)),
-                      note=f"Kích thước bong bóng theo số hồ sơ. {cco} duyệt "
-                           f"{fmt_pct(fun[cco]['approval_rate'], 1)} và chỉ {fmt_pct(mob12[cco]['rate'], 2)}.")
+    # SMR theo kênh: chấm đặc là SMR sản phẩm × đợt mở 12 tháng kèm khoảng tin cậy,
+    # vòng rỗng là SMR chỉ chuẩn hoá theo sản phẩm. Kênh có tử số dưới 10 ghi mờ.
+    smr_sc = F["origination_cohort"]["mob12"]["smr_by_channel"]
+    sx_rows = sorted((r for r in smr_sc["product_x_cut12"]["primary"] if r["channel_type"] != UNKNOWN),
+                     key=lambda r: -r["smr"])
+    sp_by = by(smr_sc["product_only"]["primary"], "channel_type")
+    s_items = []
+    for pr in sx_rows:
+        c = pr["channel_type"]
+        ref = sp_by[c]["smr"]
+        thin = pr["observed"] < THIN_K
+        s_items.append({
+            "label": c, "smr": pr["smr"], "lo": pr["ci95"][0], "hi": pr["ci95"][1], "ref": ref,
+            "cls": "accent" if c in HL_P2_CHANNELS else "grey", "faint": thin,
+            "value_txt": f"{fmt_num(pr['smr'], 2)} {interval(*pr['ci95'], 2, pct=False)}",
+            "tip": tip(c, f"SMR sản phẩm × đợt mở {fmt_num(pr['smr'], 2)} {interval(*pr['ci95'], 2, pct=False)}",
+                       f"SMR chỉ sản phẩm {fmt_num(ref, 2)}",
+                       f"Quan sát {fmt_int(pr['observed'])} ca, kỳ vọng {fmt_num(pr['expected'], 1)} ca",
+                       f"Tử số dưới {THIN_K}: không kết luận" if thin else None),
+        })
+    s_desc = ("SMR từng 30+ tại MOB 12 theo kênh, chuẩn hoá theo sản phẩm × đợt mở, kèm khoảng tin cậy 95%: "
+              + "; ".join(f"{it['label']} {it['value_txt']} (chỉ sản phẩm {fmt_num(it['ref'], 2)})"
+                          for it in s_items))
+    smr_viz = viz(H["visuals"]["smr"], responsive(
+        smr_chart(s_items, s_desc, W=560),
+        smr_chart(s_items, s_desc, W=360, label_w=118, value_w=96, label_px=11)),
+        note="Chấm đặc: SMR chuẩn hoá theo sản phẩm × đợt mở 12 tháng, gạch ngang là khoảng tin cậy 95%. "
+             "Vòng rỗng: SMR chỉ chuẩn hoá theo sản phẩm. Vạch đứt là SMR bằng một, đúng mức kỳ vọng. "
+             f"Chữ mờ: tử số dưới {THIN_K} ca, không kết luận.")
 
-    f_rows = [[esc(r["channel_type"]), fmt_int(r["n_applications"]), fmt_pct(r["approval_rate"], 1),
-               fmt_pct(r["take_up_rate"], 1)] for r in data["p2_funnel"]]
-    tot = {k: sum(r[k] for r in data["p2_funnel"]) for k in ("n_applications", "n_decided", "n_offered", "n_approved")}
-    funnel_viz = viz("Phễu duyệt theo kênh, kèm tỷ lệ khách nhận khoản vay", table(
-        ["Kênh", "Số hồ sơ", "Tỷ lệ duyệt", "Tỷ lệ nhận vay"], f_rows,
-        total=["Tổng", fmt_int(tot["n_applications"]), fmt_pct(tot["n_offered"] / tot["n_decided"], 1),
-               fmt_pct(tot["n_approved"] / tot["n_offered"], 1)]))
+    # Bảng duyệt: thô, chuẩn hoá theo sản phẩm, take-up chỉ cho vay tiêu dùng.
+    std = by(F["approval"]["channel_standardized"], "channel_type")
+    tk = by(F["approval"]["take_up_consumer_by_channel"], "channel_type")
+    apps = by(data["p2_funnel"], "channel_type")
+    a_rows = []
+    for c in sorted(std, key=lambda c: -apps[c]["n_applications"]):
+        tu = (tk.get(c) or {}).get("take_up_rate") or {}
+        tu_txt = fmt_pct(tu["rate"], 1) if tu.get("rate") is not None and tu.get("enough_n") else "không bán"
+        if tu.get("rate") is not None and not tu.get("enough_n"):
+            tu_txt = fmt_pct(tu["rate"], 1) + "*"
+        a_rows.append([esc(c), fmt_int(apps[c]["n_applications"]), fmt_pct(std[c]["crude"]["rate"], 1),
+                       fmt_num(std[c]["standardized_ratio"], 2), tu_txt])
+    appr_viz = viz(H["visuals"]["approval"], table(
+        ["Kênh", "Số hồ sơ", "Tỷ lệ duyệt thô", "Duyệt so với kỳ vọng", "Take-up vay tiêu dùng"], a_rows),
+        note="Duyệt so với kỳ vọng = số được duyệt / số kỳ vọng nếu kênh có tỷ lệ duyệt của từng sản phẩm. "
+             f"* mẫu số dưới {fmt_int(SMALL_N)} hồ sơ.")
 
-    body = (f"{trellis_viz}"
-            f'<div class="grid-2">{scatter_viz}{funnel_viz}</div>')
-    wc, wcash = d["within_ratio"]["Consumer loans"], d["within_ratio"]["Cash loans"]
-    dek = (f"Khoảng cách thô {fmt_num(d['raw_ratio'], 1)} lần giữa các kênh co lại còn "
-           f"{fmt_num(wc, 1)} và {fmt_num(wcash, 1)} lần khi so trong cùng sản phẩm")
-    caveat = (f"Khoảng cách thô {fmt_num(d['raw_ratio'], 1)} lần giữa {RAW_PAIR[0]} và {RAW_PAIR[1]} phần lớn "
-              f"là nhiễu cơ cấu sản phẩm; so trong cùng sản phẩm chỉ còn {fmt_num(wc, 1)} lần (vay tiêu dùng "
-              f"trả góp) và {fmt_num(wcash, 1)} lần (vay tiền mặt). FPD30 không dùng làm trục rủi ro vì thiên "
-              f"lệch sống sót, vùng mù {fmt_int(data['p2_fpd_blind']['n_blind'])} hồ sơ. Ba visual đã lọc bỏ "
-              "nhóm (không rõ).")
-    return page_shell(2, "Kênh bán và rủi ro", dek, body, caveat), [dek, trellis_title, sc_title]
+    body = f'{trellis_viz}<div class="grid-2">{smr_viz}{appr_viz}</div>'
+    return page_shell(2, H, body)
 
 
 # =============================================================================
 # Trang 3. Vintage theo MOB
 # =============================================================================
 
-def page3(data, d):
+def page3(data, F, H):
     by_ch = {}
     for r in data["p3_channel_mob"]:
         by_ch.setdefault(r["channel_type"], []).append(r)
@@ -862,75 +753,107 @@ def page3(data, d):
         ghost = [{"name": o, "rows": by_ch[o], "cls": "s-ghost", "width": 1.2}
                  for o in channels if o != c]
         main = {"name": c, "rows": by_ch[c], "width": 2.4, "tip": True,
-                "cls": "s-accent" if c == HIGHLIGHT_CHANNEL else "s-ink"}
-        r12 = d["mob12_channel"][c]
+                "cls": "s-accent" if c == HL_P3_CHANNEL else "s-ink"}
+        r12 = next(r for r in by_ch[c] if r["mob"] == 12)
         desc = (f"Đường vintage của kênh {c}, MOB 0 đến {x_max}, cùng thang với các ô khác. "
-                f"Tại MOB 12: {fmt_pct(r12['rate'], 2)}; tại MOB {x_max}: {fmt_pct(by_ch[c][-1]['rate'], 2)}. "
-                "Các đường mờ phía sau là sáu kênh còn lại.")
-        cls = " is-accent" if c == HIGHLIGHT_CHANNEL else ""
+                f"Tại MOB 12: {fmt_pct(r12['rate'], 3)}. Các đường mờ phía sau là sáu kênh còn lại.")
+        cls = " is-accent" if c == HL_P3_CHANNEL else ""
         cells.append(
             f'<figure class="panel{cls}"><figcaption>{esc(c)}'
-            f'<span class="en">MOB 12: {fmt_pct(r12["rate"], 2)}</span></figcaption>'
-            + line_chart(ghost + [main], desc, y_ticks, x_max, W=280, H=150, left=40, bottom=24)
+            f'<span class="en">MOB 12: {fmt_pct(r12["rate"], 3)}</span></figcaption>'
+            + line_chart(ghost + [main], desc, y_ticks, x_max, W=280, H=150, left=46, bottom=24)
             + "</figure>"
         )
-    trellis_title = "Bảy kênh trên cùng một thang: Stone và Country-wide dựng dốc sớm nhất"
     trellis_viz = viz(
-        esc(trellis_title),
+        H["visuals"]["trellis"],
         f'<p class="viz-sub">Tỷ lệ từng quá hạn 30+ theo MOB 0 đến {x_max}, mọi sản phẩm. Đường mờ phía sau '
         "mỗi ô là sáu kênh còn lại, để so vị trí mà không cần chuyển mắt.</p>"
         f'<div class="trellis-7">{"".join(cells)}</div>',
         cls="viz-wide")
 
-    prod_cls = {"Consumer loans": ("s-accent", "t-accent"), "Revolving loans": ("s-stone", "t-label"),
-                "Cash loans": ("s-greyl", "t-label")}
-    order = ["Cash loans", "Revolving loans", "Consumer loans"]  # mustard vẽ sau cùng, nằm trên
+    prod_cls = {"Revolving loans": ("s-accent", "t-accent"), "Cash loans": ("s-stone", "t-label"),
+                "Consumer loans": ("s-greyl", "t-label")}
+    order = ["Consumer loans", "Cash loans", "Revolving loans"]  # mustard vẽ sau cùng, nằm trên
     series = [{"name": PRODUCT_LABEL_VN[p], "rows": by_p[p], "cls": prod_cls[p][0],
-               "tcls": prod_cls[p][1], "width": 2.6 if p == HIGHLIGHT_PRODUCT else 2, "tip": True}
+               "tcls": prod_cls[p][1], "width": 2.6 if p == HL_P3_PRODUCT else 2, "tip": True}
               for p in order]
     p_ticks = nice_ticks(max(r["rate"] for r in data["p3_product_mob"]), 4)
-    m12p = d["mob12_product"]
-    prod_title = (f"Vay tiêu dùng trả góp xấu gấp {times_word(d['consumer_vs_cash'])} lần vay tiền mặt tại MOB 12")
     prod_desc = ("Ba đường vintage theo loại sản phẩm. "
-                 + ", ".join(f"{PRODUCT_LABEL_VN[p]} {fmt_pct(m12p[p]['rate'], 2)} tại MOB 12" for p in PRODUCTS)
-                 + ". Vay tiêu dùng trả góp được tô màu nhấn.")
-    prod_viz = viz(esc(prod_title), responsive(
-        line_chart(series, prod_desc, p_ticks, x_max, W=600, H=300, left=48, right=150, bottom=42,
+                 + ", ".join(f"{PRODUCT_LABEL_VN[p]} {fmt_pct(next(r for r in by_p[p] if r['mob'] == 12)['rate'], 3)} "
+                             "tại MOB 12" for p in PRODUCTS)
+                 + ". Thẻ quay vòng được tô màu nhấn.")
+    prod_viz = viz(H["visuals"]["by_product"], responsive(
+        line_chart(series, prod_desc, p_ticks, x_max, W=600, H=300, left=52, right=150, bottom=42,
                    end_labels=True, x_title="MOB, số tháng kể từ khi mở hợp đồng"),
-        line_chart(series, prod_desc, p_ticks, x_max, W=360, H=260, left=38, right=128, bottom=40,
+        line_chart(series, prod_desc, p_ticks, x_max, W=360, H=260, left=44, right=124, bottom=40,
+                   end_labels=True, x_title="MOB, số tháng kể từ khi mở")))
+
+    # Bảng độ nhạy: tỷ số so với vay tiền mặt tại MOB 12 theo bốn cách đo.
+    ratio = F["origination_cohort"]["mob12"]["product_ratio_vs_cash"]
+    ways = [("primary", "crude", "Định nghĩa chính"), ("primary", "mh_cut12", "Kiểm soát đợt mở"),
+            ("due_only", "crude", "Định nghĩa giữa"), ("no_threshold", "crude", "Không áp ngưỡng")]
+    s_rows = []
+    for tag, key, label in ways:
+        row = [esc(label)]
+        for p in ["Revolving loans", "Consumer loans"]:
+            x = ratio[p][tag][key]
+            row.append(f"{fmt_num(x['ratio'], 2)} {interval(*x['ci95'], 2, pct=False)}")
+        s_rows.append(row)
+    sens_viz = viz(H["visuals"]["sensitivity"], table(
+        ["Cách đo", "Thẻ quay vòng / vay tiền mặt", "Vay tiêu dùng / vay tiền mặt"], s_rows),
+        note="Tỷ số tỷ lệ từng 30+ tại MOB 12, kèm khoảng tin cậy 95%. Định nghĩa chính dùng SK_DPD_DEF; "
+             "kiểm soát đợt mở gộp Mantel-Haenszel qua đợt 12 tháng; định nghĩa giữa là SK_DPD 30+ ở tháng "
+             "còn kỳ phải trả; không áp ngưỡng là SK_DPD.")
+
+    # Vintage theo đợt mở: mỗi đợt một đường, chỉ MOB mà cả đợt đã đủ tuổi.
+    cohorts = [c for c in F["origination_cohort"]["curve_by_cohort_labeled_products"]["cohorts"]
+               if len(c["points"]) > 1]
+    c_series = []
+    for c in sorted(cohorts, key=lambda c: c["origination_cohort_start"] == HL_P3_COHORT):
+        hl = c["origination_cohort_start"] == HL_P3_COHORT
+        c_series.append({
+            "name": c["origination_cohort"],
+            "rows": [{"mob": pt["mob"], "rate": pt["rate"], "n_loans": pt["n"], "n_ever30": pt["k"]}
+                     for pt in c["points"]],
+            "cls": "s-accent" if hl else "s-greyl", "tcls": "t-accent" if hl else "t-axis",
+            "width": 2.6 if hl else 1.6, "tip": True, "end": c["points"][-1]["mob"]})
+    c_max = max(pt["mob"] for c in cohorts for pt in c["points"])
+    # Nhãn cuối đường chỉ cho đợt chạy hết trục; đợt ngắn hơn ghi tên trong chú thích
+    # (nhãn giữa biểu đồ đè lên trục và các đường khác).
+    short = [s_ for s_ in c_series if s_["end"] < c_max]
+    for s_ in short:
+        s_["label"] = False
+    c_ticks = nice_ticks(max(pt["rate"] for c in cohorts for pt in c["points"]), 4)
+    c_desc = ("Đường vintage theo đợt mở 12 tháng, sản phẩm có nhãn, chỉ vẽ MOB mà cả đợt đã đủ tuổi. "
+              + "; ".join(f"đợt {c['origination_cohort']} tới MOB {c['points'][-1]['mob']}: "
+                          f"{fmt_pct(c['points'][-1]['rate'], 3)}" for c in cohorts)
+              + ". Đợt cũ nhất được tô màu nhấn.")
+    cohort_viz = viz(H["visuals"]["cohort"], responsive(
+        line_chart(c_series, c_desc, c_ticks, c_max, W=1000, H=320, left=52, right=120, bottom=42,
+                   end_labels=True, x_title="MOB, số tháng kể từ khi mở hợp đồng"),
+        line_chart(c_series, c_desc, c_ticks, c_max, W=360, H=280, left=44, right=96, bottom=40,
                    end_labels=True, x_title="MOB, số tháng kể từ khi mở")),
-        note="Tại MOB 12: " + ", ".join(f"{PRODUCT_LABEL_VN[p].lower()} {fmt_pct(m12p[p]['rate'], 2)}"
-                                       for p in PRODUCTS) + ".")
+        note="Mỗi đường một đợt mở 12 tháng (tháng tương đối so với ngày nộp hồ sơ hiện tại). "
+             + " ".join(f"Đợt {s_['name']} dừng ở MOB {s_['end']}." for s_ in sorted(short, key=lambda x: -x["end"]))
+             + " Đợt -12 đến -1 chưa đủ tuổi tới MOB 1 nên không vẽ. Thẻ quay vòng, vay tiền mặt và vay "
+             "tiêu dùng gộp chung; cơ cấu sản phẩm đổi theo đợt.",
+        cls="viz-wide")
 
-    rank = sorted(d["mob12_channel"].values(), key=lambda r: -r["rate"])
-    rank_rows = [[esc(r["channel_type"]), fmt_pct(r["rate"], 2), fmt_int(r["n_loans"])] for r in rank]
-    n_tot = sum(r["n_loans"] for r in rank)
-    e_tot = sum(r["n_ever30"] for r in rank)
-    rank_viz = viz("Xếp hạng kênh tại MOB 12, kèm mẫu số ghim cùng ngữ cảnh", table(
-        ["Kênh", "Từng 30+ tại MOB 12", "Mẫu số tại MOB 12"], rank_rows,
-        total=["Tổng (trừ nhóm không rõ)", fmt_pct(e_tot / n_tot, 2), fmt_int(n_tot)]))
-
-    body = f'{trellis_viz}<div class="grid-2">{prod_viz}{rank_viz}</div>'
-    dek = (f"So cùng tuổi hợp đồng: vay tiêu dùng trả góp xấu gấp {times_word(d['consumer_vs_cash'])} lần "
-           "vay tiền mặt tại MOB 12")
-    caveat = ("Mẫu số vintage đã loại hợp đồng có cờ is_partial_history. Đuôi MOB cao duỗi dần vì số hợp đồng "
-              "quan sát đủ giảm đi, không phải vì rủi ro dừng lại, nên đọc kèm cột mẫu số tại MOB 12. "
-              "Ba visual đã lọc bỏ nhóm (không rõ), nhóm có tỷ lệ "
-              f"{fmt_pct(data['p3_unknown_mob12']['rate'], 2)} và sẽ kéo lệch thang trục dùng chung.")
-    return page_shell(3, "Vintage theo MOB", dek, body, caveat), [dek, trellis_title, prod_title]
+    body = f'{cohort_viz}{trellis_viz}<div class="grid-2">{prod_viz}{sens_viz}</div>'
+    return page_shell(3, H, body)
 
 
 # =============================================================================
 # Trang 4. Chuyển nhóm và thu hồi
 # =============================================================================
 
-def page4(data, d):
-    grid, base = d["roll_grid"], d["roll_base"]
-    cure = d["cure"]
+def page4(data, F, H):
+    grid, base = build_roll_grid(data["p4_roll"])
+    cure = {fs: grid[(fs, "B0 Current")]["rate"] for fs in FROM_STATES}
     total_n = sum(base[fs]["n"] for fs in FROM_STATES)
+    rc = by(F["roll_cure"]["primary"]["all"], "from_state")
 
-    # Ma trận: nền ô xám đậm dần theo tỷ lệ (thang một màu), riêng ô B1 sang B0
-    # (cure của nhóm đáng can thiệp nhất) tô mustard.
+    # Ma trận: nền ô xám đậm dần theo tỷ lệ (thang một màu), riêng ô B1 sang B0 tô mustard.
     head = ['<th scope="col">Nhóm xuất phát</th>'] + [
         f'<th scope="col" class="num">{esc(ts)}'
         + (f'<span class="en">{TO_STATE_VN[ts]}</span>' if ts in TO_STATE_VN else "") + "</th>"
@@ -943,11 +866,11 @@ def page4(data, d):
             if not c["observed"]:
                 tds.append('<td class="num empty" title="Không có quan sát nào"></td>')
                 continue
-            accent = fs == HIGHLIGHT_CURE_FROM and ts == "B0 Current"
+            accent = fs == HL_P4_FROM and ts == "B0 Current"
             alpha = 0 if accent else min(c["rate"], 1) * 0.34
             style = "" if accent else f' style="--a:{alpha:.3f}"'
             cls = "num cell accent" if accent else "num cell"
-            t = tip(f"{fs} sang {ts}", f"Tỷ lệ: {fmt_pct(c['rate'], 2)}",
+            t = tip(f"{fs} sang {ts}", f"Tỷ lệ: {fmt_pct(c['rate'], 3)}",
                     f"{fmt_int(c['n'])} trên {fmt_int(base[fs]['n'])} lượt hợp đồng-tháng")
             tds.append(f'<td class="{cls}"{style} tabindex="0" data-tip="{t}">{fmt_pct(c["rate"], 1)}</td>')
         tds.append(f'<td class="num total">{fmt_pct(1, 1)}</td>')
@@ -957,52 +880,52 @@ def page4(data, d):
         n = sum(grid[(fs, ts)]["n"] for fs in FROM_STATES)
         tot_cells.append(f'<td class="num total">{fmt_pct(n / total_n, 1)}</td>')
     tot_cells.append(f'<td class="num total">{fmt_pct(1, 1)}</td>')
-    b1 = HIGHLIGHT_CURE_FROM
     matrix_html = (
         '<div class="table-wrap"><table class="matrix" aria-describedby="matrix-desc">'
         f'<thead><tr>{"".join(head)}</tr></thead><tbody>{"".join(body_rows)}</tbody>'
         f'<tfoot><tr>{"".join(tot_cells)}</tr></tfoot></table></div>'
-        f'<p class="viz-sub" id="matrix-desc">Mỗi dòng cộng lại 100%. Ô càng đậm tỷ lệ càng cao; ô màu nhấn: '
-        f"{fmt_pct(grid[(b1, 'B0 Current')]['rate'], 1)} hợp đồng {b1} quay về B0 Current, "
-        f"{fmt_pct(grid[(b1, b1)]['rate'], 1)} ở lại {b1}. Ô trống: không có quan sát nào.</p>"
+        '<p class="viz-sub" id="matrix-desc">Dòng là nhóm tháng t, cột là nhóm tháng t+1, mỗi dòng cộng lại '
+        "100%. Ô càng đậm tỷ lệ càng cao; ô màu nhấn là B1 quay về B0. Ô trống: không có quan sát nào.</p>"
     )
-    matrix_viz = viz("Từ nhóm quá hạn tháng t (dòng) sang nhóm tháng t+1 (cột)", matrix_html, cls="viz-wide")
+    matrix_viz = viz(H["visuals"]["matrix"], matrix_html, cls="viz-wide")
 
-    cure_from = [fs for fs in FROM_STATES if fs != "B0 Current"]  # B0 về B0 không phải cure
-    items = [{
-        "label": fs, "value": cure[fs],
-        "cls": "f-accent" if fs == HIGHLIGHT_CURE_FROM else "f-grey",
-        "value_txt": fmt_pct(cure[fs], 1),
-        "tip": tip(fs, f"Cure rate: {fmt_pct(cure[fs], 2)}",
-                   f"{fmt_int(grid[(fs, 'B0 Current')]['n'])} quay về B0 trên {fmt_int(base[fs]['n'])} lượt"),
-    } for fs in cure_from]
-    b3 = "B3 61-90"
-    cure_title = (f"Cửa sổ thu hồi đóng nhanh: {fmt_pct(cure[b1], 1)} ở B1 còn {fmt_pct(cure[b3], 1)} ở B3")
+    # Cure: bỏ B0 (B0 về B0 không phải cure). B3 dưới ngưỡng mẫu nên tô xám nhạt.
+    cure_from = [fs for fs in FROM_STATES if fs != "B0 Current"]
+    items = []
+    for fs in cure_from:
+        ok = rc[fs]["enough_n"]
+        ci = rc[fs]["cure_to_b0"]["ci95"]
+        items.append({
+            "label": fs, "value": cure[fs],
+            "cls": "f-accent" if fs == HL_P4_FROM else ("f-grey" if ok else "f-greyl"),
+            "value_txt": fmt_pct(cure[fs], 1) + ("" if ok else "*"),
+            "tip": tip(fs, f"Cure rate: {fmt_pct(cure[fs], 1)} {interval(*ci, 1)}",
+                       f"{fmt_int(grid[(fs, 'B0 Current')]['n'])} quay về B0 trên {fmt_int(base[fs]['n'])} lượt",
+                       None if ok else f"* dưới {fmt_int(SMALL_N)} lượt, không diễn giải"),
+        })
     cure_desc = ("Biểu đồ thanh cure rate theo nhóm quá hạn xuất phát, đã bỏ B0 Current. "
-                 + ", ".join(f"{fs} {fmt_pct(cure[fs], 1)}" for fs in cure_from) + ". B1 1-30 được tô màu nhấn.")
-    cure_viz = viz(esc(cure_title), responsive(
+                 + ", ".join(f"{it['label']} {it['value_txt']}" for it in items) + ". B1 1-30 được tô màu nhấn.")
+    cure_viz = viz(H["visuals"]["cure"], responsive(
         hbar_chart(items, cure_desc, W=520, label_w=84, value_w=64, row_h=40, bar_h=24),
         hbar_chart(items, cure_desc, W=360, label_w=74, value_w=56, row_h=36, bar_h=20)),
-                   note="Cure rate: tỷ lệ hợp đồng ở nhóm xuất phát tháng t quay về B0 Current tháng t+1.")
+        note="Cure rate: tỷ lệ lượt ở nhóm xuất phát tháng t quay về B0 Current tháng t+1. "
+             f"* dưới {fmt_int(SMALL_N)} lượt, không diễn giải.")
 
-    s_rows = [[esc(fs), fmt_int(base[fs]["n"]), fmt_pct(cure[fs], 1), fmt_billion(base[fs]["exposure"], 1)]
-              for fs in FROM_STATES]
-    tot_cure = sum(grid[(fs, "B0 Current")]["n"] for fs in FROM_STATES) / total_n
+    s_rows = []
+    for fs in FROM_STATES:
+        c_txt = "" if fs == "B0 Current" else fmt_pct(cure[fs], 1)
+        s_rows.append([esc(fs), fmt_int(base[fs]["n"]), c_txt, fmt_billion(base[fs]["exposure"], 1)])
+    od = [fs for fs in FROM_STATES if fs != "B0 Current"]
+    tot_cure = sum(grid[(fs, "B0 Current")]["n"] for fs in od) / sum(base[fs]["n"] for fs in od)
     tot_exp = sum(base[fs]["exposure"] for fs in FROM_STATES)
-    scale_viz = viz("Mẫu số từng nhóm xuất phát, đặt cạnh cure rate", table(
-        ["Nhóm xuất phát", "Số lượt hợp đồng-tháng", "Cure rate", "Dư nợ xuất phát (tỷ)"], s_rows,
+    scale_viz = viz(H["visuals"]["roll_tbl"], table(
+        ["Nhóm xuất phát", "Số lượt hợp đồng-tháng", "Cure rate", "Dư nợ cộng dồn qua tháng (tỷ)"], s_rows,
         total=["Tổng", fmt_int(total_n), fmt_pct(tot_cure, 1), fmt_billion(tot_exp, 1)]),
-        note=f"Cure {fmt_pct(cure[b3], 1)} của B3 chỉ dựa trên {fmt_int(base[b3]['n'])} lượt, khác hẳn "
-             f"{fmt_int(base[b1]['n'])} lượt của B1. Dòng B0 Current giữ lại để thấy mẫu số thật.")
+        note="Cure của dòng tổng tính trên B1 đến B4. Dư nợ cộng dồn: một hợp đồng nằm ở B0 nhiều tháng "
+             "được cộng mỗi tháng một lần, không phải dư nợ tại một thời điểm.")
 
     body = f'{matrix_viz}<div class="grid-2">{cure_viz}{scale_viz}</div>'
-    dek = (f"Cửa sổ thu hồi đóng lại sau B1: cure rate rơi từ {fmt_pct(cure[b1], 1)} xuống "
-           f"{fmt_pct(cure[b3], 1)} chỉ sau hai nhóm")
-    caveat = (f"Cure rate rơi từ {fmt_pct(cure[b1], 1)} ở B1 xuống {fmt_pct(cure[b3], 1)} ở B3, nên can thiệp "
-              "thu hồi phải dồn vào B1. Biểu đồ cure đã lọc bỏ dòng B0 Current vì B0 về B0 không phải là cure. "
-              "Mẫu số là tổng lượt hợp đồng-tháng của nhóm xuất phát cộng qua mọi nhóm đến, KHÔNG cộng cột "
-              "n_from vì n_from là window sum lặp lại trên mỗi dòng bucket đến.")
-    return page_shell(4, "Chuyển nhóm và thu hồi", dek, body, caveat), [dek, cure_title]
+    return page_shell(4, H, body)
 
 
 # =============================================================================
@@ -1027,6 +950,8 @@ def about_html(fb):
 def glossary_html():
     terms = [
         ("DPD", "Days past due, số ngày quá hạn tính đến kỳ quan sát."),
+        ("SK_DPD_DEF", "DPD có ngưỡng trọng yếu: bỏ qua khoản nợ giá trị thấp. Định nghĩa quá hạn chính của dashboard."),
+        ("SK_DPD", "DPD không áp ngưỡng trọng yếu, đếm cả khoản dư lẻ sau kỳ trả cuối. Chỉ dùng làm độ nhạy."),
         ("Nhóm B0 đến B4", "B0 Current = 0 ngày, B1 = 1-30, B2 = 31-60, B3 = 61-90, B4 = trên 90 ngày quá hạn."),
         ("30+", "Quá hạn trên 30 ngày, tức từ nhóm B2 trở lên."),
         ("Coincident", "Đo tại đúng một thời điểm (ảnh chụp), khác với vintage theo tuổi hợp đồng."),
@@ -1034,10 +959,12 @@ def glossary_html():
         ("MOB", "Month on book, số tháng kể từ khi mở hợp đồng (MOB 0 là tháng mở)."),
         ("Vintage", "Theo dõi một nhóm hợp đồng theo tuổi hợp đồng (MOB) thay vì theo tháng lịch."),
         ("Từng 30+ tại MOB 12", "Tỷ lệ hợp đồng TỪNG quá hạn trên 30 ngày tính đến MOB 12 (ever 30+@MOB12)."),
+        ("Khoảng tin cậy 95%", "Viết trong ngoặc vuông sau con số. Hai nhóm chỉ thật sự khác nhau khi khoảng của tỷ số không chứa 1."),
+        ("SMR", "Standardized ratio: số ca quan sát chia số ca kỳ vọng nếu kênh có tỷ lệ của từng sản phẩm. Trên 1 là xấu hơn mức sản phẩm của chính nó."),
+        ("Chuẩn hoá theo sản phẩm", "So kênh sau khi bỏ ảnh hưởng của việc mỗi kênh bán tỷ trọng sản phẩm khác nhau."),
         ("Tỷ lệ duyệt", "Hồ sơ được duyệt (kể cả khách không dùng) trên hồ sơ đã có quyết định."),
-        ("Tỷ lệ nhận vay", "Take-up rate: trong hồ sơ được duyệt, tỷ lệ khách thật sự nhận khoản vay."),
-        ("FPD30", "First payment default 30: kỳ trả đầu tiên chưa trả đủ sau 30 ngày. Có thiên lệch sống sót trong dữ liệu này."),
-        ("Nhiễu cơ cấu sản phẩm", "Confounding: các kênh bán tỷ trọng sản phẩm khác nhau, mà sản phẩm vốn đã rủi ro khác nhau, nên so kênh gộp mọi sản phẩm bị lệch."),
+        ("Take-up", "Trong hồ sơ được duyệt, tỷ lệ khách thật sự nhận khoản vay. Chỉ có nghĩa ở vay tiêu dùng."),
+        ("FPD30", "First payment default 30: kỳ trả đầu tiên chưa trả đủ sau 30 ngày. Quá ít ca để làm trục rủi ro."),
         ("Roll rate", "Tỷ lệ hợp đồng chuyển từ nhóm quá hạn này sang nhóm khác ở tháng kế tiếp."),
         ("Cure rate", "Tỷ lệ hợp đồng đang quá hạn quay về B0 Current ngay tháng sau."),
         ("Closed, Other, Missing", "Tháng sau đã tất toán; trạng thái khác; không có dòng dữ liệu tháng sau."),
@@ -1320,19 +1247,18 @@ JS_BLOCK = """
 
 
 def build_html(data):
-    d = derive(data)
-    p1, h1 = page1(data, d)
-    p2, h2 = page2(data, d)
-    p3, h3 = page3(data, d)
-    p4, h4 = page4(data, d)
-    tabs = [("1. Tổng quan"), ("2. Kênh bán"), ("3. Vintage"), ("4. Thu hồi")]
+    findings = headlines.load_findings()
+    H = headlines.texts(headlines.build(findings))
+    pages = [page1(data, findings, H[1]), page2(data, findings, H[2]),
+             page3(data, findings, H[3]), page4(data, findings, H[4])]
     tab_html = "".join(
         f'<button class="tab" type="button" role="tab" id="tab-{i}" aria-controls="sec-{i}" data-hash="page-{i}" '
-        f'aria-selected="{"true" if i == 1 else "false"}">{esc(label)}</button>'
-        for i, label in enumerate(tabs, start=1))
+        f'aria-selected="{"true" if i == 1 else "false"}">{esc(H[i]["tab"])}</button>'
+        for i in range(1, 5))
 
     payload = {
-        "ghi_chu": "Số liệu tổng hợp từ data/warehouse.duckdb (chỉ đọc), sinh bởi scripts/build_dashboard.py",
+        "ghi_chu": ("Số liệu tổng hợp từ data/warehouse.duckdb (chỉ đọc), sinh bởi scripts/build_dashboard.py. "
+                    "Câu chữ lấy từ scripts/headlines.py, sinh từ data/export/findings.json."),
         **{k: v for k, v in data.items() if k != "p4_roll"},
         "p4_roll": data["p4_roll"],
     }
@@ -1361,7 +1287,7 @@ def build_html(data):
     <button class="theme" id="theme" type="button" aria-label="Đổi nền sáng hoặc tối">Nền tối</button>
   </div>
   <main>
-  {p1}{p2}{p3}{p4}
+  {''.join(pages)}
   </main>
   {about_html(data["footer_base"])}
   {glossary_html()}
@@ -1376,7 +1302,10 @@ def build_html(data):
 </body>
 </html>
 """
-    return html_out, h1 + h2 + h3 + h4
+    lines = []
+    for n in range(1, 5):
+        lines += [H[n]["title"], H[n]["dek"]] + list(H[n]["visuals"].values())
+    return html_out, lines
 
 
 def main():
@@ -1398,7 +1327,7 @@ def main():
 
     print("Dựng HTML")
     DASHBOARD_DIR.mkdir(parents=True, exist_ok=True)
-    html_out, headlines = build_html(data)
+    html_out, heads = build_html(data)
     for bad in (chr(0x2014), chr(0x2013), "Georgia"):  # em dash, en dash, font thiếu dấu
         if bad in html_out:
             sys.exit(f"Lỗi: HTML chứa ký tự hoặc font cấm: {bad!r}")
@@ -1407,7 +1336,7 @@ def main():
     print(f"  ok  {out_path.relative_to(ROOT)}  ({len(html_out):,} ký tự)")
 
     print("\nTiêu đề kết luận (đối chiếu với bản Power BI):")
-    for h in headlines:
+    for h in heads:
         print("  " + h)
 
 

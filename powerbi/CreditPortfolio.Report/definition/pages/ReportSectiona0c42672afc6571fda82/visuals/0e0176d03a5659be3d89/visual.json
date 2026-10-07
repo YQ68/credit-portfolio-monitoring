@@ -23,12 +23,11 @@
                       "Entity": "Snapshot"
                     }
                   },
-                  "Property": "Rate 30+ Coincident"
+                  "Property": "Rate 30+ Exposure Known"
                 }
               },
-              "queryRef": "Snapshot.Rate 30+ Coincident",
-              "nativeQueryRef": "Rate 30+ Coincident",
-              "displayName": "Tỷ lệ 30+ hiện tại"
+              "queryRef": "Snapshot.Rate 30+ Exposure Known",
+              "nativeQueryRef": "Rate 30+ Exposure Known"
             }
           ]
         }
@@ -318,7 +317,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tỷ lệ hợp đồng đang quá hạn từ 30 ngày trở lên.'"
+                  "Value": "'Tỷ lệ hợp đồng đang quá hạn trên 30 ngày, trong tập hợp đồng có dư nợ proxy.'"
                 }
               }
             }

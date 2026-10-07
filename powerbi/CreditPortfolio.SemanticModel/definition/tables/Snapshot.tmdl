@@ -1,105 +1,133 @@
-/// Ảnh chụp danh mục đang mở tại tháng quan sát gần nhất (months_balance = -1), theo bucket quá hạn.
+/// Ảnh chụp danh mục đang mở tại tháng quan sát gần nhất (months_balance = -1), bucket theo SK_DPD_DEF.
 /// Mã chỉ tiêu M02 và M06. Grain: sản phẩm x kênh x bucket.
 table Snapshot
-	lineageTag: 3403a94a-fd1a-4f07-96aa-29f2b290686b
 
 	/// Số hợp đồng đang mở tại tháng quan sát gần nhất.
 	measure 'Open Loans' = SUM(Snapshot[n_loans])
 		formatString: #,##0
-		lineageTag: cb41847c-c505-4680-80c5-1956edba0f22
 
 	/// Số hợp đồng đang quá hạn trên 30 ngày tại tháng quan sát.
 	measure 'Loans 30+' = SUM(Snapshot[n_30_plus])
 		formatString: #,##0
-		lineageTag: 36e43ecb-bc6f-46a3-a0f2-ac5a1f8e88a4
 
-	/// M06. Tỷ lệ 30+ coincident: đang quá hạn trên 30 ngày trên tổng hợp đồng đang mở.
-	/// Đây là ảnh chụp một thời điểm, khác với vintage vốn nhìn theo tuổi hợp đồng.
+	/// M06. Tỷ lệ 30+ coincident trên MỌI hợp đồng đang mở. Dùng cho xếp hạng kênh và bảng sản phẩm.
+	/// Không đặt cạnh thẻ tỷ lệ theo dư nợ: hai số khác tập, xem [Rate 30+ Exposure Known].
 	measure 'Rate 30+ Coincident' = DIVIDE([Loans 30+], [Open Loans])
-		formatString: 0.00%
-		lineageTag: 53662fb2-b9c1-4fcc-a693-f1bf9ae46a4d
+		formatString: 0.000%
+
+	/// Số hợp đồng đang mở có dư nợ proxy, tức tập của thẻ tỷ lệ theo dư nợ.
+	measure 'Loans Exposure Known' = SUM(Snapshot[n_loans_exposure_known])
+		formatString: #,##0
+
+	/// Số hợp đồng đang 30+ trong tập có dư nợ proxy.
+	measure 'Loans 30+ Exposure Known' = SUM(Snapshot[n_30_plus_exposure_known])
+		formatString: #,##0
+
+	/// M06 tính trên CÙNG tập với [Exposure Rate 30+] (hợp đồng có dư nợ proxy), để hai thẻ KPI so được với nhau.
+	measure 'Rate 30+ Exposure Known' = DIVIDE([Loans 30+ Exposure Known], [Loans Exposure Known])
+		formatString: 0.000%
 
 	/// Dư nợ proxy của hợp đồng đang mở. Visual tự chọn đơn vị hiển thị.
 	measure 'Open Exposure' = SUM(Snapshot[exposure])
 		formatString: #,##0
-		lineageTag: 578d946e-b089-44e4-9774-7f32c498a840
 
 	/// Dư nợ proxy đang quá hạn trên 30 ngày.
 	measure 'Exposure 30+' = SUM(Snapshot[exposure_30_plus])
 		formatString: #,##0
-		lineageTag: 00251a3f-821e-4032-91fb-08b55bd30d70
 
-	/// M06 tính theo dư nợ thay vì theo số hợp đồng. Thường cao hơn bản đếm hợp đồng
-	/// vì hợp đồng quá hạn hay có dư nợ lớn hơn trung bình.
+	/// M06 tính theo dư nợ. Tập hợp đồng có dư nợ proxy, trùng tập của [Rate 30+ Exposure Known].
 	measure 'Exposure Rate 30+' = DIVIDE([Exposure 30+], [Open Exposure])
-		formatString: 0.00%
-		lineageTag: 7b581f4a-42e3-4562-bd58-4a2667b9f694
+		formatString: 0.000%
+
+	/// Độ nhạy: tỷ lệ 30+ theo SK_DPD (không áp ngưỡng trọng yếu) trên mọi hợp đồng đang mở.
+	measure 'Rate 30+ No Threshold' = DIVIDE(SUM(Snapshot[n_30_plus_no_threshold]), [Open Loans])
+		formatString: 0.000%
+
+	/// Độ nhạy: tỷ lệ dư nợ 30+ theo SK_DPD. Gần như không đổi so với định nghĩa chính,
+	/// vì phần 30+ chỉ có theo SK_DPD là khoản dư lẻ.
+	measure 'Exposure Rate 30+ No Threshold' = DIVIDE(SUM(Snapshot[exposure_30_plus_no_threshold]), [Open Exposure])
+		formatString: 0.000%
 
 	/// Loại sản phẩm. ẨN: slicer dùng Dim Product[Sản phẩm].
 	column contract_type
 		dataType: string
 		isHidden
-		lineageTag: b994da30-224d-408c-b85c-99a4a3389737
 		sourceColumn: contract_type
 
 	/// Kênh bán. ẨN: slicer dùng Dim Channel[Kênh].
 	column channel_type
 		dataType: string
 		isHidden
-		lineageTag: 55ecd5e6-1147-4f91-9767-8a5be116d191
 		sourceColumn: channel_type
 
-	/// Nhóm quá hạn theo số ngày: B0 Current, B1 1-30, B2 31-60, B3 61-90, B4 90+.
+	/// Nhóm quá hạn theo SK_DPD_DEF: B0 Current, B1 1-30, B2 31-60, B3 61-90, B4 90+.
 	column dpd_bucket
 		dataType: string
-		lineageTag: 538ca587-62e1-4248-8ef6-367c173cef88
+		sortByColumn: 'dpd_bucket_order'
 		sourceColumn: dpd_bucket
-		sortByColumn: dpd_bucket_order
 
 	/// Thứ tự bucket, dùng để sắp xếp.
 	column dpd_bucket_order
 		dataType: int64
 		isHidden
 		formatString: 0
-		lineageTag: 404eac71-8052-4808-a9e8-ca5d001f4a70
 		summarizeBy: none
 		sourceColumn: dpd_bucket_order
 
 	column n_loans
 		dataType: int64
-		lineageTag: 37a805b2-61a7-4340-a277-8ddb3e00166e
 		summarizeBy: sum
 		sourceColumn: n_loans
 
 	column exposure
 		dataType: double
-		lineageTag: e71b7df5-80a6-4448-84dd-a832373cd125
 		summarizeBy: sum
 		sourceColumn: exposure
 
 	column n_30_plus
 		dataType: int64
-		lineageTag: cd0d8498-8bc2-4797-ab27-2c5ab626bc2c
 		summarizeBy: sum
 		sourceColumn: n_30_plus
 
 	column exposure_30_plus
 		dataType: double
-		lineageTag: bae44599-874f-4b4b-91f5-d6d4764031fc
 		summarizeBy: sum
 		sourceColumn: exposure_30_plus
+
+	/// Hợp đồng có dư nợ proxy.
+	column n_loans_exposure_known
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_loans_exposure_known
+
+	/// Hợp đồng 30+ có dư nợ proxy.
+	column n_30_plus_exposure_known
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_30_plus_exposure_known
+
+	/// Độ nhạy SK_DPD. Không khớp dpd_bucket của dòng.
+	column n_30_plus_no_threshold
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_30_plus_no_threshold
+
+	/// Độ nhạy SK_DPD.
+	column exposure_30_plus_no_threshold
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: exposure_30_plus_no_threshold
 
 	partition Snapshot = m
 		mode: import
 		source =
-				let
-					// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
-					#"Đã đọc file CSV" = Csv.Document(
-						File.Contents(DataFolder & "\mart_portfolio_snapshot.csv"),
-						[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
-					),
-					#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
-					#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"contract_type", type text}, {"channel_type", type text}, {"dpd_bucket", type text}, {"dpd_bucket_order", Int64.Type}, {"n_loans", Int64.Type}, {"exposure", type number}, {"n_30_plus", Int64.Type}, {"exposure_30_plus", type number}})
-				in
-					#"Đã ép kiểu dữ liệu từng cột"
-
+			let
+				// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
+				#"Đã đọc file CSV" = Csv.Document(
+					File.Contents(DataFolder & "\mart_portfolio_snapshot.csv"),
+					[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				),
+				#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
+				#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"contract_type", type text}, {"channel_type", type text}, {"dpd_bucket", type text}, {"dpd_bucket_order", Int64.Type}, {"n_loans", Int64.Type}, {"exposure", type number}, {"n_30_plus", Int64.Type}, {"exposure_30_plus", type number}, {"n_loans_exposure_known", Int64.Type}, {"n_30_plus_exposure_known", Int64.Type}, {"n_30_plus_no_threshold", Int64.Type}, {"exposure_30_plus_no_threshold", type number}}, "en-US")
+			in
+				#"Đã ép kiểu dữ liệu từng cột"

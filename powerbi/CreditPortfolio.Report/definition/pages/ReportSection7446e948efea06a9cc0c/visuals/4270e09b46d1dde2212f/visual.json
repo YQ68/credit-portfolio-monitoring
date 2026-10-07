@@ -3,10 +3,10 @@
   "name": "4270e09b46d1dde2212f",
   "position": {
     "x": 24,
-    "y": 632,
+    "y": 624,
     "z": 900,
     "width": 1232,
-    "height": 48,
+    "height": 88,
     "tabOrder": 900
   },
   "visual": {
@@ -22,16 +22,16 @@
                     "value": "LƯU Ý   ",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
-                      "fontSize": "9pt",
+                      "fontSize": "8pt",
                       "color": "#D4A30A",
                       "fontWeight": "bold"
                     }
                   },
                   {
-                    "value": "Khoảng cách thô 8,1 lần giữa Stone và Credit and cash offices phần lớn là nhiễu cơ cấu sản phẩm; so trong cùng sản phẩm chỉ còn 2,0 lần (vay tiêu dùng trả góp) và 4,4 lần (vay tiền mặt). FPD30 không dùng làm trục rủi ro vì thiên lệch sống sót, vùng mù 77.885 hồ sơ. Ba visual đã lọc bỏ nhóm (không rõ).",
+                    "value": "SMR = số ca từng 30+ tại MOB 12 chia số ca kỳ vọng nếu kênh có tỷ lệ của từng tầng (sản phẩm × đợt mở 12 tháng) trên toàn danh mục có nhãn; khoảng tin cậy 95% Byar. Mỗi SMR so một kênh với kỳ vọng của chính nó; không chia hai SMR cho nhau để so hai kênh. Kiểm soát đợt mở là phân tích hậu nghiệm, thêm sau lần soát độc lập thứ hai. Theo định nghĩa giữa (SK_DPD 30+ ở tháng còn kỳ phải trả), Contact center 1,65 [1,23; 2,17], Stone 1,06 [0,95; 1,19]: chỉ Contact center giữ. Stone / Country-wide gộp Mantel-Haenszel qua ba sản phẩm 1,80 [1,34; 2,42], qua sản phẩm × đợt 1,76 [1,31; 2,37], theo định nghĩa giữa 1,09 [0,95; 1,26]; các cặp khác chỉ để mô tả. AP+ (Cash loan) có 2 ca và Khác 1 ca: tử số quá nhỏ, không kết luận. Tỷ lệ duyệt = (duyệt + duyệt không dùng) / đã có quyết định; take-up chỉ tính cho vay tiêu dùng. Nhóm (không rõ) không có kênh nên bị loại. FPD30 không dùng làm trục rủi ro: chỉ 99 ca trên 895.744 hợp đồng.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "9pt",
+                      "fontSize": "8pt",
                       "color": "#5C5349"
                     }
                   }

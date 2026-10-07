@@ -73,7 +73,7 @@
               },
               "queryRef": "RollRate.Exposure From",
               "nativeQueryRef": "Exposure From",
-              "displayName": "Dư nợ xuất phát"
+              "displayName": "Dư nợ cộng dồn qua tháng"
             }
           ]
         }
@@ -349,7 +349,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Bảng số lượt hợp đồng-tháng, cure rate và dư nợ của từng nhóm quá hạn xuất phát. Cure 7,0% của B3 chỉ dựa trên 7.172 lượt, khác hẳn 259.546 lượt của B1.'"
+                  "Value": "'Bảng số lượt hợp đồng-tháng, cure rate và dư nợ proxy cộng dồn của từng nhóm xuất phát. Dòng B0 không có cure.'"
                 }
               }
             }
@@ -369,7 +369,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Mẫu số từng nhóm xuất phát, đặt cạnh cure rate'"
+                  "Value": "'Mẫu số từng nhóm: B1 có 193.814 lượt, B2 chỉ 1.642 và B3 403'"
                 }
               }
             },
@@ -381,6 +381,13 @@
                       "Value": "'#0F172A'"
                     }
                   }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }

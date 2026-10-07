@@ -1,59 +1,49 @@
-/// Rủi ro sớm FPD30 theo phân khúc (M11). CHẶN DƯỚI, không phải số cuối cùng: xem vùng mù dữ liệu ở docs/metric_dictionary.md mục M11.
+/// Rủi ro sớm FPD30 theo phân khúc (M11), trên hợp đồng đã kích hoạt (có kỳ 1 trong lịch trả gốc).
+/// Thẻ quay vòng không có trong mẫu số. Tử số rất mỏng nên không dùng làm trục rủi ro.
 table FPD
-	lineageTag: b1af9293-d609-4042-b8d7-eb0d5115fc87
 
 	/// Số hợp đồng trong mẫu số FPD30.
 	measure 'FPD Base Loans' = SUM(FPD[n_loans])
 		formatString: #,##0
-		lineageTag: 16d8e0d6-ade7-4319-b1b4-75ec440267b6
 
-	/// Số hợp đồng trễ hạn ngay kỳ trả góp đầu tiên trên 30 ngày.
+	/// Số hợp đồng trả chưa đủ 95% kỳ 1 trong 30 ngày sau hạn.
 	measure 'FPD30 Loans' = SUM(FPD[n_fpd30])
 		formatString: #,##0
-		lineageTag: 49692544-b3cf-44af-a71a-887d7cbde236
 
-	/// M11. Tỷ lệ FPD30. ĐÂY LÀ CHẶN DƯỚI: dữ liệu chỉ ghi kỳ đã trả nên có thiên lệch sống sót,
-	/// vùng mù 77.885 hồ sơ. Không dùng riêng số này để xếp hạng kênh hay sản phẩm.
+	/// M11. Tỷ lệ FPD30 trên hợp đồng đã kích hoạt. Tử số rất mỏng (99 ca toàn danh mục),
+	/// không dùng riêng số này để xếp hạng kênh hay sản phẩm.
 	measure 'FPD30 Rate' = DIVIDE([FPD30 Loans], [FPD Base Loans])
-		formatString: 0.0%
-		lineageTag: e7d80c81-2ebd-4da0-b9a2-d1be8c193a23
+		formatString: 0.000%
 
-	/// Số hợp đồng được duyệt nhưng không có dòng trả góp nào, tức vùng mù không quan sát được FPD.
-	measure 'FPD Blind Spot Loans' = SUM(FPD[n_approved_no_installment])
+	/// Hồ sơ được duyệt nhưng không có lịch trả, tức không kích hoạt. Không thuộc mẫu số FPD30.
+	measure 'Approved Not Activated' = SUM(FPD[n_approved_not_activated])
 		formatString: #,##0
-		lineageTag: 2ee1ca9e-2665-4dc8-9879-d891ead9f646
 
 	column contract_type
 		dataType: string
 		isHidden
-		lineageTag: 90999c92-184e-4536-95ad-e831f388b571
 		sourceColumn: contract_type
 
 	column channel_type
 		dataType: string
 		isHidden
-		lineageTag: 511d5cec-90d6-48be-897a-ad29e14f89ba
 		sourceColumn: channel_type
 
 	column client_type
 		dataType: string
-		lineageTag: 2ba95412-4cfc-4d60-a096-c2942f3ffe5f
 		sourceColumn: client_type
 
 	column yield_group
 		dataType: string
-		lineageTag: 1e42d55d-766f-4408-8783-19c54ac6d14a
 		sourceColumn: yield_group
 
 	column n_loans
 		dataType: int64
-		lineageTag: f582ed5c-a1c3-4f78-97ff-4f6cc920b49c
 		summarizeBy: sum
 		sourceColumn: n_loans
 
 	column n_fpd30
 		dataType: int64
-		lineageTag: f721e2c8-d0a8-4fc3-be54-c057a3089ea4
 		summarizeBy: sum
 		sourceColumn: n_fpd30
 
@@ -61,13 +51,12 @@ table FPD
 	column fpd30_rate
 		dataType: double
 		isHidden
-		lineageTag: 0a62074b-e029-4c20-82f0-0081bdb6deee
 		summarizeBy: none
 		sourceColumn: fpd30_rate
 
+	/// FPD30 theo ngày: có lần trả trễ quá 30 ngày.
 	column n_fpd30_late_rule
 		dataType: int64
-		lineageTag: 36dfa245-3453-4e48-a5de-60f2b4537d4c
 		summarizeBy: sum
 		sourceColumn: n_fpd30_late_rule
 
@@ -75,27 +64,31 @@ table FPD
 	column fpd30_late_rule_rate
 		dataType: double
 		isHidden
-		lineageTag: 987c24c9-8772-48bb-8f82-f2a32afba735
 		summarizeBy: none
 		sourceColumn: fpd30_late_rule_rate
 
-	column n_approved_no_installment
+	/// Duyệt, không có lịch trả.
+	column n_approved_not_activated
 		dataType: int64
-		lineageTag: f2fd6560-d935-4337-83b9-26cfef61eec4
 		summarizeBy: sum
-		sourceColumn: n_approved_no_installment
+		sourceColumn: n_approved_not_activated
+
+	/// Duyệt, có lịch trả, không có dòng kỳ 1.
+	column n_approved_scheduled_no_installment
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: n_approved_scheduled_no_installment
 
 	partition FPD = m
 		mode: import
 		source =
-				let
-					// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
-					#"Đã đọc file CSV" = Csv.Document(
-						File.Contents(DataFolder & "\mart_fpd_by_segment.csv"),
-						[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
-					),
-					#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
-					#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"contract_type", type text}, {"channel_type", type text}, {"client_type", type text}, {"yield_group", type text}, {"n_loans", Int64.Type}, {"n_fpd30", Int64.Type}, {"fpd30_rate", type number}, {"n_fpd30_late_rule", Int64.Type}, {"fpd30_late_rule_rate", type number}, {"n_approved_no_installment", Int64.Type}})
-				in
-					#"Đã ép kiểu dữ liệu từng cột"
-
+			let
+				// Đọc CSV mart xuất từ DuckDB, ép UTF-8 để giữ dấu tiếng Việt
+				#"Đã đọc file CSV" = Csv.Document(
+					File.Contents(DataFolder & "\mart_fpd_by_segment.csv"),
+					[Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				),
+				#"Đã nâng dòng đầu thành tiêu đề" = Table.PromoteHeaders(#"Đã đọc file CSV", [PromoteAllScalars = true]),
+				#"Đã ép kiểu dữ liệu từng cột" = Table.TransformColumnTypes(#"Đã nâng dòng đầu thành tiêu đề", {{"contract_type", type text}, {"channel_type", type text}, {"client_type", type text}, {"yield_group", type text}, {"n_loans", Int64.Type}, {"n_fpd30", Int64.Type}, {"fpd30_rate", type number}, {"n_fpd30_late_rule", Int64.Type}, {"fpd30_late_rule_rate", type number}, {"n_approved_not_activated", Int64.Type}, {"n_approved_scheduled_no_installment", Int64.Type}}, "en-US")
+			in
+				#"Đã ép kiểu dữ liệu từng cột"

@@ -317,7 +317,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tỷ lệ dư nợ đang quá hạn từ 30 ngày trở lên.'"
+                  "Value": "'Tỷ lệ dư nợ đang quá hạn trên 30 ngày, cùng tập với thẻ tỷ lệ theo hợp đồng.'"
                 }
               }
             }

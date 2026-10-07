@@ -46,7 +46,7 @@
               },
               "queryRef": "Snapshot.Rate 30+ Coincident",
               "nativeQueryRef": "Rate 30+ Coincident",
-              "displayName": "Tỷ lệ 30+ hiện tại"
+              "displayName": "Tỷ lệ 30+"
             }
           ]
         }
@@ -119,7 +119,7 @@
                     },
                     "Right": {
                       "Literal": {
-                        "Value": "'Stone'"
+                        "Value": "'Credit and cash offices'"
                       }
                     }
                   }
@@ -372,7 +372,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Biểu đồ thanh tỷ lệ quá hạn 30+ hiện tại theo kênh bán, sắp xếp giảm dần. Stone 0,55% đứng đầu và được tô mustard, Khác 0,00% thấp nhất.'"
+                  "Value": "'Biểu đồ thanh tỷ lệ quá hạn 30+ hiện tại theo kênh bán, sắp xếp giảm dần, đã loại nhóm (không rõ). Credit and cash offices đứng đầu và được tô mustard.'"
                 }
               }
             }
@@ -392,7 +392,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Stone dẫn đầu tỷ lệ 30+ hiện tại, 0,55% so với 0,23% của Credit and cash offices'"
+                  "Value": "'Tỷ lệ 30+ hiện tại theo kênh phản ánh sản phẩm, không xếp hạng kênh: 98 trên 100 ca của Credit and cash offices là vay tiền mặt'"
                 }
               }
             },
@@ -404,6 +404,13 @@
                       "Value": "'#0F172A'"
                     }
                   }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }

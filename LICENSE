@@ -19,13 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-----------------------------------------------------------------------------
-
-Ghi chú về dữ liệu (không thuộc giấy phép MIT ở trên)
-
-Dữ liệu gốc thuộc cuộc thi Home Credit Default Risk trên Kaggle
-(https://www.kaggle.com/competitions/home-credit-default-risk) và tuân theo
-điều khoản của cuộc thi đó. Repo này không chứa dữ liệu thô, chỉ chứa các bảng
-tổng hợp trong data/export/. Giấy phép MIT chỉ áp dụng cho phần mã nguồn, không
-áp dụng cho dữ liệu gốc.

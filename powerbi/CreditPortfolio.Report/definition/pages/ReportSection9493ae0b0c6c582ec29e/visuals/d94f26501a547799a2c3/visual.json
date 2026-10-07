@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Vintage theo MOB",
+                    "value": "Vintage theo MOB và đợt mở",
                     "textStyle": {
                       "fontFamily": "Cambria",
                       "fontSize": "28pt",
@@ -33,10 +33,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "So cùng tuổi hợp đồng: vay tiêu dùng trả góp xấu gấp bảy lần vay tiền mặt tại MOB 12",
+                    "value": "Kiểm soát đợt mở, thẻ quay vòng vẫn rủi ro nhất: gấp 2,29 [1,59; 3,31] lần vay tiền mặt tại MOB 12; vay tiêu dùng so với vay tiền mặt đổi chiều theo định nghĩa và kiểm soát, không kết luận được",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "11pt",
+                      "fontSize": "9pt",
                       "color": "#5C5349"
                     }
                   }
@@ -128,7 +128,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tên trang: Vintage theo MOB'"
+                  "Value": "'Tên trang: Vintage theo MOB và đợt mở'"
                 }
               }
             }

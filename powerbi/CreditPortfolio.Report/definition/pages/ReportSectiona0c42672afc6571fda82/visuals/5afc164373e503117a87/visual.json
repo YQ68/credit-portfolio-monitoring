@@ -28,7 +28,7 @@
               },
               "queryRef": "Snapshot.Open Loans",
               "nativeQueryRef": "Open Loans",
-              "displayName": "Số hợp đồng mở"
+              "displayName": "Hợp đồng mở"
             }
           ]
         }

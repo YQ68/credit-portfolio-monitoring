@@ -1,9 +1,14 @@
 -- severity: error
 -- Các cột đếm phải nhất quán: tỷ lệ trong khoảng 0 đến 1, tử số không lớn hơn mẫu số,
 -- số dòng hở tháng và số dòng thiếu exposure không vượt quá số dòng của ô,
--- và hở tháng chỉ được xuất hiện ở trạng thái đích 'Missing'.
+-- và hở tháng chỉ được xuất hiện ở trạng thái đích 'Missing'. Kiểm cả hai bảng.
+with both_tables as (
+    select 'roll_rate' as tbl, * from mart.roll_rate
+    union all
+    select 'roll_rate_no_threshold' as tbl, * from mart.roll_rate_no_threshold
+)
 select *
-from mart.roll_rate
+from both_tables
 where roll_rate < 0 or roll_rate > 1
    or n_loans > n_from
    or n_month_gap > n_loans

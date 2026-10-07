@@ -1,6 +1,6 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
-  "name": "0415505ff4156642e50f",
+  "name": "b249b32b5b20c47b8b1f",
   "position": {
     "x": 648,
     "y": 160,
@@ -10,10 +10,10 @@
     "tabOrder": 1200
   },
   "visual": {
-    "visualType": "scatterChart",
+    "visualType": "tableEx",
     "query": {
       "queryState": {
-        "Category": {
+        "Values": {
           "projections": [
             {
               "field": {
@@ -28,30 +28,7 @@
               },
               "queryRef": "Dim Channel.Kênh",
               "nativeQueryRef": "Kênh"
-            }
-          ]
-        },
-        "X": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Funnel"
-                    }
-                  },
-                  "Property": "Approval Rate"
-                }
-              },
-              "queryRef": "Funnel.Approval Rate",
-              "nativeQueryRef": "Approval Rate",
-              "displayName": "Tỷ lệ duyệt"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
+            },
             {
               "field": {
                 "Measure": {
@@ -60,319 +37,280 @@
                       "Entity": "Vintage"
                     }
                   },
-                  "Property": "Ever 30 Plus MOB12"
+                  "Property": "Ever 30 Plus Loans MOB12"
                 }
               },
-              "queryRef": "Vintage.Ever 30 Plus MOB12",
-              "nativeQueryRef": "Ever 30 Plus MOB12",
-              "displayName": "Từng 30+ tại MOB 12"
-            }
-          ]
-        },
-        "Size": {
-          "projections": [
+              "queryRef": "Vintage.Ever 30 Plus Loans MOB12",
+              "nativeQueryRef": "Ever 30 Plus Loans MOB12",
+              "displayName": "Ca quan sát"
+            },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Funnel"
+                      "Entity": "Vintage"
                     }
                   },
-                  "Property": "Applications"
+                  "Property": "SMR MOB12"
                 }
               },
-              "queryRef": "Funnel.Applications",
-              "nativeQueryRef": "Applications",
-              "displayName": "Số hồ sơ"
+              "queryRef": "Vintage.SMR MOB12",
+              "nativeQueryRef": "SMR MOB12",
+              "displayName": "SMR chỉ SP"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Vintage"
+                    }
+                  },
+                  "Property": "Expected 30 Plus MOB12 Cohort"
+                }
+              },
+              "queryRef": "Vintage.Expected 30 Plus MOB12 Cohort",
+              "nativeQueryRef": "Expected 30 Plus MOB12 Cohort",
+              "displayName": "Kỳ vọng SP × đợt"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Vintage"
+                    }
+                  },
+                  "Property": "SMR MOB12 Cohort"
+                }
+              },
+              "queryRef": "Vintage.SMR MOB12 Cohort",
+              "nativeQueryRef": "SMR MOB12 Cohort",
+              "displayName": "SMR SP × đợt"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Vintage"
+                    }
+                  },
+                  "Property": "SMR MOB12 Cohort CI Low"
+                }
+              },
+              "queryRef": "Vintage.SMR MOB12 Cohort CI Low",
+              "nativeQueryRef": "SMR MOB12 Cohort CI Low",
+              "displayName": "Cận dưới"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Vintage"
+                    }
+                  },
+                  "Property": "SMR MOB12 Cohort CI High"
+                }
+              },
+              "queryRef": "Vintage.SMR MOB12 Cohort CI High",
+              "nativeQueryRef": "SMR MOB12 Cohort CI High",
+              "displayName": "Cận trên"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Vintage"
+                  }
+                },
+                "Property": "SMR MOB12 Cohort"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
       }
     },
     "objects": {
-      "dataPoint": [
+      "columnHeaders": [
         {
           "properties": {
-            "defaultColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#938A7F'"
-                    }
-                  }
+            "columnAdjustment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'growToFit'"
                 }
               }
-            }
-          }
-        },
-        {
-          "properties": {
-            "fill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#D4A30A'"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "data": [
-              {
-                "scopeId": {
-                  "Comparison": {
-                    "ComparisonKind": 0,
-                    "Left": {
-                      "Column": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Entity": "Dim Channel"
-                          }
-                        },
-                        "Property": "Kênh"
-                      }
-                    },
-                    "Right": {
-                      "Literal": {
-                        "Value": "'Stone'"
-                      }
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        }
-      ],
-      "categoryAxis": [
-        {
-          "properties": {
-            "show": {
+            },
+            "autoSizeColumnWidth": {
               "expr": {
                 "Literal": {
                   "Value": "true"
                 }
               }
             },
-            "gridlineShow": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI Semibold'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0F172A'"
+                    }
+                  }
+                }
+              }
+            },
+            "backColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FAF7F0'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            },
+            "fontColorPrimary": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0F172A'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontColorSecondary": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0F172A'"
+                    }
+                  }
+                }
+              }
+            },
+            "backColorPrimary": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FAF7F0'"
+                    }
+                  }
+                }
+              }
+            },
+            "backColorSecondary": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FAF7F0'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "grid": [
+        {
+          "properties": {
+            "gridHorizontal": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "gridHorizontalColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#E3DACB'"
+                    }
+                  }
+                }
+              }
+            },
+            "gridHorizontalWeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "gridVertical": {
               "expr": {
                 "Literal": {
                   "Value": "false"
                 }
               }
             },
-            "fontFamily": {
+            "rowPadding": {
               "expr": {
                 "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "9D"
-                }
-              }
-            },
-            "labelColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#5C5349'"
-                    }
-                  }
-                }
-              }
-            },
-            "showAxisTitle": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "titleText": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Tỷ lệ duyệt'"
-                }
-              }
-            },
-            "axisStyle": {
-              "expr": {
-                "Literal": {
-                  "Value": "'showTitleOnly'"
-                }
-              }
-            },
-            "titleFontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "titleFontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "9D"
-                }
-              }
-            },
-            "titleColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#5C5349'"
-                    }
-                  }
+                  "Value": "0D"
                 }
               }
             }
           }
         }
       ],
-      "valueAxis": [
+      "total": [
         {
           "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "gridlineShow": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            },
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "9D"
-                }
-              }
-            },
-            "labelColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#5C5349'"
-                    }
-                  }
-                }
-              }
-            },
-            "showAxisTitle": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "titleText": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Từng 30+ tại MOB 12'"
-                }
-              }
-            },
-            "axisStyle": {
-              "expr": {
-                "Literal": {
-                  "Value": "'showTitleOnly'"
-                }
-              }
-            },
-            "titleFontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "titleFontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "9D"
-                }
-              }
-            },
-            "titleColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#5C5349'"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ],
-      "categoryLabels": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "9D"
-                }
-              }
-            },
-            "color": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#5C5349'"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ],
-      "legend": [
-        {
-          "properties": {
-            "show": {
+            "totals": {
               "expr": {
                 "Literal": {
                   "Value": "false"
@@ -463,7 +401,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Biểu đồ phân tán, trục ngang tỷ lệ duyệt, trục dọc tỷ lệ từng quá hạn 30+ tại MOB 12, kích thước bong bóng theo số hồ sơ. Stone ở góc trên phải và được tô mustard; Credit and cash offices duyệt 66,4% và chỉ 0,13%.'"
+                  "Value": "'Bảng SMR theo kênh tại MOB 12: số ca quan sát, SMR chỉ chuẩn hoá theo sản phẩm, số ca kỳ vọng và SMR khi chuẩn hoá theo sản phẩm × đợt mở 12 tháng kèm khoảng tin cậy 95%, sắp giảm dần theo SMR sản phẩm × đợt.'"
                 }
               }
             }
@@ -483,7 +421,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Duyệt rộng, rủi ro cao: Stone duyệt 89,8%, xấu nhất 1,07%'"
+                  "Value": "'Chuẩn hoá thêm đợt mở: Contact center từ 2,90 xuống 1,65 [1,21; 2,18], Credit and cash offices từ 0,58 lên 0,89 [0,68; 1,14]; phần vượt của Contact center nằm ở thẻ (47 ca so với 28,0 kỳ vọng)'"
                 }
               }
             },
@@ -495,6 +433,20 @@
                       "Value": "'#0F172A'"
                     }
                   }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
                 }
               }
             }
@@ -513,13 +465,26 @@
             }
           }
         }
+      ],
+      "stylePreset": [
+        {
+          "properties": {
+            "name": {
+              "expr": {
+                "Literal": {
+                  "Value": "'None'"
+                }
+              }
+            }
+          }
+        }
       ]
     }
   },
   "filterConfig": {
     "filters": [
       {
-        "name": "Filter0415505ff4156642e50f2ca1",
+        "name": "Filterb249b32b5b20c47b8b1fc549",
         "field": {
           "Column": {
             "Expression": {

@@ -2,10 +2,10 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
   "name": "ffa798f6c4bf25cefa53",
   "position": {
-    "x": 24,
-    "y": 384,
+    "x": 544,
+    "y": 160,
     "z": 1200,
-    "width": 608,
+    "width": 296,
     "height": 208,
     "tabOrder": 1200
   },
@@ -120,7 +120,7 @@
                     },
                     "Right": {
                       "Literal": {
-                        "Value": "'Consumer loans'"
+                        "Value": "'Revolving loans'"
                       }
                     }
                   }
@@ -161,7 +161,7 @@
                     },
                     "Right": {
                       "Literal": {
-                        "Value": "'Revolving loans'"
+                        "Value": "'Cash loans'"
                       }
                     }
                   }
@@ -202,7 +202,7 @@
                     },
                     "Right": {
                       "Literal": {
-                        "Value": "'Cash loans'"
+                        "Value": "'Consumer loans'"
                       }
                     }
                   }
@@ -521,7 +521,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Ba đường vintage theo loại sản phẩm. Consumer loans tô mustard đạt 0,89% tại MOB 12, Revolving loans 0,68%, Cash loans 0,13%.'"
+                  "Value": "'Ba đường vintage theo loại sản phẩm. Thẻ quay vòng tô mustard, tách xa hai đường còn lại; vay tiền mặt và vay tiêu dùng gần như trùng nhau.'"
                 }
               }
             }
@@ -541,7 +541,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Vay tiêu dùng trả góp xấu gấp bảy lần vay tiền mặt tại MOB 12'"
+                  "Value": "'Số thô tại MOB 12: thẻ quay vòng 0,155% [0,127; 0,189], vay tiền mặt 0,032%, vay tiêu dùng 0,029%'"
                 }
               }
             },
@@ -553,6 +553,20 @@
                       "Value": "'#0F172A'"
                     }
                   }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
                 }
               }
             }

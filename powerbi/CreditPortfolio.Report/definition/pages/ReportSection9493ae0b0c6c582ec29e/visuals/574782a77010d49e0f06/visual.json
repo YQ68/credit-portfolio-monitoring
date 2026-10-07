@@ -1,11 +1,11 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
-  "name": "20bfdfcde0a2afda9bee",
+  "name": "574782a77010d49e0f06",
   "position": {
-    "x": 648,
-    "y": 384,
+    "x": 856,
+    "y": 160,
     "z": 1300,
-    "width": 608,
+    "width": 400,
     "height": 208,
     "tabOrder": 1300
   },
@@ -20,59 +20,74 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Dim Channel"
+                      "Entity": "Dim Product"
                     }
                   },
-                  "Property": "Kênh"
+                  "Property": "Sản phẩm"
                 }
               },
-              "queryRef": "Dim Channel.Kênh",
-              "nativeQueryRef": "Kênh"
+              "queryRef": "Dim Product.Sản phẩm",
+              "nativeQueryRef": "Sản phẩm"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Funnel"
+                      "Entity": "Vintage"
                     }
                   },
-                  "Property": "Applications"
+                  "Property": "Ratio vs Cash Crude"
                 }
               },
-              "queryRef": "Funnel.Applications",
-              "nativeQueryRef": "Applications",
-              "displayName": "Số hồ sơ"
+              "queryRef": "Vintage.Ratio vs Cash Crude",
+              "nativeQueryRef": "Ratio vs Cash Crude",
+              "displayName": "Đ.n. chính"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Funnel"
+                      "Entity": "Vintage"
                     }
                   },
-                  "Property": "Approval Rate"
+                  "Property": "Ratio vs Cash MH Cohort"
                 }
               },
-              "queryRef": "Funnel.Approval Rate",
-              "nativeQueryRef": "Approval Rate",
-              "displayName": "Tỷ lệ duyệt"
+              "queryRef": "Vintage.Ratio vs Cash MH Cohort",
+              "nativeQueryRef": "Ratio vs Cash MH Cohort",
+              "displayName": "Kiểm soát đợt"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Funnel"
+                      "Entity": "Vintage"
                     }
                   },
-                  "Property": "Take-up Rate"
+                  "Property": "Ratio vs Cash Due Only"
                 }
               },
-              "queryRef": "Funnel.Take-up Rate",
-              "nativeQueryRef": "Take-up Rate",
-              "displayName": "Tỷ lệ nhận vay"
+              "queryRef": "Vintage.Ratio vs Cash Due Only",
+              "nativeQueryRef": "Ratio vs Cash Due Only",
+              "displayName": "Đ.n. giữa"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Vintage"
+                    }
+                  },
+                  "Property": "Ratio vs Cash No Threshold"
+                }
+              },
+              "queryRef": "Vintage.Ratio vs Cash No Threshold",
+              "nativeQueryRef": "Ratio vs Cash No Threshold",
+              "displayName": "Không ngưỡng"
             }
           ]
         }
@@ -84,10 +99,10 @@
               "Measure": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "Funnel"
+                    "Entity": "Vintage"
                   }
                 },
-                "Property": "Applications"
+                "Property": "Ratio vs Cash Crude"
               }
             },
             "direction": "Descending"
@@ -124,7 +139,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "9D"
+                  "Value": "8D"
                 }
               }
             },
@@ -166,7 +181,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "9D"
+                  "Value": "8D"
                 }
               }
             },
@@ -261,6 +276,19 @@
             }
           }
         }
+      ],
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -343,7 +371,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Bảng số hồ sơ, tỷ lệ duyệt và tỷ lệ khách nhận khoản vay theo từng kênh bán, sắp xếp giảm dần theo số hồ sơ.'"
+                  "Value": "'Bảng độ nhạy tại MOB 12: tỷ số tỷ lệ từng 30+ của thẻ quay vòng và vay tiêu dùng so với vay tiền mặt theo bốn cách đo: định nghĩa chính, kiểm soát đợt mở, định nghĩa giữa, không áp ngưỡng.'"
                 }
               }
             }
@@ -363,7 +391,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Phễu duyệt theo kênh, kèm tỷ lệ khách nhận khoản vay'"
+                  "Value": "'Vay tiêu dùng / vay tiền mặt tuỳ cách đo: 0,90 theo định nghĩa chính, 0,41 khi kiểm soát đợt mở, 1,74 theo định nghĩa giữa, 6,48 khi không áp ngưỡng trọng yếu'"
                 }
               }
             },
@@ -375,6 +403,20 @@
                       "Value": "'#0F172A'"
                     }
                   }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
                 }
               }
             }
@@ -412,15 +454,15 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "Filter20bfdfcde0a2afda9bee0f56",
+        "name": "Filter574782a77010d49e0f063664",
         "field": {
           "Column": {
             "Expression": {
               "SourceRef": {
-                "Entity": "Dim Channel"
+                "Entity": "Dim Product"
               }
             },
-            "Property": "Kênh"
+            "Property": "Sản phẩm"
           }
         },
         "type": "Categorical",
@@ -429,7 +471,7 @@
           "From": [
             {
               "Name": "f",
-              "Entity": "Dim Channel",
+              "Entity": "Dim Product",
               "Type": 0
             }
           ],
@@ -447,7 +489,7 @@
                                 "Source": "f"
                               }
                             },
-                            "Property": "Kênh"
+                            "Property": "Sản phẩm"
                           }
                         }
                       ],
@@ -456,6 +498,13 @@
                           {
                             "Literal": {
                               "Value": "'(không rõ)'"
+                            }
+                          }
+                        ],
+                        [
+                          {
+                            "Literal": {
+                              "Value": "'Cash loans'"
                             }
                           }
                         ]

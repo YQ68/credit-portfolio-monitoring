@@ -33,10 +33,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Cửa sổ thu hồi đóng lại sau B1: cure rate rơi từ 50,1% xuống 7,0% chỉ sau hai nhóm",
+                    "value": "Cửa sổ thu hồi đóng nhanh sau B1: cure 57,7% [57,5; 57,9] ở B1, còn 27,8% [25,7; 30,0] ở B2 và 1,2% ở B4; trong từng đợt mở B1 vẫn gấp 2,09 [1,94; 2,27] lần B2",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "11pt",
+                      "fontSize": "10pt",
                       "color": "#5C5349"
                     }
                   }

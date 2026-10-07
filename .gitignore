@@ -1,6 +1,21 @@
 .venv/
 __pycache__/
-.ipynb_checkpoints/
+
+# Bí mật và cấu hình cục bộ, phòng trường hợp lỡ đặt vào thư mục repo
+.env
+kaggle.json
+access_token
+credentials.json
+
+# File tạm của hệ điều hành, Office và editor
+~$*
+Thumbs.db
+.DS_Store
+.vscode/
+*.log
+
+# Bản Power BI dạng file nén; repo dùng PBIP dạng văn bản
+*.pbix
 
 # Dữ liệu Kaggle không được đưa lên GitHub.
 # Dùng data/* chứ không dùng data/: git không thể re-include file nằm trong
@@ -8,8 +23,11 @@ __pycache__/
 data/*
 !data/export/
 data/export/*
-# Ngoại lệ: 5 file CSV tổng hợp nhỏ (~1,4 MB) để PBIP mở được ngay sau khi clone
+# Ngoại lệ: các bảng tổng hợp nhỏ để dashboard và PBIP có dữ liệu ngay sau khi clone
+# (PBIP vẫn cần sửa tham số DataFolder, xem powerbi/README.md), và findings.json là
+# nguồn số liệu duy nhất cho các câu kết luận.
 !data/export/*.csv
+!data/export/findings.json
 *.duckdb
 *.duckdb.wal
 

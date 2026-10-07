@@ -41,12 +41,19 @@
 --   annuity_amount). Các dòng đó KHÔNG được coi như bằng 0: chúng bị bỏ qua khi cộng tiền và đếm
 --   riêng ở cột n_exposure_null. Vì vậy mẫu số tiền và mẫu số hợp đồng không tương ứng 1-1.
 --
+-- ĐỊNH NGHĨA QUÁ HẠN: mart.roll_rate dùng bucket chính (SK_DPD_DEF, có ngưỡng trọng yếu).
+-- mart.roll_rate_no_threshold có cùng grain và cùng cột nhưng bucket theo SK_DPD (không áp ngưỡng
+-- trọng yếu), CHỈ dùng cho phân tích độ nhạy. Hai bảng sinh từ cùng một table macro
+-- mart.roll_matrix(no_threshold) để logic không lệch nhau.
+-- Các con số trong comment phía trên (số dòng Missing, 182.821, 1.036.603...) không phụ thuộc định
+-- nghĩa DPD vì chỉ đếm cặp tháng.
+--
 -- M10 CURE RATE lấy trực tiếp từ bảng này, không có mart riêng:
 --   select from_state, sum(n_loans) filter (where to_state = 'B0 Current') / sum(n_loans)
 --   from mart.roll_rate where from_state <> 'B0 Current' group by from_state;
 
-create or replace table mart.roll_rate as
-with months as (
+create or replace macro mart.roll_matrix(no_threshold) as table
+with bucketed as (
     select
         f.sk_id_prev,
         f.source,
@@ -55,17 +62,33 @@ with months as (
         d.has_application,
         f.months_balance,
         f.is_open,
-        f.dpd_bucket,
-        f.dpd_bucket_order,
-        f.exposure_proxy,
-        lead(f.months_balance)  over w as next_month,
-        lead(f.is_open)         over w as next_is_open,
-        lead(f.is_closed)       over w as next_is_closed,
-        lead(f.dpd_bucket)      over w as next_bucket,
-        lead(f.exposure_proxy)  over w as next_exposure
+        f.is_closed,
+        case when no_threshold then f.dpd_bucket_no_threshold       else f.dpd_bucket       end as dpd_bucket,
+        case when no_threshold then f.dpd_bucket_order_no_threshold else f.dpd_bucket_order end as dpd_bucket_order,
+        f.exposure_proxy
     from core.fct_loan_month f
     join core.dim_loan d on d.sk_id_prev = f.sk_id_prev
-    window w as (partition by f.sk_id_prev order by f.months_balance)
+),
+
+months as (
+    select
+        sk_id_prev,
+        source,
+        contract_type,
+        channel_type,
+        has_application,
+        months_balance,
+        is_open,
+        dpd_bucket,
+        dpd_bucket_order,
+        exposure_proxy,
+        lead(months_balance)  over w as next_month,
+        lead(is_open)         over w as next_is_open,
+        lead(is_closed)       over w as next_is_closed,
+        lead(dpd_bucket)      over w as next_bucket,
+        lead(exposure_proxy)  over w as next_exposure
+    from bucketed
+    window w as (partition by sk_id_prev order by months_balance)
 ),
 
 transitions as (
@@ -145,3 +168,11 @@ select
     exposure_to
 from cells
 window w as (partition by source, contract_type, channel_type, from_state);
+
+-- Bảng chính: bucket theo SK_DPD_DEF.
+create or replace table mart.roll_rate as
+select * from mart.roll_matrix(false);
+
+-- Bảng độ nhạy: bucket theo SK_DPD (không áp ngưỡng trọng yếu). Không xuất CSV cho Power BI.
+create or replace table mart.roll_rate_no_threshold as
+select * from mart.roll_matrix(true);

@@ -3,10 +3,10 @@
   "name": "a35a89e044b4187974a1",
   "position": {
     "x": 24,
-    "y": 632,
+    "y": 624,
     "z": 900,
     "width": 1232,
-    "height": 48,
+    "height": 88,
     "tabOrder": 900
   },
   "visual": {
@@ -22,16 +22,16 @@
                     "value": "LƯU Ý   ",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
-                      "fontSize": "9pt",
+                      "fontSize": "8pt",
                       "color": "#D4A30A",
                       "fontWeight": "bold"
                     }
                   },
                   {
-                    "value": "Cure rate rơi từ 50,1% ở B1 xuống 7,0% ở B3, nên can thiệp thu hồi phải dồn vào B1. Biểu đồ cure đã lọc bỏ dòng B0 Current vì B0 về B0 không phải là cure. Mẫu số dùng measure [Roll Base Loans], KHÔNG cộng cột n_from vì n_from là window sum lặp lại trên mỗi dòng bucket đến.",
+                    "value": "Lượt hợp đồng-tháng từ tháng t sang t+1, toàn danh mục; một hợp đồng góp nhiều lượt nên các lượt không độc lập. Cure = quay về B0 Current tháng sau; dòng B0 không có cure nên để trống. Dòng Tổng của bảng cộng mọi nhóm xuất phát kể cả B0 (12.714.200 lượt); cure gộp B1 trở lên là 55,8% trên 201.448 lượt, không phải cure của dòng Tổng. Nhóm dưới 1.000 lượt (B3) không diễn giải. Cột dư nợ là dư nợ proxy cộng dồn qua mọi tháng xuất phát, không phải dư nợ tại một thời điểm. Mẫu số cộng n_loans qua mọi nhóm đến, KHÔNG cộng cột n_from (window sum lặp lại). Thử nghiệm thu hồi tính theo hợp đồng: cure ở lần đầu vào B1 là 67,9%, phát hiện mức tăng 5 điểm phần trăm cần 1.308 hợp đồng mỗi nhánh. Độ nhạy SK_DPD: cure B1 50,1%, B1 sang B2 4,302%.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "9pt",
+                      "fontSize": "8pt",
                       "color": "#5C5349"
                     }
                   }

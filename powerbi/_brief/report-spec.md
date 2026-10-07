@@ -3,6 +3,14 @@
 Bản chốt phạm vi và thiết kế trước khi ghi file PBIR. Khung 1280x720, 4 trang,
 kể đúng câu chuyện của `dashboard/index.html`.
 
+> **Cập nhật 2026-10-04: đổi định nghĩa quá hạn chính sang `SK_DPD_DEF`.** Thiết kế
+> (tông, lưới, chữ ký, khung chung, archetype và variant từng trang) GIỮ NGUYÊN. Nội
+> dung và câu chuyện làm lại theo `data/export/findings.json`: thẻ quay vòng là sản phẩm
+> rủi ro nhất, vay tiêu dùng ngang vay tiền mặt; sau chuẩn hoá theo sản phẩm (SMR)
+> Contact center và Stone trên kỳ vọng, Credit and cash offices dưới; cure B1 so với B2,
+> B3 thiếu mẫu. Mọi câu chữ có số sinh từ `scripts/headlines.py`, không ghi trong spec
+> này. Các chỗ đổi so với bản trước được ghi ngay trong từng mục bên dưới.
+
 Phần Markdown dưới đây là để người đọc duyệt. Khối YAML `Design Brief:` ở cuối
 file mới là hợp đồng triển khai chính thức; `scripts/build_pbip_report.py` sinh
 file PBIR theo đúng khối đó.
@@ -46,8 +54,12 @@ Cùng 4 câu hỏi kinh doanh trong `README.md` của project:
 Hai bảng danh mục dùng chung `Dim Channel[Kênh]` và `Dim Product[Sản phẩm]`
 gom giá trị từ cả năm bảng fact, nối 1-nhiều để một slicer lọc đồng thời mọi visual.
 
-Semantic model đóng băng ở bản đã kiểm chứng: 7 bảng, 10 quan hệ, 27 measure.
-Bản thiết kế này **không yêu cầu thêm measure nào**.
+Semantic model: 7 bảng, 10 quan hệ, 44 measure. Bản 2026-10-04 thêm measure cho hai
+thẻ tỷ lệ cùng một tập (`Rate 30+ Exposure Known`), SMR kèm khoảng tin cậy 95%
+(`Expected 30 Plus MOB12`, `SMR MOB12`, `SMR MOB12 CI Low`, `SMR MOB12 CI High`), tỷ số
+duyệt chuẩn hoá theo sản phẩm (`Approval Expected`, `Approval Standardized Ratio`),
+take-up chỉ cho vay tiêu dùng, độ nhạy `SK_DPD` (`... No Threshold`) và bốn measure
+trình bày `Highlight ...` / `Base ...` để tô màu trong small multiples.
 
 ## Tông và chữ ký
 
@@ -90,9 +102,14 @@ Vì sao chọn S6:
 - Nó buộc mỗi biểu đồ phải trả lời câu hỏi "phần tử nào là thông điệp", nên tiêu
   đề visual viết được thành một câu khẳng định.
 
-Phần tử được nhấn ở từng trang: Stone (trang 1 và 2), Consumer loans tức vay tiêu
-dùng trả góp (trang 3), nhóm B1 1-30 (trang 4), nhóm B4 90+ (biểu đồ cơ cấu
-trang 1).
+Phần tử được nhấn ở từng trang, luôn là đối tượng mà câu kết luận của visual nói tới:
+Credit and cash offices và nhóm B1 1-30 (trang 1), Contact center và Stone (trang 2),
+Contact center và thẻ quay vòng (trang 3), nhóm B1 1-30 (trang 4).
+
+Power BI bỏ qua selector màu theo từng danh mục khi visual có Rows (small multiples):
+bản trước tô Stone trong trellis trang 2 nhưng ảnh chụp cho thấy Stone vẫn xám. Bản
+này tách giá trị thành hai measure trình bày `Highlight ...` và `Base ...`, tô màu theo
+selector metadata của measure.
 
 ## Lưới và khung chung
 
@@ -138,13 +155,16 @@ Mỗi trang đi lại bảng chọn variant trong file archetype của chính n�
 
 Archetype **Executive Summary**, variant **A. Hero-Right**.
 Tín hiệu: 4 KPI và đúng một thông điệp chủ đạo có biểu đồ chứng minh
-("98,65% danh mục sạch nhưng đuôi B4 đáng kể"). Bảng chọn variant xếp trường hợp
+(tỷ trọng B0 và tỷ lệ 30+ rất thấp, đuôi quá hạn chủ yếu là B1). Bảng chọn variant xếp trường hợp
 "3-4 KPI và một chỉ số chủ đạo có biểu đồ giải thích" vào A.
 
 - Dải KPI 4 thẻ (816x96) bên trái, biểu đồ chủ đạo cơ cấu nhóm quá hạn (400x208)
   bên phải, đúng hình Z của trang tổng quan.
-- Hàng phân tích: tỷ lệ 30+ theo kênh (816x320, 7 cột, sắp giảm dần, Stone màu
-  mustard) và bảng theo loại sản phẩm (400x208).
+- Hàng phân tích: tỷ lệ 30+ theo kênh (816x320, 7 cột, sắp giảm dần, Credit and cash
+  offices màu mustard) và bảng theo loại sản phẩm (400x208, thêm cột số hợp đồng 30+).
+- Hai thẻ tỷ lệ (theo hợp đồng và theo dư nợ) tính trên CÙNG một tập: hợp đồng có dư
+  nợ proxy. Bản trước đặt tỷ lệ trên mọi hợp đồng cạnh tỷ lệ dư nợ trên tập nhỏ hơn.
+- Biểu đồ chủ đạo bỏ dòng B0 Current (B0 chiếm gần hết, ép bốn thanh đuôi về gần 0).
 - Thẻ KPI không có sparkline vì model không có trục thời gian; bù lại mỗi thẻ có
   một dòng ngữ cảnh ở phụ đề nói rõ mẫu số.
 
@@ -156,21 +176,22 @@ trang là trellis tách theo sản phẩm. Variant C (slope graph) bị loại v
 hai mốc thời gian mà model không có; variant B (stacked pairs) bị loại vì không
 có measure baseline để ghép cặp.
 
-- Scatter `Approval Rate` x `Ever 30 Plus MOB12`, bong bóng theo số hồ sơ, có nhãn
-  tên kênh trên từng bong bóng (608x208, cột phải phía trên).
-- Bảng phễu duyệt theo kênh (608x208, cột phải phía dưới) ở ô callout của variant A. Theo đúng ghi chú
-  trong `comparative-benchmark.md`: khi ô callout chỉ lặp lại con số đã có trong
-  biểu đồ bên cạnh thì thay bằng bảng chi tiết gọn. Bảng này thêm `Take-up Rate`,
-  thứ scatter không có.
+- Bảng SMR theo kênh (608x208, cột phải phía trên): ca quan sát, SMR chỉ chuẩn hoá theo
+  sản phẩm, ca kỳ vọng theo tầng sản phẩm × đợt mở 12 tháng, SMR sản phẩm × đợt, cận
+  dưới và cận trên 95% (measure `... Cohort`), sắp theo SMR sản phẩm × đợt. Thay biểu đồ phân tán duyệt x rủi ro của
+  bản trước: nó đặt tỷ lệ duyệt thô (phụ thuộc cơ cấu sản phẩm) cạnh rủi ro thô, nên
+  câu "duyệt rộng, rủi ro cao" là sản phẩm của cơ cấu, không phải của kênh.
+- Bảng duyệt theo kênh (608x208, cột phải phía dưới): số hồ sơ, tỷ lệ duyệt thô, tỷ số
+  duyệt so với kỳ vọng theo sản phẩm, take-up chỉ cho vay tiêu dùng (nơi duy nhất có
+  Unused offer đáng kể).
 - Trellis 3 ô (608x432, cột trái cao suốt 4 hàng nội dung), mỗi ô một sản phẩm,
-  cùng một thang trục giá trị. Đây là luận điểm của trang: so trong cùng sản phẩm
-  thì khoảng cách kênh co lại từ 8,1 lần xuống 2,0 lần (Consumer loans) và 4,4 lần
-  (Cash loans). Trellis phải cao: Power BI ép mỗi thanh danh mục tối thiểu khoảng
+  cùng một thang trục giá trị, đã bỏ kênh Khác (mẫu số nhỏ). Đây là bằng chứng của
+  trang: chênh lệch kênh lớn nhất nằm trong thẻ quay vòng. Trellis phải cao: Power BI ép mỗi thanh danh mục tối thiểu khoảng
   26px, 7 kênh cần cỡ 182px vùng vẽ. Ô cao 208px chỉ chứa được 3 kênh và hiện thanh
   cuộn dọc, làm hỏng mục đích so sánh, nên bản đầu (trellis nằm ngang dưới đáy) đã
   bị bỏ.
 
-### Trang 3. Vintage theo MOB
+### Trang 3. Vintage theo MOB và đợt mở
 
 Archetype **Analytical Canvas**, variant **C. Small-Multiples-Grid**.
 Tín hiệu: câu hỏi của trang chính là so nhiều thực thể cùng một trục (7 kênh trên
@@ -178,11 +199,22 @@ cùng trục MOB). Variant B (inline slicers) hợp với số lượng slicer n
 giải quyết được việc 7-8 đường chồng lên nhau; bảng chọn variant xếp trường hợp
 "so nhiều thực thể dọc theo các trục giống nhau" vào C.
 
+Bố cục: hàng trên ba visual (đợt mở 400x208, sản phẩm 296x208, bảng tỷ số 400x208),
+hàng dưới trellis 7 kênh trải hết bề ngang. Ba visual hàng trên dùng cỡ chữ tiêu đề
+nhỏ hơn (11, bảng 9) vì câu kết luận dài, Power BI cắt tiêu đề quá ba dòng.
+
+- Vintage theo đợt mở (lineChart, Series = `Vintage[origination_cohort]`, sắp theo
+  `origination_cohort_start`): measure `Cohort Ever 30 Plus Rate` chỉ trả giá trị tại
+  MOB mà cả đợt đã đủ tuổi; lọc bỏ `(không rõ)` và đợt -12 đến -1 (chỉ có MOB 0). Đợt
+  -96 đến -85 tô mustard, các đợt khác xám nhạt; legend ở trên.
 - Trellis 7 ô (1232x208, lưới 4x2), mỗi ô một kênh, cùng một thang trục giá trị.
   Đây là cách sửa lỗi 8 đường: tách thành 7 ô thì không còn legend để cắt chữ.
-- Biểu đồ đường theo sản phẩm (608x208): sau khi bỏ `(không rõ)` còn 3 đường, đọc
-  được; Consumer loans màu mustard, hai đường còn lại xám.
-- Bảng xếp hạng kênh tại MOB 12 kèm cột mẫu số `Vintage Loans MOB12` (608x208).
+- Biểu đồ đường theo sản phẩm: sau khi bỏ `(không rõ)` còn 3 đường, đọc
+  được; thẻ quay vòng màu mustard, hai đường còn lại xám.
+- Bảng độ nhạy tại MOB 12: tỷ số tỷ lệ từng 30+ của thẻ quay vòng và vay tiêu dùng so
+  với vay tiền mặt theo bốn cách đo (`Ratio vs Cash Crude`, `Ratio vs Cash MH Cohort`
+  gộp Mantel-Haenszel qua đợt 12 tháng, `Ratio vs Cash Due Only`, `Ratio vs Cash No
+  Threshold`). Đây là chỗ người đọc thấy kết luận về vay tiêu dùng đổi chiều theo cách đo.
 
 ### Trang 4. Chuyển nhóm và thu hồi
 
@@ -195,11 +227,13 @@ toàn trang; variant B (wallboard) sai ngữ cảnh đọc.
   nên bị cuộn ngang; 10 cột giờ hiện hết.
 - Cure rate theo nhóm xuất phát (608x208), **đã bỏ dòng `B0 Current`** vì B0 về B0
   không phải là cure. Nhóm B1 1-30 màu mustard.
-- Bảng quy mô từng nhóm xuất phát (608x208), giữ cả B0 để thấy mẫu số thật.
+- Bảng quy mô từng nhóm xuất phát (608x208), giữ cả B0 để thấy mẫu số thật. Cure rate
+  của dòng B0 để trống (measure chỉ tính trên B1 đến B4); cột dư nợ đổi tên thành "dư
+  nợ cộng dồn qua tháng" vì nó cộng mọi lượt hợp đồng-tháng. B3 tô xám nhạt trong biểu
+  đồ cure vì dưới ngưỡng 1.000 lượt.
 
 Dải trạng thái 4 ô của variant C bị bỏ có chủ đích: không có measure trạng thái
-mức trang nào đúng nghĩa (cure rate toàn bộ bị B0 kéo lên 89,6%), và thêm measure
-mới nằm ngoài phạm vi được phép sửa.
+mức trang nào đúng nghĩa (cure rate toàn bộ sẽ bị B0 kéo lên nếu không loại B0).
 
 ## Năm lỗi của bản cũ và cách xử lý
 
@@ -219,19 +253,21 @@ nay dời sang phải masthead) và tiêu đề visual mô tả loại biểu đ
 
 1. **Lọc bỏ `(không rõ)` ở các biểu đồ so sánh kênh và sản phẩm.** Nhãn này nghĩa
    là hợp đồng không khớp `previous_application` nên mọi thuộc tính phân khúc đều
-   không biết được. Nhóm này có tỷ lệ 6,72% tại MOB 12, gấp hơn 6 lần kênh xấu
-   nhất, nên nếu giữ lại thì trục chung bị nó kéo và 7 kênh thật dồn vào 15%
-   chiều dài trục. Bộ lọc đặt ở mức visual, không phải mức trang, nên 4 thẻ KPI
+   không biết được. Nhóm này có tỷ lệ cao bất thường tại MOB 12 (số trong LƯU Ý trang
+   3) và gánh khoảng một phần tư số ca, nên nếu giữ lại trong biểu đồ thì trục chung
+   bị nó kéo. Bảng độ nhạy trang 3 và bảng sản phẩm trang 1 GIỮ nhóm này. Bộ lọc đặt ở mức visual, không phải mức trang, nên 4 thẻ KPI
    và ma trận roll rate vẫn tính đủ toàn danh mục. Ghi chú chân trang nói rõ.
 2. **Biểu đồ "cơ cấu bucket theo loại sản phẩm" ở trang 1 đổi thành bảng tỷ lệ 30+
-   theo loại sản phẩm.** Lý do: B0 chiếm 98,65% nên biểu đồ cột nhóm 4 sản phẩm x
+   theo loại sản phẩm.** Lý do: B0 chiếm gần hết danh mục nên biểu đồ cột nhóm 4 sản phẩm x
    5 bucket có 20 cột trong đó 16 cột ngắn tới mức không nhìn thấy. Thông điệp
    "phần lớn sạch, có đuôi B4" vẫn do biểu đồ chủ đạo bên phải gánh, còn so sánh
    giữa các sản phẩm chuyển sang dạng bảng đọc được số.
 3. **Cure rate trang 4 bỏ dòng `B0 Current`.** Ghi chú cũ đã dặn người đọc tự bỏ
    dòng này; đưa luôn vào bộ lọc thì biểu đồ không còn mời người đọc đọc sai.
 4. **Bốn ghi chú cảnh báo được giữ nguyên ý, viết gọn lại** để vừa dải chân trang
-   48px: vùng mù FPD30, nhiễu cơ cấu sản phẩm, cure rate dồn vào B1, mẫu số vintage.
+   dải chân trang (cao 88px, chữ 8pt từ bản 2026-10-04 vì ghi chú dài hơn): tập tính của
+   hai thẻ KPI và độ nhạy SK_DPD, cách tính SMR và so sánh định trước, nhóm (không rõ)
+   và mẫu số vintage, cách đọc cure và dư nợ cộng dồn.
 
 ## Ràng buộc kỹ thuật bắt buộc
 
@@ -429,7 +465,7 @@ Design Brief:
             field_bindings: { Category: "Snapshot[dpd_bucket]", Y: "Snapshot[Open Loans]" }
             sort_policy: natural_order
             color_strategy: semantic
-            comparison_basis: "B4 90+ so voi B2 31-60 va B3 61-90 cong lai."
+            comparison_basis: "B1 1-30 so voi B2 tro len (da bo B0 Current)."
           - id: rate_by_channel
             region: drivers
             kind: clusteredBarChart
@@ -467,8 +503,8 @@ Design Brief:
         baseline de ghep cap, cung khong co.
       page_background: "#FAF7F0"
       layout_summary: >-
-        Trellis 3 o theo san pham o cot trai cao suot 8 hang, scatter duyet-rui
-        ro va bang pheu xep chong o cot phai.
+        Trellis 3 o theo san pham o cot trai cao suot 8 hang, bang SMR va bang duyet
+        xep chong o cot phai.
       layout_contract:
         canvas: { width: 1280, height: 720, margin: 24, gutter: 16, snap: 8 }
         grid:
@@ -482,34 +518,33 @@ Design Brief:
             context:  [7, 7, 13, 11]
             mix:      [1, 3,  7, 11]
         placements:
-          - id: approval_risk_scatter
+          - id: smr_table
             region: headline
-            kind: scatterChart
-            purpose: "Kenh duyet rong co phai kenh rui ro cao khong?"
-            field_bindings:
-              { Category: "Dim Channel[Kênh]", X: "Funnel[Approval Rate]", Y: "Vintage[Ever 30 Plus MOB12]", Size: "Funnel[Applications]" }
-            color_strategy: semantic
-            comparison_basis: "Tung kenh so voi 6 kenh con lai tren cung hai truc."
+            kind: tableEx
+            purpose: "Sau khi bo anh huong co cau san pham, kenh nao xau hon ky vong?"
+            field_bindings: ["Dim Channel[Kênh]", "Vintage[Ever 30 Plus Loans MOB12]", "Vintage[Expected 30 Plus MOB12]", "Vintage[SMR MOB12]", "Vintage[SMR MOB12 CI Low]", "Vintage[SMR MOB12 CI High]"]
+            sort_policy: value_desc
+            color_strategy: none
+            comparison_basis: "SMR so voi 1, kem khoang tin cay 95% Byar."
           - id: funnel_table
             region: context
             kind: tableEx
             purpose: "Moi kenh duyet bao nhieu ho so va giu duoc bao nhieu?"
-            field_bindings: ["Dim Channel[Kênh]", "Funnel[Applications]", "Funnel[Approval Rate]", "Funnel[Take-up Rate]"]
+            field_bindings: ["Dim Channel[Kênh]", "Funnel[Applications]", "Funnel[Approval Rate]", "Funnel[Approval Standardized Ratio]", "Funnel[Take-up Rate Consumer]"]
             sort_policy: value_desc
             color_strategy: none
             callout_value_basis: >-
-              Khong phai callout lap so. Bang nay them Take-up Rate, chi tieu
-              scatter khong co, nen no tra loi cau hoi khac: duyet roi khach co
-              nhan khong.
+              Ty le duyet tho dat canh ty so chuan hoa theo san pham: chenh lech
+              duyet giua kenh la do co cau san pham. Take-up chi cho vay tieu dung.
           - id: risk_by_product_trellis
             region: mix
             kind: clusteredBarChart
             purpose: "Trong cung mot san pham, khoang cach rui ro giua cac kenh con bao nhieu?"
             field_bindings:
-              { Category: "Dim Channel[Kênh]", Y: "Vintage[Ever 30 Plus MOB12]", Rows: "Dim Product[Sản phẩm]" }
+              { Category: "Dim Channel[Kênh]", Y: ["Vintage[Highlight Ever 30 Plus MOB12]", "Vintage[Base Ever 30 Plus MOB12]"], Rows: "Dim Product[Sản phẩm]" }
             sort_policy: value_desc
             color_strategy: semantic
-            comparison_basis: "Stone so voi Regional / Local trong Consumer loans; Country-wide so voi Credit and cash offices trong Cash loans."
+            comparison_basis: "Contact center va Stone so voi cac kenh khac trong cung san pham, nhat la the quay vong."
         space_audit:
           content_cell_count: 96
           placed_cell_count: 96
@@ -520,7 +555,7 @@ Design Brief:
             Trellis la o small multiples cua variant A va la luan diem cua
             trang, nen no duoc lam vung chu dao (608x432). Ba o rong khoang
             192px, moi o cao du cho 7 thanh kenh; o cao 208px chi chua 3 kenh va
-            hien thanh cuon doc. Scatter va bang pheu xep chong o cot phai, moi
+            hien thanh cuon doc. Bang SMR va bang duyet xep chong o cot phai, moi
             khoi 608x208, du cho 7 bong bong co nhan va 7 dong bang kem tieu de.
     - name: "3. Vintage"
       role: detail
@@ -553,7 +588,7 @@ Design Brief:
             kind: lineChart
             purpose: "Kenh nao dung doc som nhat theo tuoi hop dong?"
             field_bindings:
-              { Category: "Vintage[mob]", Y: "Vintage[Ever 30 Plus Rate]", Rows: "Dim Channel[Kênh]" }
+              { Category: "Vintage[mob]", Y: ["Vintage[Base Ever 30 Plus Rate]", "Vintage[Highlight Ever 30 Plus Rate]"], Rows: "Dim Channel[Kênh]" }
             color_strategy: measure_match
             comparison_basis: "Bay kenh tren cung mot thang truc gia tri."
           - id: vintage_by_product
@@ -563,17 +598,16 @@ Design Brief:
             field_bindings:
               { Category: "Vintage[mob]", Series: "Dim Product[Sản phẩm]", Y: "Vintage[Ever 30 Plus Rate]" }
             color_strategy: semantic
-          - id: mob12_rank
+          - id: definition_sensitivity
             region: rank
             kind: tableEx
-            purpose: "Tai MOB 12 kenh nao xau nhat, va mau so bao nhieu hop dong?"
-            field_bindings: ["Dim Channel[Kênh]", "Vintage[Ever 30 Plus MOB12]", "Vintage[Vintage Loans MOB12]"]
+            purpose: "Vi sao doi dinh nghia qua han? Hai dinh nghia cho ket qua khac nhau the nao?"
+            field_bindings: ["Dim Product[Sản phẩm]", "Vintage[Ever 30 Plus MOB12]", "Vintage[Ever 30 Plus MOB12 No Threshold]", "Vintage[Vintage Loans MOB12]"]
             sort_policy: value_desc
             color_strategy: none
             insight_basis: >-
-              Cot mau so Vintage Loans MOB12 ghim cung mob = 12 voi tu so, dung
-              bai hoc cua loi cu: moi ty le ghim ngu canh can mot mau so ghim
-              cung ngu canh dat ngay canh.
+              Cung mau so tai MOB 12, hai tu so: SK_DPD_DEF (chinh) va SK_DPD (khong
+              ap nguong). Thu hang san pham dao chieu giua hai cot.
         space_audit:
           content_cell_count: 96
           placed_cell_count: 96
@@ -634,8 +668,8 @@ Design Brief:
             sort_policy: natural_order
             color_strategy: none
             insight_basis: >-
-              Mau so Roll Base Loans dat canh Cure Rate de thay ngay cure 7,0%
-              cua B3 chi dua tren 7.172 luot, khac han 259.546 luot cua B1.
+              Mau so Roll Base Loans dat canh Cure Rate de thay ngay cure cua B3
+              chi dua tren vai tram luot, khac han gan hai tram nghin luot cua B1.
         space_audit:
           content_cell_count: 96
           placed_cell_count: 96

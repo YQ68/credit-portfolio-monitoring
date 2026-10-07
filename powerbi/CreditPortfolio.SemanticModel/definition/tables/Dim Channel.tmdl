@@ -1,29 +1,26 @@
-/// Danh mục kênh bán dùng chung. Slicer nên lấy từ bảng này để lọc đồng thời cả bốn bảng mart.
+/// Danh mục kênh bán dùng chung. Slicer nên lấy từ bảng này để lọc đồng thời cả năm bảng mart.
 table 'Dim Channel'
-	lineageTag: c3b7c913-5433-42fd-b0d5-58c95e11c477
 
-	/// Danh mục kênh bán dùng chung. Slicer nên lấy từ bảng này để lọc đồng thời cả bốn bảng mart.
-	column Kênh
+	/// Danh mục kênh bán dùng chung. Slicer nên lấy từ bảng này để lọc đồng thời cả năm bảng mart.
+	column 'Kênh'
 		dataType: string
-		lineageTag: af34c8d6-4d89-4cc5-9099-3f4184feacf7
 		summarizeBy: none
 		sourceColumn: Kênh
 
 	partition 'Dim Channel' = m
 		mode: import
 		source =
-				let
-					// Gom giá trị từ cả bốn bảng mart để không thiếu giá trị nào chỉ có ở một bảng
-					#"Đã gộp giá trị từ bốn bảng mart" = Table.Combine({
-						Table.SelectColumns(Funnel, {"channel_type"}),
-						Table.SelectColumns(FPD, {"channel_type"}),
-						Table.SelectColumns(Vintage, {"channel_type"}),
-						Table.SelectColumns(RollRate, {"channel_type"}),
-						Table.SelectColumns(Snapshot, {"channel_type"})
-					}),
-					#"Đã bỏ giá trị trùng" = Table.Distinct(#"Đã gộp giá trị từ bốn bảng mart"),
-					#"Đã sắp xếp theo thứ tự chữ cái" = Table.Sort(#"Đã bỏ giá trị trùng", {{"channel_type", Order.Ascending}}),
-					#"Đã đổi tên cột cho dễ đọc" = Table.RenameColumns(#"Đã sắp xếp theo thứ tự chữ cái", {{"channel_type", "Kênh"}})
-				in
-					#"Đã đổi tên cột cho dễ đọc"
-
+			let
+				// Gom giá trị từ cả năm bảng mart để không thiếu giá trị nào chỉ có ở một bảng
+				#"Đã gộp giá trị từ năm bảng mart" = Table.Combine({
+					Table.SelectColumns(Funnel, {"channel_type"}),
+					Table.SelectColumns(FPD, {"channel_type"}),
+					Table.SelectColumns(Vintage, {"channel_type"}),
+					Table.SelectColumns(RollRate, {"channel_type"}),
+					Table.SelectColumns(Snapshot, {"channel_type"})
+				}),
+				#"Đã bỏ giá trị trùng" = Table.Distinct(#"Đã gộp giá trị từ năm bảng mart"),
+				#"Đã sắp xếp theo thứ tự chữ cái" = Table.Sort(#"Đã bỏ giá trị trùng", {{"channel_type", Order.Ascending}}),
+				#"Đã đổi tên cột cho dễ đọc" = Table.RenameColumns(#"Đã sắp xếp theo thứ tự chữ cái", {{"channel_type", "Kênh"}})
+			in
+				#"Đã đổi tên cột cho dễ đọc"

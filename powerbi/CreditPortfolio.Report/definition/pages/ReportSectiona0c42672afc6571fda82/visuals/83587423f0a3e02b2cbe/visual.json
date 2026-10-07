@@ -42,7 +42,22 @@
               },
               "queryRef": "Snapshot.Open Loans",
               "nativeQueryRef": "Open Loans",
-              "displayName": "Số hợp đồng mở"
+              "displayName": "Hợp đồng mở"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Snapshot"
+                    }
+                  },
+                  "Property": "Loans 30+"
+                }
+              },
+              "queryRef": "Snapshot.Loans 30+",
+              "nativeQueryRef": "Loans 30+",
+              "displayName": "Số 30+"
             },
             {
               "field": {
@@ -57,7 +72,7 @@
               },
               "queryRef": "Snapshot.Rate 30+ Coincident",
               "nativeQueryRef": "Rate 30+ Coincident",
-              "displayName": "Tỷ lệ 30+ hiện tại"
+              "displayName": "Tỷ lệ 30+"
             }
           ]
         }
@@ -240,7 +255,7 @@
             "rowPadding": {
               "expr": {
                 "Literal": {
-                  "Value": "2D"
+                  "Value": "0D"
                 }
               }
             }
@@ -328,7 +343,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Bảng quy mô và tỷ lệ quá hạn 30+ theo loại sản phẩm, sắp xếp giảm dần theo tỷ lệ.'"
+                  "Value": "'Bảng số hợp đồng mở, số hợp đồng 30+ và tỷ lệ 30+ theo loại sản phẩm, gồm cả nhóm (không rõ), sắp xếp giảm dần theo tỷ lệ.'"
                 }
               }
             }
@@ -348,7 +363,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tỷ lệ 30+ theo loại sản phẩm'"
+                  "Value": "'Vay tiền mặt gánh 113 trên 159 ca 30+ đang mở, tỷ lệ 0,256% [0,213; 0,308]'"
                 }
               }
             },
@@ -360,6 +375,13 @@
                       "Value": "'#0F172A'"
                     }
                   }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }

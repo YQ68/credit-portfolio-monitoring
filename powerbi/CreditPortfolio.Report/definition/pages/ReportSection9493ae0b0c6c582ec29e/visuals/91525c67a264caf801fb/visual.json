@@ -3,10 +3,10 @@
   "name": "91525c67a264caf801fb",
   "position": {
     "x": 24,
-    "y": 632,
+    "y": 624,
     "z": 900,
     "width": 1232,
-    "height": 48,
+    "height": 88,
     "tabOrder": 900
   },
   "visual": {
@@ -22,16 +22,16 @@
                     "value": "LƯU Ý   ",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
-                      "fontSize": "9pt",
+                      "fontSize": "8pt",
                       "color": "#D4A30A",
                       "fontWeight": "bold"
                     }
                   },
                   {
-                    "value": "Mẫu số vintage đã loại hợp đồng có cờ is_partial_history. Đuôi MOB cao duỗi dần vì số hợp đồng quan sát đủ giảm đi, không phải vì rủi ro dừng lại, nên đọc kèm cột mẫu số tại MOB 12. Ba visual đã lọc bỏ nhóm (không rõ), nhóm có tỷ lệ 6,72% và sẽ kéo lệch thang trục dùng chung.",
+                    "value": "Mẫu số: hợp đồng đã biết kết quả đến MOB n, loại is_partial_history; tại MOB 24 chỉ 70.635 hợp đồng (9,2%) quan sát đủ. Đợt mở = nhóm 12 tháng của tháng mở hợp đồng, tính tương đối so với ngày nộp hồ sơ hiện tại của từng khách, không phải tháng lịch; đường theo đợt chỉ vẽ MOB mà cả đợt đã đủ tuổi. Không phân biệt được chất lượng giải ngân cải thiện thật với chọn lọc mẫu (khách vừa quá hạn gần đây ít có hồ sơ mới). Kiểm soát đợt mở là hậu nghiệm; tỷ số thẻ / vay tiền mặt qua ba cách cắt đợt từ 2,29 đến 2,75. Nhóm (không rõ) có 2.083 hợp đồng tại MOB 12 nhưng tỷ lệ 5,089% và gánh 106 trên 425 ca; vintage của nhóm chỉ dựa trên 2.605 hợp đồng, và nếu hợp đồng dừng sớm của nhóm được coi là đã đóng như nhóm có hồ sơ thì tỷ lệ là 4,35%. Hai biểu đồ đường loại nhóm này để không kéo lệch thang chung, bảng bên phải giữ lại. Toàn danh mục 0,052%, không gồm nhóm này 0,039%.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "9pt",
+                      "fontSize": "8pt",
                       "color": "#5C5349"
                     }
                   }

@@ -47,7 +47,7 @@
               },
               "queryRef": "Snapshot.Open Loans",
               "nativeQueryRef": "Open Loans",
-              "displayName": "Số hợp đồng mở"
+              "displayName": "Hợp đồng mở"
             }
           ]
         }
@@ -62,176 +62,12 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#C2B9AC'"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "properties": {
-            "fill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#C2B9AC'"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "data": [
-              {
-                "scopeId": {
-                  "Comparison": {
-                    "ComparisonKind": 0,
-                    "Left": {
-                      "Column": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Entity": "Snapshot"
-                          }
-                        },
-                        "Property": "dpd_bucket"
-                      }
-                    },
-                    "Right": {
-                      "Literal": {
-                        "Value": "'B0 Current'"
-                      }
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        },
-        {
-          "properties": {
-            "fill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
                       "Value": "'#938A7F'"
                     }
                   }
                 }
               }
             }
-          },
-          "selector": {
-            "data": [
-              {
-                "scopeId": {
-                  "Comparison": {
-                    "ComparisonKind": 0,
-                    "Left": {
-                      "Column": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Entity": "Snapshot"
-                          }
-                        },
-                        "Property": "dpd_bucket"
-                      }
-                    },
-                    "Right": {
-                      "Literal": {
-                        "Value": "'B1 1-30'"
-                      }
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        },
-        {
-          "properties": {
-            "fill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#5C5349'"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "data": [
-              {
-                "scopeId": {
-                  "Comparison": {
-                    "ComparisonKind": 0,
-                    "Left": {
-                      "Column": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Entity": "Snapshot"
-                          }
-                        },
-                        "Property": "dpd_bucket"
-                      }
-                    },
-                    "Right": {
-                      "Literal": {
-                        "Value": "'B2 31-60'"
-                      }
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        },
-        {
-          "properties": {
-            "fill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#0F172A'"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "data": [
-              {
-                "scopeId": {
-                  "Comparison": {
-                    "ComparisonKind": 0,
-                    "Left": {
-                      "Column": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Entity": "Snapshot"
-                          }
-                        },
-                        "Property": "dpd_bucket"
-                      }
-                    },
-                    "Right": {
-                      "Literal": {
-                        "Value": "'B3 61-90'"
-                      }
-                    }
-                  }
-                }
-              }
-            ]
           }
         },
         {
@@ -266,7 +102,7 @@
                     },
                     "Right": {
                       "Literal": {
-                        "Value": "'B4 90+'"
+                        "Value": "'B1 1-30'"
                       }
                     }
                   }
@@ -519,7 +355,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Biểu đồ thanh cơ cấu danh mục theo nhóm quá hạn: B0 Current 142.474 hợp đồng, B1 1.362, B2 89, B3 58, B4 438. Nhóm B4 90+ được tô mustard.'"
+                  "Value": "'Biểu đồ thanh số hợp đồng ở phần đuôi quá hạn B1 đến B4 (đã bỏ B0 Current để phần đuôi đọc được). Nhóm B1 1-30 lớn nhất và được tô mustard.'"
                 }
               }
             }
@@ -539,7 +375,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'B4 90+ đông gấp ba lần B2 và B3 gộp'"
+                  "Value": "'Đuôi quá hạn chủ yếu là B1 1-30: 997 hợp đồng, so với 159 từ B2 trở lên'"
                 }
               }
             },
@@ -551,6 +387,13 @@
                       "Value": "'#0F172A'"
                     }
                   }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }
@@ -571,5 +414,67 @@
         }
       ]
     }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "Filter9152ecdaec88b2ac6aeb3419",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Snapshot"
+              }
+            },
+            "Property": "dpd_bucket"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "f",
+              "Entity": "Snapshot",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Not": {
+                  "Expression": {
+                    "In": {
+                      "Expressions": [
+                        {
+                          "Column": {
+                            "Expression": {
+                              "SourceRef": {
+                                "Source": "f"
+                              }
+                            },
+                            "Property": "dpd_bucket"
+                          }
+                        }
+                      ],
+                      "Values": [
+                        [
+                          {
+                            "Literal": {
+                              "Value": "'B0 Current'"
+                            }
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "User"
+      }
+    ]
   }
 }

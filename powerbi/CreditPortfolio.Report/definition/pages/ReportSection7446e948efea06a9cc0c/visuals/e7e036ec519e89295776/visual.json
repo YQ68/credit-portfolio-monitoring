@@ -10,7 +10,7 @@
     "tabOrder": 1100
   },
   "visual": {
-    "visualType": "clusteredBarChart",
+    "visualType": "barChart",
     "query": {
       "queryState": {
         "Category": {
@@ -41,12 +41,27 @@
                       "Entity": "Vintage"
                     }
                   },
-                  "Property": "Ever 30 Plus MOB12"
+                  "Property": "Highlight Ever 30 Plus MOB12"
                 }
               },
-              "queryRef": "Vintage.Ever 30 Plus MOB12",
-              "nativeQueryRef": "Ever 30 Plus MOB12",
-              "displayName": "Từng 30+ tại MOB 12"
+              "queryRef": "Vintage.Highlight Ever 30 Plus MOB12",
+              "nativeQueryRef": "Highlight Ever 30 Plus MOB12",
+              "displayName": "Contact center và Stone"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Vintage"
+                    }
+                  },
+                  "Property": "Base Ever 30 Plus MOB12"
+                }
+              },
+              "queryRef": "Vintage.Base Ever 30 Plus MOB12",
+              "nativeQueryRef": "Base Ever 30 Plus MOB12",
+              "displayName": "Kênh khác"
             }
           ]
         },
@@ -68,43 +83,10 @@
             }
           ]
         }
-      },
-      "sortDefinition": {
-        "sort": [
-          {
-            "field": {
-              "Measure": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "Vintage"
-                  }
-                },
-                "Property": "Ever 30 Plus MOB12"
-              }
-            },
-            "direction": "Descending"
-          }
-        ],
-        "isDefaultSort": true
       }
     },
     "objects": {
       "dataPoint": [
-        {
-          "properties": {
-            "defaultColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#938A7F'"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
         {
           "properties": {
             "fill": {
@@ -120,30 +102,25 @@
             }
           },
           "selector": {
-            "data": [
-              {
-                "scopeId": {
-                  "Comparison": {
-                    "ComparisonKind": 0,
-                    "Left": {
-                      "Column": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Entity": "Dim Channel"
-                          }
-                        },
-                        "Property": "Kênh"
-                      }
-                    },
-                    "Right": {
-                      "Literal": {
-                        "Value": "'Stone'"
-                      }
+            "metadata": "Vintage.Highlight Ever 30 Plus MOB12"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#938A7F'"
                     }
                   }
                 }
               }
-            ]
+            }
+          },
+          "selector": {
+            "metadata": "Vintage.Base Ever 30 Plus MOB12"
           }
         }
       ],
@@ -344,6 +321,51 @@
           }
         }
       ],
+      "labels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0F172A'"
+                    }
+                  }
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
       "legend": [
         {
           "properties": {
@@ -438,7 +460,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Ba ô nhỏ, mỗi ô một loại sản phẩm, dùng chung thang trục giá trị. Trong vay tiêu dùng trả góp, Stone 1,07% so với Regional / Local 0,53%; trong vay tiền mặt, Country-wide 0,44% so với Credit and cash offices 0,10%.'"
+                  "Value": "'Ba ô nhỏ, mỗi ô một loại sản phẩm, dùng chung thang trục giá trị: tỷ lệ từng 30+ tại MOB 12 theo kênh. Contact center và Stone được tô mustard; chênh lệch lớn nhất nằm ở thẻ quay vòng.'"
                 }
               }
             }
@@ -458,7 +480,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Cùng một sản phẩm, cùng một thang: khoảng cách co lại'"
+                  "Value": "'Trong thẻ, Contact center 0,507% và Stone 0,529% so với Credit and cash offices 0,026% tại MOB 12, nhưng 77,2% thẻ của kênh sau mở từ -35 trở về sau, Contact center chỉ 21,1%'"
                 }
               }
             },
@@ -470,6 +492,13 @@
                       "Value": "'#0F172A'"
                     }
                   }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }
@@ -538,6 +567,71 @@
                           {
                             "Literal": {
                               "Value": "'(không rõ)'"
+                            }
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "User"
+      },
+      {
+        "name": "Filter297f5148e18c311b86b27c50",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Dim Channel"
+              }
+            },
+            "Property": "Kênh"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "f",
+              "Entity": "Dim Channel",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Not": {
+                  "Expression": {
+                    "In": {
+                      "Expressions": [
+                        {
+                          "Column": {
+                            "Expression": {
+                              "SourceRef": {
+                                "Source": "f"
+                              }
+                            },
+                            "Property": "Kênh"
+                          }
+                        }
+                      ],
+                      "Values": [
+                        [
+                          {
+                            "Literal": {
+                              "Value": "'(không rõ)'"
+                            }
+                          }
+                        ],
+                        [
+                          {
+                            "Literal": {
+                              "Value": "'Khác'"
                             }
                           }
                         ]
