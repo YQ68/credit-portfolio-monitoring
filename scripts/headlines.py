@@ -327,9 +327,7 @@ def page2(f):
 
     T = Text()
     trellis = T.done(
-        f"Trong thẻ, Contact center {T.pct(cell('Revolving loans', 'Contact center')('rate'), 3)} và Stone "
-        f"{T.pct(cell('Revolving loans', 'Stone')('rate'), 3)} so với Credit and cash offices "
-        f"{T.pct(cell('Revolving loans', 'Credit and cash offices')('rate'), 3)} tại MOB 12, nhưng "
+        "Trong thẻ, tỷ lệ thô tại MOB 12 của Contact center và Stone cao hơn Credit and cash offices, nhưng "
         f"{T.pct(mix_cco('share_of_channel_product'), 1)} thẻ của kênh sau mở từ -35 trở về sau, "
         f"Contact center chỉ {T.pct(mix_cc('share_of_channel_product'), 1)}")
 

@@ -93,6 +93,7 @@ HL_P4_FROM = "B1 1-30"                         # nhóm còn cửa sổ thu hồi
 
 OTHER_CHANNEL = "Khác"  # nhóm kênh gộp, mẫu số nhỏ
 SMALL_N = 1000  # ngưỡng diễn giải của project (findings.json meta.min_n_to_interpret)
+FEW_K = 5       # tử số dưới ngưỡng này: đẩy xuống cuối bảng SMR, quá ít ca
 THIN_K = 10     # tử số dưới ngưỡng này: tỷ số không kết luận được (theo A1, mục 9)
 
 
@@ -686,7 +687,7 @@ def page2(data, F, H):
     # vòng rỗng là SMR chỉ chuẩn hoá theo sản phẩm. Kênh có tử số dưới 10 ghi mờ.
     smr_sc = F["origination_cohort"]["mob12"]["smr_by_channel"]
     sx_rows = sorted((r for r in smr_sc["product_x_cut12"]["primary"] if r["channel_type"] != UNKNOWN),
-                     key=lambda r: -r["smr"])
+                     key=lambda r: (r["observed"] < FEW_K, -r["smr"]))
     sp_by = by(smr_sc["product_only"]["primary"], "channel_type")
     s_items = []
     for pr in sx_rows:

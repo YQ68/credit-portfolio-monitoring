@@ -110,6 +110,9 @@ table Vintage
 	measure 'SMR MOB12 Cohort' = DIVIDE([Ever 30 Plus Loans MOB12], [Expected 30 Plus MOB12 Cohort])
 		formatString: 0.00
 
+	/// Ghi chú cho kênh có dưới 5 ca quan sát tại MOB 12. Dùng làm khoá sắp đầu tiên của bảng SMR để kênh quá ít ca xuống cuối.
+	measure 'SMR MOB12 Few Cases Note' = IF([Ever 30 Plus Loans MOB12] < 5, "quá ít ca")
+
 	/// Cận dưới khoảng tin cậy 95% của [SMR MOB12 Cohort], xấp xỉ Byar.
 	measure 'SMR MOB12 Cohort CI Low' = ```
 			VAR O = [Ever 30 Plus Loans MOB12]

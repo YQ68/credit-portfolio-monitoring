@@ -118,12 +118,40 @@
               "queryRef": "Vintage.SMR MOB12 Cohort CI High",
               "nativeQueryRef": "SMR MOB12 Cohort CI High",
               "displayName": "Cận trên"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Vintage"
+                    }
+                  },
+                  "Property": "SMR MOB12 Few Cases Note"
+                }
+              },
+              "queryRef": "Vintage.SMR MOB12 Few Cases Note",
+              "nativeQueryRef": "SMR MOB12 Few Cases Note",
+              "displayName": "Ghi chú"
             }
           ]
         }
       },
       "sortDefinition": {
         "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Vintage"
+                  }
+                },
+                "Property": "SMR MOB12 Few Cases Note"
+              }
+            },
+            "direction": "Ascending"
+          },
           {
             "field": {
               "Measure": {
@@ -401,7 +429,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Bảng SMR theo kênh tại MOB 12: số ca quan sát, SMR chỉ chuẩn hoá theo sản phẩm, số ca kỳ vọng và SMR khi chuẩn hoá theo sản phẩm × đợt mở 12 tháng kèm khoảng tin cậy 95%, sắp giảm dần theo SMR sản phẩm × đợt.'"
+                  "Value": "'Bảng SMR theo kênh tại MOB 12: số ca quan sát, SMR chỉ chuẩn hoá theo sản phẩm, số ca kỳ vọng và SMR khi chuẩn hoá theo sản phẩm × đợt mở 12 tháng kèm khoảng tin cậy 95%, sắp giảm dần theo SMR sản phẩm × đợt; kênh dưới 5 ca quan sát xếp cuối, ghi chú quá ít ca, không kết luận.'"
                 }
               }
             }

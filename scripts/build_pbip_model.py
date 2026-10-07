@@ -109,7 +109,8 @@ def measure(name, dax, fmt, desc):
         for ln in lines:
             s += "\t\t\t{}\n".format(ln)
         s += "\t\t\t```\n"
-    s += "\t\tformatString: {}\n".format(fmt)
+    if fmt is not None:
+        s += "\t\tformatString: {}\n".format(fmt)
     return s + "\n"
 
 
@@ -325,6 +326,8 @@ SUMX(
                 "Số ca KỲ VỌNG (E) tại MOB 12 nếu kênh có tỷ lệ của từng tầng sản phẩm × đợt mở 12 tháng trên toàn danh mục.\nKhớp origination_cohort.mob12.smr_by_channel.product_x_cut12.primary[].expected trong findings.json.")
       + measure("SMR MOB12 Cohort", "DIVIDE([Ever 30 Plus Loans MOB12], [Expected 30 Plus MOB12 Cohort])", RATIO,
                 "SMR kiểm soát cả sản phẩm lẫn đợt mở = O / E theo tầng sản phẩm × đợt. Tử số dưới 10 thì không kết luận.")
+      + measure("SMR MOB12 Few Cases Note", 'IF([Ever 30 Plus Loans MOB12] < 5, "quá ít ca")', None,
+                "Ghi chú cho kênh có dưới 5 ca quan sát tại MOB 12. Dùng làm khoá sắp đầu tiên của bảng SMR để kênh quá ít ca xuống cuối.")
       + measure("SMR MOB12 Cohort CI Low", """
 VAR O = [Ever 30 Plus Loans MOB12]
 VAR E = [Expected 30 Plus MOB12 Cohort]

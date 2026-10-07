@@ -712,12 +712,16 @@ v2.append(data_table(
                 ("Vintage", "Expected 30 Plus MOB12 Cohort", "meas", "Kỳ vọng SP × đợt"),
                 ("Vintage", "SMR MOB12 Cohort", "meas", "SMR SP × đợt"),
                 ("Vintage", "SMR MOB12 Cohort CI Low", "meas", "Cận dưới"),
-                ("Vintage", "SMR MOB12 Cohort CI High", "meas", "Cận trên")]},
+                ("Vintage", "SMR MOB12 Cohort CI High", "meas", "Cận trên"),
+                ("Vintage", "SMR MOB12 Few Cases Note", "meas", "Ghi chú")]},
     1200, V2["smr"],
     "Bảng SMR theo kênh tại MOB 12: số ca quan sát, SMR chỉ chuẩn hoá theo sản phẩm, số ca kỳ vọng "
     "và SMR khi chuẩn hoá theo sản phẩm × đợt mở 12 tháng kèm khoảng tin cậy 95%, sắp giảm dần theo "
-    "SMR sản phẩm × đợt.",
-    sort=sort_by_measure("Vintage", "SMR MOB12 Cohort"),
+    "SMR sản phẩm × đợt; kênh dưới 5 ca quan sát xếp cuối, ghi chú quá ít ca, không kết luận.",
+    # Khoá 1: ghi chú tăng dần (trống trước, kênh dưới 5 ca xuống cuối); khoá 2: SMR giảm dần.
+    sort={"sort": [{"field": fmeas("Vintage", "SMR MOB12 Few Cases Note"), "direction": "Ascending"},
+                   {"field": fmeas("Vintage", "SMR MOB12 Cohort"), "direction": "Descending"}],
+          "isDefaultSort": True},
     filters=[exclude("Dim Channel", "Kênh", UNKNOWN, p2 + "|smr")],
     row_pad=0, size=8, totals=False, title_size=11))
 
